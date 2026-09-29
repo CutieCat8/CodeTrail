@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { lessons } from "../src/content/lessons";
 import { emptyData } from "../src/lib/storage";
 import { recommendation } from "../src/lib/recommendation";
+import { learningSteps, topicSources } from "../src/content/curriculum";
 
 describe("curriculum", () => {
   it("ships 12 full-stack and 10 Java lessons", () => {
@@ -18,6 +19,24 @@ describe("curriculum", () => {
       expect(lesson.starterCode.trim().length).toBeGreaterThan(10);
       expect(lesson.solution.trim().length).toBeGreaterThan(10);
       expect(lesson.hints).toHaveLength(3);
+    }
+  });
+});
+
+describe("zero-beginner micro curriculum", () => {
+  it("ships five distinct interactions for every authored topic", () => {
+    expect(topicSources.length).toBeGreaterThanOrEqual(40);
+    expect(learningSteps).toHaveLength(topicSources.length * 5);
+    for (const topic of topicSources) {
+      const kinds = learningSteps.filter((step) => step.topicId === topic.id).map((step) => step.kind);
+      expect(kinds).toEqual(["concept", "trace", "practice", "debug", "checkpoint"]);
+    }
+  });
+
+  it("does not count empty roadmap items as live steps", () => {
+    for (const step of learningSteps) {
+      expect(step.body.join(" ").length).toBeGreaterThan(40);
+      expect(step.objective.length).toBeGreaterThan(20);
     }
   });
 });

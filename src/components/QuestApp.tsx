@@ -120,7 +120,7 @@ function ModeSwitch({ data, setData }: { data: AppData; setData: React.Dispatch<
 }
 
 function Dashboard({ data, setData, openLesson, openStep }: { data: AppData; setData: React.Dispatch<React.SetStateAction<AppData>>; openLesson: (id: string) => void; openStep: (id:string)=>void }) {
-  const rec = recommendation(data); const stepRec=stepRecommendation(data); const passed = Object.values(data.progress).filter((p) => p.status === "passed").length; const stepPassed=Object.values(data.stepProgress).filter(p=>p.completed).length; const streak = calculateStreak(data);
+  const stepRec=stepRecommendation(data); const passed = Object.values(data.progress).filter((p) => p.status === "passed").length; const stepPassed=Object.values(data.stepProgress).filter(p=>p.completed).length; const streak = calculateStreak(data);
   const last = data.lastLessonId ? lessonById(data.lastLessonId) : undefined;
   const lastStep = data.lastStepId ? stepById(data.lastStepId) : undefined;
   const recent = Object.values(data.progress).sort((a,b) => b.updatedAt.localeCompare(a.updatedAt))[0];

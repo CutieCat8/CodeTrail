@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { ArrowRight, Check, CircleDot, Code2, Database, GitBranch, LockKeyhole, Route, Server, ShieldCheck } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ArrowDown, ArrowRight, Check, CircleDot, Code2, Database, GitBranch, LockKeyhole, Route, Server, ShieldCheck, X } from "lucide-react";
 import { fullstackRoadmap, laneLabels, type RoadmapLane, type RoadmapNode } from "@/content/fullstack-roadmap";
 import { learningSteps } from "@/content/curriculum";
 import { lessons } from "@/content/lessons";
@@ -12,6 +12,8 @@ type Props = {
   openStep: (id: string) => void;
   openLesson: (id: string) => void;
 };
+
+type NodeEvidence = ReturnType<typeof evidenceFor>;
 
 const laneIcons = {
   core: Route,
@@ -34,18 +36,51 @@ function evidenceFor(node: RoadmapNode, data: AppData) {
   return { steps, relatedLessons, total, done, status } as const;
 }
 
+function statusLabel(evidence: NodeEvidence) {
+  if (evidence.status === "passed") return "ผ่านครบ";
+  if (evidence.status === "active") return "กำลังทำ";
+  if (evidence.status === "ready") return "พร้อมเรียน";
+  return "วางแผนไว้";
+}
+
+function partitionNodes(nodes: RoadmapNode[]) {
+  const left: RoadmapNode[] = [];
+  const right: RoadmapNode[] = [];
+  for (const node of nodes) {
+    if (node.lane === "frontend" || node.lane === "data") left.push(node);
+    else if (node.lane === "backend" || node.lane === "quality" || node.lane === "java") right.push(node);
+    else (left.length <= right.length ? left : right).push(node);
+  }
+  return { left, right };
+}
+
 export function FullStackRoadmap({ data, openStep, openLesson }: Props) {
   const [lane, setLane] = useState<RoadmapLane | "all">("all");
-  const [selectedId, setSelectedId] = useState(fullstackRoadmap[0].nodes[0].id);
+  const [selectedId, setSelectedId] = useState<string>();
   const allNodes = useMemo(() => fullstackRoadmap.flatMap((stage) => stage.nodes), []);
-  const selected = allNodes.find((node) => node.id === selectedId) ?? allNodes[0];
-  const selectedEvidence = evidenceFor(selected, data);
+  const selected = allNodes.find((node) => node.id === selectedId);
+  const selectedEvidence = selected ? evidenceFor(selected, data) : undefined;
   const visibleStages = fullstackRoadmap
     .map((stage) => ({ ...stage, nodes: stage.nodes.filter((node) => lane === "all" || node.lane === lane) }))
     .filter((stage) => stage.nodes.length);
   const passed = allNodes.filter((node) => evidenceFor(node, data).status === "passed").length;
   const active = allNodes.filter((node) => evidenceFor(node, data).status === "active").length;
   const available = allNodes.filter((node) => evidenceFor(node, data).total > 0).length;
+
+  useEffect(() => {
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") setSelectedId(undefined);
+    }
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, []);
+
+  useEffect(() => {
+    if (!selectedId) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = previousOverflow; };
+  }, [selectedId]);
 
   function startNode(node: RoadmapNode) {
     const evidence = evidenceFor(node, data);
@@ -55,65 +90,87 @@ export function FullStackRoadmap({ data, openStep, openLesson }: Props) {
     if (nextLesson) openLesson(nextLesson.id);
   }
 
+  function renderNode(node: RoadmapNode, side: "left" | "right") {
+    const Icon = laneIcons[node.lane];
+    const evidence = evidenceFor(node, data);
+    return (
+      <button key={node.id} className={`quest-map-node ${node.lane} ${evidence.status} ${side}`} aria-label={`${node.title} — ${statusLabel(evidence)}`} onClick={() => setSelectedId(node.id)}>
+        <span className="quest-node-topline">
+          <span className="quest-node-lane"><Icon aria-hidden="true"/>{laneLabels[node.lane]}</span>
+          <span className="quest-node-status">{evidence.status === "passed" && <Check aria-hidden="true"/>}{statusLabel(evidence)}</span>
+        </span>
+        <strong>{node.title}</strong>
+        <span className="quest-node-description">{node.description}</span>
+        <span className="quest-node-foot">
+          <span>{node.optional ? "เลือกเรียน" : "เส้นทางหลัก"}</span>
+          <span>{evidence.total ? `${evidence.done}/${evidence.total} หลักฐาน` : "รอเนื้อหาเต็ม"}</span>
+        </span>
+        {evidence.total > 0 && <span className="quest-node-progress" aria-hidden="true"><i style={{ width: `${evidence.done / evidence.total * 100}%` }}/></span>}
+      </button>
+    );
+  }
+
   return (
-    <div className="page roadmap-page">
-      <div className="page-heading roadmap-heading">
+    <div className="page quest-map-page">
+      <header className="quest-map-hero">
         <div>
           <span className="eyebrow">SEA’S PERSONAL FULL-STACK ROUTE</span>
-          <h1>Roadmap จากพื้นฐานถึงส่งระบบจริง</h1>
-          <p>แผนภาพนี้ตอบว่า “ต้องเรียนอะไร ก่อน–หลัง และเพราะอะไร” ส่วนคอร์สและ Lab คือพื้นที่ลงมือทำ สถานะทุก node มาจากหลักฐานที่บันทึกจริง</p>
+          <h1>จากศูนย์ สู่การส่งระบบจริง</h1>
+          <p>ไล่ตามแกนกลางทีละด่าน แล้วแตกแขนงไปฝึก Front-end, Back-end, Database และ Java ทุกสถานะอิงจากงานที่ซีบันทึกจริง</p>
         </div>
-        <div className="roadmap-summary" aria-label="สรุปความคืบหน้า roadmap">
-          <span><strong>{passed}</strong> ผ่านครบ</span>
-          <span><strong>{active}</strong> กำลังสำรวจ</span>
-          <span><strong>{available}</strong> มีบทเรียนแล้ว</span>
+        <div className="quest-map-stats" aria-label="สรุปความคืบหน้า roadmap">
+          <span><strong>{passed}</strong><small>ผ่านครบ</small></span>
+          <span><strong>{active}</strong><small>กำลังสำรวจ</small></span>
+          <span><strong>{available}</strong><small>มีบทเรียนแล้ว</small></span>
         </div>
-      </div>
+      </header>
 
-      <div className="roadmap-legend">
-        <div className="segmented" aria-label="กรองสายทักษะ">
-          <button aria-pressed={lane === "all"} onClick={() => setLane("all")}>ทั้งหมด</button>
+      <div className="quest-map-toolbar">
+        <div className="quest-map-filters" aria-label="กรองสายทักษะ">
+          <button aria-pressed={lane === "all"} onClick={() => setLane("all")}>ภาพรวม</button>
           {(Object.keys(laneLabels) as RoadmapLane[]).map((key) => <button key={key} aria-pressed={lane === key} onClick={() => setLane(key)}>{laneLabels[key]}</button>)}
         </div>
-        <p><i className="legend-dot ready"/>พร้อมเรียน <i className="legend-dot active"/>กำลังทำ <i className="legend-dot passed"/>ผ่านครบ <i className="legend-dot planned"/>วางแผนไว้</p>
+        <div className="quest-map-key" aria-label="คำอธิบายสถานะ"><span className="ready"/>พร้อมเรียน <span className="active"/>กำลังทำ <span className="passed"/>ผ่านครบ <span className="planned"/>วางแผนไว้</div>
       </div>
 
-      <div className="roadmap-layout">
-        <div className="roadmap-track">
-          {visibleStages.map((stage) => (
-            <section className="roadmap-stage" key={stage.id} aria-labelledby={`stage-${stage.id}`}>
-              <header>
-                <span>{stage.number}</span>
-                <div><h2 id={`stage-${stage.id}`}>{stage.title}</h2><p>{stage.outcome}</p></div>
-              </header>
-              <div className="roadmap-node-grid">
-                {stage.nodes.map((node) => {
-                  const Icon = laneIcons[node.lane];
-                  const evidence = evidenceFor(node, data);
-                  return <button key={node.id} className={`roadmap-node ${node.lane} ${evidence.status} ${selected.id === node.id ? "selected" : ""}`} aria-pressed={selected.id === node.id} onClick={() => setSelectedId(node.id)}>
-                    <span className="roadmap-node-icon">{evidence.status === "passed" ? <Check/> : evidence.status === "planned" ? <LockKeyhole/> : <Icon/>}</span>
-                    <span><small>{laneLabels[node.lane]}{node.optional ? " · เลือกเรียน" : ""}</small><strong>{node.title}</strong><em>{evidence.total ? `${evidence.done}/${evidence.total} หลักฐาน` : "วางแผนไว้"}</em></span>
-                    <ArrowRight aria-hidden="true"/>
-                  </button>;
-                })}
+      <main className="quest-map-journey">
+        <div className="quest-map-start"><CircleDot aria-hidden="true"/><span>START HERE</span></div>
+        {visibleStages.map((stage, stageIndex) => {
+          const { left, right } = partitionNodes(stage.nodes);
+          return (
+            <section className="quest-map-stage" key={stage.id} aria-labelledby={`quest-stage-${stage.id}`}>
+              <div className="quest-map-stage-heading">
+                <span className="quest-stage-number">{stage.number}</span>
+                <div><span>CHECKPOINT {stage.number}</span><h2 id={`quest-stage-${stage.id}`}>{stage.title}</h2><p>{stage.outcome}</p></div>
               </div>
+              <div className="quest-map-branches">
+                <div className="quest-map-column left">{left.map((node) => renderNode(node, "left"))}</div>
+                <div className="quest-map-spine"><i/><span>{stage.nodes.length}</span><i/></div>
+                <div className="quest-map-column right">{right.map((node) => renderNode(node, "right"))}</div>
+              </div>
+              {stageIndex < visibleStages.length - 1 && <div className="quest-map-next" aria-hidden="true"><ArrowDown/></div>}
             </section>
-          ))}
-        </div>
+          );
+        })}
+        <div className="quest-map-finish"><Check aria-hidden="true"/><span>BUILD · EXPLAIN · SHIP · IMPROVE</span></div>
+      </main>
 
-        <aside className={`roadmap-inspector ${selected.lane}`} aria-live="polite">
-          <div className="inspector-kicker"><CircleDot/> {laneLabels[selected.lane]}</div>
-          <h2>{selected.title}</h2>
-          <p>{selected.description}</p>
-          <dl>
-            <div><dt>ทำไมต้องเรียน</dt><dd>{selected.why}</dd></div>
-            <div><dt>หลักฐานที่ควรทำได้</dt><dd>{selected.evidence}</dd></div>
-            <div><dt>สถานะ</dt><dd>{selectedEvidence.status === "passed" ? "ผ่านหลักฐานครบแล้ว" : selectedEvidence.status === "active" ? `กำลังทำ · ${selectedEvidence.done}/${selectedEvidence.total}` : selectedEvidence.status === "ready" ? `พร้อมเรียน · ${selectedEvidence.total} หลักฐาน` : "วางแผนไว้—ยังไม่มีปุ่มเริ่ม"}</dd></div>
-          </dl>
-          {selectedEvidence.total > 0 ? <button className="primary inspector-action" onClick={() => startNode(selected)}>{selectedEvidence.status === "passed" ? "กลับไปทบทวน" : selectedEvidence.status === "active" ? "เรียนต่อ" : "เริ่มหัวข้อนี้"}<ArrowRight/></button> : <div className="inspector-planned"><LockKeyhole/><span>หัวข้อนี้แสดงให้เห็นภาพรวม แต่จะยังเปิดไม่ได้จนกว่าเนื้อหาและ feedback พร้อมจริง</span></div>}
-          <p className="roadmap-note">Roadmap ไม่ใช่ checklist ที่ต้องรีบติ๊กทุกช่อง เลือกแกนหลักก่อน แล้วใช้โปรเจกต์เป็นตัวบอกว่าควรย้อนเติมพื้นฐานตรงไหน</p>
+      {selected && selectedEvidence && <>
+        <button className="quest-drawer-backdrop" aria-label="ปิดรายละเอียดหัวข้อ" onClick={() => setSelectedId(undefined)}/>
+        <aside className={`quest-map-drawer ${selected.lane}`} role="dialog" aria-modal="true" aria-labelledby="quest-drawer-title">
+          <button autoFocus className="quest-drawer-close" onClick={() => setSelectedId(undefined)} aria-label="ปิดรายละเอียด"><X/></button>
+          <span className="quest-drawer-lane">{laneLabels[selected.lane]}{selected.optional ? " · เลือกเรียน" : " · เส้นทางหลัก"}</span>
+          <h2 id="quest-drawer-title">{selected.title}</h2>
+          <p className="quest-drawer-description">{selected.description}</p>
+          <div className={`quest-drawer-status ${selectedEvidence.status}`}><CircleDot/>{statusLabel(selectedEvidence)}{selectedEvidence.total > 0 && <span>{selectedEvidence.done}/{selectedEvidence.total} หลักฐาน</span>}</div>
+          <section><span>WHY IT MATTERS</span><h3>ทำไมต้องเรียน</h3><p>{selected.why}</p></section>
+          <section><span>PROOF OF WORK</span><h3>เมื่อเข้าใจแล้วควรทำอะไรได้</h3><p>{selected.evidence}</p></section>
+          {selectedEvidence.total > 0
+            ? <button className="primary quest-drawer-action" onClick={() => startNode(selected)}>{selectedEvidence.status === "passed" ? "กลับไปทบทวน" : selectedEvidence.status === "active" ? "เรียนต่อจากหลักฐานล่าสุด" : "เริ่มหัวข้อนี้"}<ArrowRight/></button>
+            : <div className="quest-drawer-planned"><LockKeyhole/><div><strong>ยังไม่เปิดให้เริ่ม</strong><p>จะแสดงในแผนที่เพื่อเห็นภาพรวม แต่จะไม่มีหน้าว่างจนกว่าเนื้อหาและ feedback พร้อมจริง</p></div></div>}
+          <p className="quest-drawer-note">Roadmap เป็นเข็มทิศ ไม่ใช่รายการที่ต้องรีบติ๊กทุกช่อง ใช้โปรเจกต์จริงบอกว่าควรย้อนเสริมพื้นฐานตรงไหน</p>
         </aside>
-      </div>
+      </>}
     </div>
   );
 }

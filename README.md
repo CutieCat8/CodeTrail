@@ -2,10 +2,11 @@
 
 แพลตฟอร์มฝึกเขียนโปรแกรมส่วนตัวสำหรับซี: นักศึกษา Digital Industry Integration ที่ต้องการพัฒนาเป็น Full-stack Developer โดยเน้น Back-end, system design, Java และ OOP
 
-## ขอบเขตเวอร์ชันแรก
+## ขอบเขตที่ใช้งานได้ในปัจจุบัน
 
-- บทเว็บเต็ม 12 บท เชื่อมเป็นบริบท **Friends Activity Planner**
-- บท Java เต็ม 10 บท ตั้งแต่ JDK/command line ถึง encapsulation และ composition
+- คอร์สจากพื้นฐาน **230 micro-steps**: Developer Foundations 40, Java Foundations 70, Java OOP 40, JavaScript Foundations 40 และ Node/HTTP Foundations 40
+- แต่ละหัวข้อฝึก 5 รอบ: อธิบายแนวคิด → trace/predict → ลงมือเขียน → debug → checkpoint
+- บทเว็บเต็ม 12 บทและ Java Lab 10 บททำหน้าที่เป็น labs ที่ประกอบหลายแนวคิด
 - โหมดภารกิจ Full-stack, Java & OOP และผสมสองเส้นทาง
 - โจทย์ตรวจอัตโนมัติ 3 ข้อ ทำงานใน Web Worker พร้อม timeout 1.5 วินาที
 - โจทย์เช็กลิสต์และ Java ที่ตรวจในเครื่องมากกว่า 3 ข้อ
@@ -39,6 +40,7 @@ npm test
 ## โครงสร้าง
 
 - `src/content/lessons.ts` — เนื้อหาบทและ challenge แบบ structured data
+- `src/content/curriculum/` — courses, topic sources และตัวสร้าง micro-steps สำหรับผู้เริ่มจากศูนย์
 - `src/types/domain.ts` — Course/Lesson/Challenge/Test/Attempt/Progress/Journal/Skill/Achievement model ในรูป TypeScript
 - `src/lib/storage.ts` — persistence, validation, streak (Asia/Bangkok), XP
 - `src/lib/recommendation.ts` — กฎภารกิจที่อธิบายเหตุผลได้
@@ -48,11 +50,13 @@ npm test
 
 ## เพิ่มบทเรียน
 
-1. เพิ่ม object ชนิด `Lesson` ใน `src/content/lessons.ts`
+Micro-step course: เพิ่ม `TopicSource` ในไฟล์ course ที่ `src/content/curriculum/` หนึ่ง topic ต้องมี explanation, runnable example, trace prompt/answer, starter/practice/solution, buggy example/fix และ vocabulary จากนั้น generator จะสร้าง learning cycle 5 แบบ
+
+Lab: เพิ่ม object ชนิด `Lesson` ใน `src/content/lessons.ts`
 2. ตั้ง `id` ไม่ซ้ำ, `track`, `module`, `order`, prerequisite และ skill IDs
 3. ใส่ objective, real-world reason, explanation, runnable example, mistakes, prompt, acceptance criteria, starter, hints 3 ระดับ, solution, reflection และ bonus
 4. เลือก `checkMode`: `auto`, `self` หรือ `local-java`
-5. รัน `npm test` เพื่อตรวจว่าไม่มี starter/solution ว่าง
+5. รัน `npm test` เพื่อตรวจว่าไม่มี starter/solution ว่าง และทุก topic มี interaction ครบ 5 แบบ
 
 ## เพิ่มโจทย์และ test cases
 

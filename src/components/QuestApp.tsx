@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Activity, BookOpen, Braces, Check, ChevronRight, CircleDot, Code2, Database, Download, FileText, FlaskConical, FolderGit2, Gauge, Import, LayoutDashboard, LockKeyhole, Map, Menu, NotebookPen, Play, Search, Settings, ShieldCheck, Sparkles, Target, Trophy, Upload, X } from "lucide-react";
+import { Activity, BookOpen, Braces, Check, ChevronRight, CircleDot, Code2, Download, FlaskConical, FolderGit2, Gauge, LayoutDashboard, LockKeyhole, Map, Menu, NotebookPen, Play, Search, Settings, ShieldCheck, Sparkles, Target, Trophy, Upload, X } from "lucide-react";
 import { lessons, lessonById, plannedJava } from "@/content/lessons";
 import { accessReason, recommendation } from "@/lib/recommendation";
 import { calculateStreak, emptyData, isAppData, loadData, newProgress, saveData, xpTotal } from "@/lib/storage";
@@ -45,10 +45,10 @@ function useQuestData() {
   const [ready, setReady] = useState(false);
   const [saveState, setSaveState] = useState<SaveState>("idle");
   const timer = useRef<number | null>(null);
-  useEffect(() => { setData(loadData()); setReady(true); }, []);
+  useEffect(() => { queueMicrotask(() => { setData(loadData()); setReady(true); }); }, []);
   useEffect(() => {
     if (!ready) return;
-    setSaveState("saving");
+    queueMicrotask(() => setSaveState("saving"));
     if (timer.current) window.clearTimeout(timer.current);
     timer.current = window.setTimeout(() => {
       try { saveData(data); setSaveState("saved"); }
@@ -76,8 +76,8 @@ export function QuestApp() {
     restoreRoute(); window.addEventListener("hashchange", restoreRoute);
     return () => window.removeEventListener("hashchange", restoreRoute);
   }, []);
-  const goView = (next: View) => { setView(next); setMobileNav(false); window.location.hash = next; window.scrollTo({ top: 0, behavior: "smooth" }); };
-  const openLesson = (id: string) => { setActiveLessonId(id); setView("lesson"); setMobileNav(false); window.location.hash = `lesson/${id}`; setData((d) => ({ ...d, lastLessonId: id })); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const goView = (next: View) => { setView(next); setMobileNav(false); window.history.pushState(null, "", `#${next}`); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const openLesson = (id: string) => { setActiveLessonId(id); setView("lesson"); setMobileNav(false); window.history.pushState(null, "", `#lesson/${id}`); setData((d) => ({ ...d, lastLessonId: id })); window.scrollTo({ top: 0, behavior: "smooth" }); };
   if (!ready) return <div className="loading-screen"><PixelCat /><p>กำลังเปิดสมุดภารกิจของซี…</p></div>;
   const completed = Object.values(data.progress).filter((p) => p.status === "passed").length;
   const rec = recommendation(data);

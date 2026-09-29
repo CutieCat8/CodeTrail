@@ -3,6 +3,7 @@ node_modules/
 out/
 coverage/
 *.log
+*.class
 .env*
 !.env.example
 qa-artifacts/

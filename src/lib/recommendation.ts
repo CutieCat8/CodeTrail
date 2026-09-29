@@ -1,5 +1,6 @@
 import { lessons } from "@/content/lessons";
 import type { AppData, Lesson } from "@/types/domain";
+import { curriculumCourses, learningSteps } from "@/content/curriculum";
 
 function eligible(data: AppData, lesson: Lesson) {
   if (data.mode === "fullstack" && lesson.track !== "web") return false;
@@ -31,4 +32,17 @@ export function accessReason(data: AppData, lesson: Lesson) {
   if (!missing.length) return "พร้อมเริ่มเรียน";
   const names = missing.map((id) => lessons.find((l) => l.id === id)?.title ?? id);
   return `แนะนำให้ผ่านก่อน: ${names.join(", ")} — แต่ซีข้ามเข้าเรียนได้`;
+}
+
+export function stepRecommendation(data: AppData) {
+  const courseOrder = data.mode === "java"
+    ? ["java-foundations", "java-oop"]
+    : data.mode === "fullstack"
+      ? ["developer-foundations", "javascript-foundations", "node-foundations"]
+      : ["developer-foundations", "java-foundations", "javascript-foundations", "java-oop", "node-foundations"];
+  const pool = courseOrder.flatMap((courseId) => learningSteps.filter((step) => step.courseId === courseId));
+  const step = pool.find((candidate) => !data.stepProgress[candidate.id]?.completed) ?? pool[0] ?? learningSteps[0];
+  const course = curriculumCourses.find((candidate) => candidate.id === step.courseId);
+  const started = data.stepProgress[step.id];
+  return { step, course, reason: started ? "กลับมาต่อจากคำตอบที่บันทึกไว้" : `เรียนตามลำดับพื้นฐานของ ${course?.title ?? "เส้นทางนี้"} โดยไม่ข้าม mental model` };
 }

@@ -81,4 +81,6 @@ export type AppData = {
   progress: Record<string, LessonProgress>;
   journal: JournalEntry[];
   lastLessonId?: string;
+  stepProgress: Record<string, import("./curriculum").StepProgress>;
+  lastStepId?: string;
 };

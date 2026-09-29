@@ -8,6 +8,7 @@ export const emptyData = (): AppData => ({
   weeklyGoal: 5,
   progress: {},
   journal: [],
+  stepProgress: {},
 });
 
 export function isAppData(value: unknown): value is AppData {
@@ -25,7 +26,7 @@ export function loadData(): AppData {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return emptyData();
     const parsed: unknown = JSON.parse(raw);
-    return isAppData(parsed) ? parsed : emptyData();
+    return isAppData(parsed) ? { ...parsed, stepProgress: parsed.stepProgress ?? {} } : emptyData();
   } catch {
     return emptyData();
   }

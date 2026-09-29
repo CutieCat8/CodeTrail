@@ -1,19 +1,20 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Activity, BookOpen, Braces, Check, ChevronRight, CircleDot, Code2, Download, FlaskConical, FolderGit2, Gauge, LayoutDashboard, LockKeyhole, Map, Menu, NotebookPen, Play, Search, Settings, ShieldCheck, Sparkles, Target, Trophy, Upload, X } from "lucide-react";
+import { Activity, BookOpen, Braces, Check, ChevronLeft, ChevronRight, CircleDot, Code2, Download, FlaskConical, FolderGit2, Gauge, Layers3, LayoutDashboard, LockKeyhole, Map, Menu, NotebookPen, Play, Search, Settings, ShieldCheck, Sparkles, Target, Trophy, Upload, X } from "lucide-react";
 import { lessons, lessonById, plannedJava } from "@/content/lessons";
+import { curriculumCourses, learningSteps, stepById } from "@/content/curriculum";
 import { accessReason, recommendation } from "@/lib/recommendation";
 import { calculateStreak, emptyData, isAppData, loadData, newProgress, saveData, xpTotal } from "@/lib/storage";
 import { runIsolatedTests } from "@/lib/runner";
 import type { AppData, JournalEntry, Lesson, LessonProgress, StudyMode } from "@/types/domain";
 import { PixelCat } from "./PixelCat";
 
-type View = "dashboard" | "map" | "challenges" | "skills" | "journal" | "projects" | "settings" | "lesson";
+type View = "dashboard" | "curriculum" | "map" | "challenges" | "skills" | "journal" | "projects" | "settings" | "lesson" | "step";
 type SaveState = "idle" | "saving" | "saved" | "error";
 
 const nav = [
-  ["dashboard", "ฐานปฏิบัติการ", LayoutDashboard], ["map", "แผนที่การเรียน", Map], ["challenges", "คลังโจทย์", FlaskConical],
+  ["dashboard", "ฐานปฏิบัติการ", LayoutDashboard], ["curriculum", "คอร์สจากพื้นฐาน", Layers3], ["map", "แผนที่ Lab", Map], ["challenges", "คลังโจทย์", FlaskConical],
   ["skills", "หลักฐานทักษะ", Gauge], ["journal", "สมุดบันทึก", NotebookPen], ["projects", "โปรเจกต์", FolderGit2], ["settings", "ตั้งค่า", Settings],
 ] as const;
 
@@ -63,6 +64,7 @@ export function QuestApp() {
   const { data, setData, ready, saveState } = useQuestData();
   const [view, setView] = useState<View>("dashboard");
   const [activeLessonId, setActiveLessonId] = useState("web-ts-narrowing");
+  const [activeStepId, setActiveStepId] = useState(learningSteps[0]?.id ?? "");
   const [mobileNav, setMobileNav] = useState(false);
   const xpMap = useMemo(() => Object.fromEntries(lessons.map((l) => [l.id, l.xp])), []);
   useEffect(() => {
@@ -71,6 +73,9 @@ export function QuestApp() {
       if (hash.startsWith("lesson/")) {
         const id = hash.slice(7);
         if (lessonById(id)) { setActiveLessonId(id); setView("lesson"); }
+      } else if (hash.startsWith("step/")) {
+        const id = hash.slice(5);
+        if (stepById(id)) { setActiveStepId(id); setView("step"); }
       } else if (nav.some(([id]) => id === hash)) setView(hash as View);
     };
     restoreRoute(); window.addEventListener("hashchange", restoreRoute);
@@ -78,6 +83,7 @@ export function QuestApp() {
   }, []);
   const goView = (next: View) => { setView(next); setMobileNav(false); window.history.pushState(null, "", `#${next}`); window.scrollTo({ top: 0, behavior: "smooth" }); };
   const openLesson = (id: string) => { setActiveLessonId(id); setView("lesson"); setMobileNav(false); window.history.pushState(null, "", `#lesson/${id}`); setData((d) => ({ ...d, lastLessonId: id })); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const openStep = (id: string) => { setActiveStepId(id); setView("step"); setMobileNav(false); window.history.pushState(null, "", `#step/${id}`); setData((d) => ({ ...d, lastStepId: id })); window.scrollTo({ top: 0, behavior: "smooth" }); };
   if (!ready) return <div className="loading-screen"><PixelCat /><p>กำลังเปิดสมุดภารกิจของซี…</p></div>;
   const completed = Object.values(data.progress).filter((p) => p.status === "passed").length;
   const rec = recommendation(data);
@@ -90,9 +96,10 @@ export function QuestApp() {
         <div className="sidebar-foot"><div className="xp-line"><Trophy size={16} /> {xpTotal(data, xpMap)} XP</div><small>{completed}/{lessons.length} บทผ่านแล้ว</small></div>
       </aside>
       <div className="content-shell">
-        <header className="topbar"><button className="menu-button" onClick={() => setMobileNav(true)} aria-label="เปิดเมนู" aria-expanded={mobileNav}><Menu aria-hidden="true" /></button><div><span className="eyebrow">CURRENT ROUTE</span><strong>{view === "lesson" ? lessonById(activeLessonId)?.title : nav.find(([id]) => id === view)?.[1]}</strong></div><div className={`save-pill ${saveState}`} aria-live="polite"><CircleDot size={12} aria-hidden="true" /> {saveState === "saving" ? "กำลังบันทึก" : saveState === "error" ? "บันทึกไม่สำเร็จ" : "บันทึกแล้ว"}</div></header>
+        <header className="topbar"><button className="menu-button" onClick={() => setMobileNav(true)} aria-label="เปิดเมนู" aria-expanded={mobileNav}><Menu aria-hidden="true" /></button><div><span className="eyebrow">CURRENT ROUTE</span><strong>{view === "lesson" ? lessonById(activeLessonId)?.title : view === "step" ? stepById(activeStepId)?.title : nav.find(([id]) => id === view)?.[1]}</strong></div><div className={`save-pill ${saveState}`} aria-live="polite"><CircleDot size={12} aria-hidden="true" /> {saveState === "saving" ? "กำลังบันทึก" : saveState === "error" ? "บันทึกไม่สำเร็จ" : "บันทึกแล้ว"}</div></header>
         <main id="main">
           {view === "dashboard" && <Dashboard data={data} setData={setData} openLesson={openLesson} />}
+          {view === "curriculum" && <CurriculumView data={data} openStep={openStep} />}
           {view === "map" && <LearningMap data={data} openLesson={openLesson} />}
           {view === "challenges" && <ChallengeLibrary data={data} openLesson={openLesson} />}
           {view === "skills" && <SkillSummary data={data} openLesson={openLesson} />}
@@ -100,6 +107,7 @@ export function QuestApp() {
           {view === "projects" && <Projects />}
           {view === "settings" && <SettingsView data={data} setData={setData} />}
           {view === "lesson" && <LessonWorkspace lesson={lessonById(activeLessonId) ?? rec.lesson} data={data} setData={setData} saveState={saveState} openLesson={openLesson} onExit={() => goView("map")} />}
+          {view === "step" && stepById(activeStepId) && <MicroStepWorkspace stepId={activeStepId} data={data} setData={setData} openStep={openStep} onExit={() => goView("curriculum")} />}
         </main>
       </div>
     </div>
@@ -125,6 +133,19 @@ function Dashboard({ data, setData, openLesson }: { data: AppData; setData: Reac
     <section className="surface project-tease"><span className="eyebrow">ACTIVE PROJECT</span><h2>Friends Activity Planner</h2><p>ประกอบ 12 บทเว็บให้เป็นระบบวางแผนกิจกรรมของเพื่อน 9 คน</p><div className="progress"><i style={{width: `${Math.round(Object.values(data.progress).filter(p => p.status === "passed" && p.lessonId.startsWith("web-")).length / 12 * 100)}%`}} /></div></section>
     <section className="surface weekly"><span className="eyebrow">WEEKLY TARGET</span><h2>{data.weeklyGoal} ภารกิจ / สัปดาห์</h2><input aria-label="เป้าหมายต่อสัปดาห์" type="range" min="1" max="14" value={data.weeklyGoal} onChange={(e) => setData((d) => ({ ...d, weeklyGoal: Number(e.target.value) }))} /><p className="muted">ปรับได้ตามภาระเรียน ไม่มีการหักคะแนนเมื่อพัก</p></section></div>
   </div>;
+}
+
+function CurriculumView({ data, openStep }: { data: AppData; openStep: (id: string) => void }) {
+  const [track, setTrack] = useState<"all" | "web" | "java" | "foundation">("all");
+  const visible = curriculumCourses.filter((course) => track === "all" || course.track === track);
+  return <div className="page curriculum-page"><div className="page-heading"><span className="eyebrow">ZERO → PROGRAMMER · {learningSteps.length} LIVE MICRO-STEPS</span><h1>คอร์สจากพื้นฐานจริง</h1><p>หนึ่ง step สอนหนึ่ง mental model แล้วให้ทำนาย เขียน แก้บั๊ก และอธิบายซ้ำ บทเดิม 22 บทถูกเก็บเป็น Lab สำหรับประกอบหลายแนวคิด</p></div><div className="segmented curriculum-filter" aria-label="กรองเส้นทาง">{([['all','ทั้งหมด'],['foundation','พื้นฐานนักพัฒนา'],['java','Java & OOP'],['web','Web & Back-end']] as const).map(([id,label])=><button key={id} aria-pressed={track===id} onClick={()=>setTrack(id)}>{label}</button>)}</div><div className="course-catalog">{visible.map(course=>{const steps=learningSteps.filter(s=>s.courseId===course.id);const done=steps.filter(s=>data.stepProgress[s.id]?.completed).length;const units=[...new Set(steps.map(s=>s.unit))];return <article key={course.id} className={`course-row ${course.status}`}><div className="course-signal"><span>{course.track==='java'?<Braces/>:course.track==='web'?<Code2/>:<Layers3/>}</span><i/></div><div className="course-detail"><div className="course-head"><div><span className={`track-tag ${course.track==='java'?'java':''}`}>{course.status==='live'?'พร้อมเรียน':course.status==='writing'?'กำลังเขียน':'วางแผนไว้'}</span><h2>{course.title}</h2><p>{course.description}</p></div><div className="course-count"><strong>{steps.length || course.targetSteps}</strong><span>{steps.length?'live steps':`target steps`}</span></div></div>{steps.length>0?<><div className="course-progress"><i style={{width:`${steps.length?done/steps.length*100:0}%`}}/><span>{done}/{steps.length} ผ่านแล้ว</span></div><div className="unit-list">{units.map(unit=>{const unitSteps=steps.filter(s=>s.unit===unit);const unitDone=unitSteps.filter(s=>data.stepProgress[s.id]?.completed).length;return <section key={unit}><div><strong>{unit}</strong><span>{unitDone}/{unitSteps.length}</span></div><div className="step-dots">{unitSteps.map((step,index)=><button key={step.id} title={`${index+1}. ${step.title}`} aria-label={`${step.title}${data.stepProgress[step.id]?.completed?' ผ่านแล้ว':''}`} className={data.stepProgress[step.id]?.completed?'done':data.stepProgress[step.id]?'started':''} onClick={()=>openStep(step.id)}>{data.stepProgress[step.id]?.completed?<Check/>:index+1}</button>)}</div></section>})}</div></>:<div className="roadmap-only"><LockKeyhole/>ยังไม่มีปุ่มเริ่มจนกว่าเนื้อหาและ feedback จะพร้อมครบ</div>}</div></article>})}</div></div>;
+}
+
+function MicroStepWorkspace({stepId,data,setData,openStep,onExit}:{stepId:string;data:AppData;setData:React.Dispatch<React.SetStateAction<AppData>>;openStep:(id:string)=>void;onExit:()=>void}) {
+  const step=stepById(stepId)!; const index=learningSteps.findIndex(s=>s.id===stepId); const course=curriculumCourses.find(c=>c.id===step.courseId); const saved=data.stepProgress[stepId]??{stepId,answer:"",notes:"",completed:false,updatedAt:new Date().toISOString()}; const [revealed,setRevealed]=useState(!!saved.answerRevealed);
+  const update=(patch:Partial<typeof saved>)=>setData(d=>({...d,lastStepId:stepId,stepProgress:{...d.stepProgress,[stepId]:{...(d.stepProgress[stepId]??saved),...patch,updatedAt:new Date().toISOString()}}}));
+  const next=learningSteps[index+1]?.courseId===step.courseId?learningSteps[index+1]:undefined; const previous=learningSteps[index-1]?.courseId===step.courseId?learningSteps[index-1]:undefined;
+  return <div className="micro-workspace"><header className="micro-header"><button onClick={onExit}><ChevronLeft/>คอร์สทั้งหมด</button><div><span className="eyebrow">{course?.title} · {step.unit}</span><h1>{step.title}</h1><p>{step.objective}</p></div><div className="step-position"><strong>{step.position}</strong><span>/ {learningSteps.filter(s=>s.courseId===step.courseId).length}</span></div></header><div className="micro-layout"><aside className="micro-rail"><span className={`kind ${step.kind}`}>{step.kind}</span><strong>{step.minutes} นาที</strong><p>ทำความเข้าใจทีละหนึ่งเรื่อง ไม่ต้องรีบผ่าน</p><div className="rail-nav"><button disabled={!previous} onClick={()=>previous&&openStep(previous.id)}><ChevronLeft/>ก่อนหน้า</button><button disabled={!next} onClick={()=>next&&openStep(next.id)}>ถัดไป<ChevronRight/></button></div></aside><main className="micro-content">{step.body.map(p=><p className="teaching-copy" key={p}>{p}</p>)}{step.vocabulary.length>0&&<dl className="vocabulary">{step.vocabulary.map(([term,meaning])=><div key={term}><dt>{term}</dt><dd>{meaning}</dd></div>)}</dl>}{step.code&&<pre><code>{step.code}</code></pre>}{step.starter&&<><h2>Starter code</h2><pre><code>{step.starter}</code></pre></>}{step.prompt&&<section className="micro-task"><span className="eyebrow">YOUR TURN</span><h2>{step.prompt}</h2><textarea value={saved.answer} onChange={e=>update({answer:e.target.value})} placeholder={step.kind==='practice'||step.kind==='debug'?"เขียนโค้ดและเหตุผลของซีที่นี่…":"ตอบก่อนเปิดแนวทาง…"}/><div className="task-actions"><button className="secondary" onClick={()=>{setRevealed(true);update({answerRevealed:true})}}>เปิดแนวทางเมื่อพยายามแล้ว</button><button className="primary" onClick={()=>update({completed:true})} disabled={!saved.answer.trim()}>บันทึกและผ่าน step <Check/></button></div>{revealed&&<div className="reveal"><strong>แนวทางตรวจคำตอบ</strong><pre><code>{step.reveal}</code></pre><p>เทียบเหตุผลและ behavior ไม่จำเป็นต้องเขียนเหมือนตัวอย่างทุกตัวอักษร</p></div>}</section>}<section className="step-notes"><h2>Field notes</h2><textarea value={saved.notes} onChange={e=>update({notes:e.target.value})} placeholder="สิ่งที่เข้าใจ / จุดที่ยังสงสัย / error ที่พบ…"/></section>{saved.completed&&<div className="step-complete"><Check/><div><strong>บันทึกหลักฐานแล้ว</strong><p>ผ่านครั้งแรกเท่านั้นที่นับความคืบหน้า กลับมาแก้คำตอบได้เสมอ</p></div>{next&&<button className="primary" onClick={()=>openStep(next.id)}>ไป step ถัดไป<ChevronRight/></button>}</div>}</main></div></div>;
 }
 
 function LearningMap({ data, openLesson }: { data: AppData; openLesson: (id: string) => void }) {

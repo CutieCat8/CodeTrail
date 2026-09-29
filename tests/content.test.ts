@@ -3,6 +3,7 @@ import { lessons } from "../src/content/lessons";
 import { emptyData } from "../src/lib/storage";
 import { recommendation } from "../src/lib/recommendation";
 import { learningSteps, topicSources } from "../src/content/curriculum";
+import { roadmapNodes } from "../src/content/fullstack-roadmap";
 
 describe("curriculum", () => {
   it("ships 12 full-stack and 10 Java lessons", () => {
@@ -60,5 +61,26 @@ describe("daily recommendation", () => {
       status: "in-progress", attempts: 3, updatedAt: new Date().toISOString(),
     };
     expect(recommendation(data).reason).toContain("ทบทวน");
+  });
+});
+
+describe("personal full-stack roadmap", () => {
+  it("uses unique nodes with useful learning context", () => {
+    expect(roadmapNodes.length).toBeGreaterThanOrEqual(35);
+    expect(new Set(roadmapNodes.map((node) => node.id)).size).toBe(roadmapNodes.length);
+    for (const node of roadmapNodes) {
+      expect(node.description.length).toBeGreaterThan(25);
+      expect(node.why.length).toBeGreaterThan(25);
+      expect(node.evidence.length).toBeGreaterThan(20);
+    }
+  });
+
+  it("only marks nodes available when referenced learning evidence exists", () => {
+    const topicIds = new Set(topicSources.map((topic) => topic.id));
+    const lessonIds = new Set(lessons.map((lesson) => lesson.id));
+    for (const node of roadmapNodes) {
+      for (const id of node.topicIds ?? []) expect(topicIds.has(id), `missing topic ${id}`).toBe(true);
+      for (const id of node.lessonIds ?? []) expect(lessonIds.has(id), `missing lesson ${id}`).toBe(true);
+    }
   });
 });

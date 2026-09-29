@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Activity, BookOpen, Braces, Check, ChevronLeft, ChevronRight, CircleDot, Code2, Download, FlaskConical, FolderGit2, Gauge, Layers3, LayoutDashboard, LockKeyhole, Map, Menu, NotebookPen, Play, Search, Settings, ShieldCheck, Sparkles, Target, Trophy, Upload, X } from "lucide-react";
+import { Activity, BookOpen, Braces, Check, ChevronLeft, ChevronRight, CircleDot, Code2, Download, FlaskConical, FolderGit2, Gauge, Layers3, LayoutDashboard, LockKeyhole, Map, Menu, NotebookPen, Play, Route, Search, Settings, ShieldCheck, Sparkles, Target, Trophy, Upload, X } from "lucide-react";
 import { lessons, lessonById, plannedJava } from "@/content/lessons";
 import { curriculumCourses, learningSteps, stepById } from "@/content/curriculum";
 import { accessReason, recommendation, stepRecommendation } from "@/lib/recommendation";
@@ -9,12 +9,13 @@ import { calculateStreak, emptyData, isAppData, loadData, newProgress, saveData,
 import { runIsolatedTests } from "@/lib/runner";
 import type { AppData, JournalEntry, Lesson, LessonProgress, StudyMode } from "@/types/domain";
 import { PixelCat } from "./PixelCat";
+import { FullStackRoadmap } from "./FullStackRoadmap";
 
-type View = "dashboard" | "curriculum" | "map" | "challenges" | "skills" | "journal" | "projects" | "settings" | "lesson" | "step";
+type View = "dashboard" | "curriculum" | "roadmap" | "map" | "challenges" | "skills" | "journal" | "projects" | "settings" | "lesson" | "step";
 type SaveState = "idle" | "saving" | "saved" | "error";
 
 const nav = [
-  ["dashboard", "ฐานปฏิบัติการ", LayoutDashboard], ["curriculum", "คอร์สจากพื้นฐาน", Layers3], ["map", "แผนที่ Lab", Map], ["challenges", "คลังโจทย์", FlaskConical],
+  ["dashboard", "ฐานปฏิบัติการ", LayoutDashboard], ["curriculum", "คอร์สจากพื้นฐาน", Layers3], ["roadmap", "Full-stack Roadmap", Route], ["map", "แผนที่ Lab", Map], ["challenges", "คลังโจทย์", FlaskConical],
   ["skills", "หลักฐานทักษะ", Gauge], ["journal", "สมุดบันทึก", NotebookPen], ["projects", "โปรเจกต์", FolderGit2], ["settings", "ตั้งค่า", Settings],
 ] as const;
 
@@ -100,6 +101,7 @@ export function QuestApp() {
         <main id="main">
           {view === "dashboard" && <Dashboard data={data} setData={setData} openLesson={openLesson} openStep={openStep} />}
           {view === "curriculum" && <CurriculumView data={data} openStep={openStep} />}
+          {view === "roadmap" && <FullStackRoadmap data={data} openStep={openStep} openLesson={openLesson} />}
           {view === "map" && <LearningMap data={data} openLesson={openLesson} />}
           {view === "challenges" && <ChallengeLibrary data={data} openLesson={openLesson} />}
           {view === "skills" && <SkillSummary data={data} openLesson={openLesson} />}

@@ -1,5 +1,7 @@
 # Sea’s Full-stack Quest
 
+> มี Personal Full-stack Roadmap แบบโต้ตอบได้ แสดงลำดับก่อน–หลัง เส้นทาง Front-end, Back-end, Database และ Java โดยคำนวณสถานะจากหลักฐานการเรียนจริง ไม่ใช้ progress จำลอง
+
 แพลตฟอร์มฝึกเขียนโปรแกรมส่วนตัวสำหรับซี: นักศึกษา Digital Industry Integration ที่ต้องการพัฒนาเป็น Full-stack Developer โดยเน้น Back-end, system design, Java และ OOP
 
 ## ขอบเขตที่ใช้งานได้ในปัจจุบัน

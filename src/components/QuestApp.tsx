@@ -65,7 +65,19 @@ export function QuestApp() {
   const [activeLessonId, setActiveLessonId] = useState("web-ts-narrowing");
   const [mobileNav, setMobileNav] = useState(false);
   const xpMap = useMemo(() => Object.fromEntries(lessons.map((l) => [l.id, l.xp])), []);
-  const openLesson = (id: string) => { setActiveLessonId(id); setView("lesson"); setMobileNav(false); setData((d) => ({ ...d, lastLessonId: id })); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  useEffect(() => {
+    const restoreRoute = () => {
+      const hash = window.location.hash.slice(1);
+      if (hash.startsWith("lesson/")) {
+        const id = hash.slice(7);
+        if (lessonById(id)) { setActiveLessonId(id); setView("lesson"); }
+      } else if (nav.some(([id]) => id === hash)) setView(hash as View);
+    };
+    restoreRoute(); window.addEventListener("hashchange", restoreRoute);
+    return () => window.removeEventListener("hashchange", restoreRoute);
+  }, []);
+  const goView = (next: View) => { setView(next); setMobileNav(false); window.location.hash = next; window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const openLesson = (id: string) => { setActiveLessonId(id); setView("lesson"); setMobileNav(false); window.location.hash = `lesson/${id}`; setData((d) => ({ ...d, lastLessonId: id })); window.scrollTo({ top: 0, behavior: "smooth" }); };
   if (!ready) return <div className="loading-screen"><PixelCat /><p>กำลังเปิดสมุดภารกิจของซี…</p></div>;
   const completed = Object.values(data.progress).filter((p) => p.status === "passed").length;
   const rec = recommendation(data);
@@ -74,7 +86,7 @@ export function QuestApp() {
       <a className="skip-link" href="#main">ข้ามไปเนื้อหาหลัก</a>
       <aside className={`sidebar ${mobileNav ? "open" : ""}`}>
         <div className="brand"><PixelCat small /><div><strong>SEA’S QUEST</strong><span>FULL-STACK FIELD LOG</span></div><button className="mobile-close" onClick={() => setMobileNav(false)} aria-label="ปิดเมนู"><X /></button></div>
-        <nav aria-label="เมนูหลัก">{nav.map(([id, label, Icon]) => <button key={id} className={view === id ? "active" : ""} onClick={() => { setView(id); setMobileNav(false); }}><Icon size={18} />{label}</button>)}</nav>
+        <nav aria-label="เมนูหลัก">{nav.map(([id, label, Icon]) => <button key={id} className={view === id ? "active" : ""} onClick={() => goView(id)}><Icon size={18} />{label}</button>)}</nav>
         <div className="sidebar-foot"><div className="xp-line"><Trophy size={16} /> {xpTotal(data, xpMap)} XP</div><small>{completed}/{lessons.length} บทผ่านแล้ว</small></div>
       </aside>
       <div className="content-shell">
@@ -87,7 +99,7 @@ export function QuestApp() {
           {view === "journal" && <Journal data={data} setData={setData} />}
           {view === "projects" && <Projects />}
           {view === "settings" && <SettingsView data={data} setData={setData} />}
-          {view === "lesson" && <LessonWorkspace lesson={lessonById(activeLessonId) ?? rec.lesson} data={data} setData={setData} saveState={saveState} openLesson={openLesson} />}
+          {view === "lesson" && <LessonWorkspace lesson={lessonById(activeLessonId) ?? rec.lesson} data={data} setData={setData} saveState={saveState} openLesson={openLesson} onExit={() => goView("map")} />}
         </main>
       </div>
     </div>
@@ -147,7 +159,7 @@ function SettingsView({data,setData}:{data:AppData;setData:React.Dispatch<React.
   return <div className="page"><div className="page-heading"><span className="eyebrow">LOCAL DATA CONTROL</span><h1>ตั้งค่าและสำรองข้อมูล</h1><p>ข้อมูลอยู่ใน localStorage ของ browser นี้เท่านั้น ยังไม่ซิงก์ข้ามอุปกรณ์</p></div><section className="privacy-callout"><ShieldCheck/><div><h2>พื้นที่ส่วนตัวในเครื่องนี้</h2><p>คำตอบ ความคืบหน้า และ Journal ไม่ถูกส่งไป server แต่หายได้เมื่อล้างข้อมูล browser โปรด Export สำรองเป็นระยะ</p></div></section><section className="settings-section"><h2>โหมดภารกิจ</h2><ModeSwitch data={data} setData={setData}/></section><section className="settings-section"><h2>สำรองและย้ายข้อมูล</h2><div className="button-row"><button className="primary" onClick={exportData}><Download/> Export JSON</button><button className="secondary" onClick={()=>fileRef.current?.click()}><Upload/> Import JSON</button><input ref={fileRef} hidden type="file" accept="application/json" onChange={e=>importData(e.target.files?.[0])}/></div>{message&&<p className="status-message" role="status">{message}</p>}</section><section className="settings-section danger"><h2>เริ่มข้อมูลใหม่</h2><p>ลบคำตอบและความคืบหน้าเฉพาะใน browser นี้</p><button onClick={()=>{if(confirm("ล้างข้อมูลทั้งหมดใน browser นี้?")){setData(emptyData());setMessage("ล้างข้อมูลแล้ว")}}}>ล้างข้อมูล</button></section></div>;
 }
 
-function LessonWorkspace({lesson,data,setData,saveState,openLesson}:{lesson:Lesson;data:AppData;setData:React.Dispatch<React.SetStateAction<AppData>>;saveState:SaveState;openLesson:(id:string)=>void}) {
+function LessonWorkspace({lesson,data,setData,saveState,openLesson,onExit}:{lesson:Lesson;data:AppData;setData:React.Dispatch<React.SetStateAction<AppData>>;saveState:SaveState;openLesson:(id:string)=>void;onExit:()=>void}) {
   const [tab,setTab]=useState<"lesson"|"task"|"code"|"result"|"notes">("lesson"); const [hintCount,setHintCount]=useState(0); const [showSolution,setShowSolution]=useState(false); const [running,setRunning]=useState(false);
   const progress=data.progress[lesson.id]??newProgress(lesson.id,lesson.starterCode);
   useEffect(()=>{if(!data.progress[lesson.id])setData(d=>({...d,lastLessonId:lesson.id,progress:{...d.progress,[lesson.id]:newProgress(lesson.id,lesson.starterCode)}}));},[lesson.id]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -156,7 +168,7 @@ function LessonWorkspace({lesson,data,setData,saveState,openLesson}:{lesson:Less
   const toggleCheck=(i:number)=>{const checks=lesson.acceptance.map((_,idx)=>idx===i?!progress.checklist[idx]:!!progress.checklist[idx]);patchProgress({checklist:checks});};
   const selfComplete=()=>{const all=lesson.acceptance.every((_,i)=>progress.checklist[i]); if(!all)return;patchProgress({status:"passed",completedAt:progress.completedAt??new Date().toISOString(),attempts:progress.attempts+1,lastResult:{passed:true,at:new Date().toISOString(),details:[]}});setTab("result");};
   const next=lessons.find(l=>l.track===lesson.track&&l.order===lesson.order+1);
-  return <div className="lesson-page"><div className="lesson-header"><div><button className="back-link" onClick={()=>history.back()} aria-label="กลับ"><ChevronRight/> แผนที่ / {lesson.module}</button><div><span className={`track-tag ${lesson.track}`}>{lesson.track==="java"?"JAVA & OOP":"FULL-STACK"}</span><span className="lesson-time">{lesson.minutes} นาที · {lesson.xp} XP ครั้งแรก</span></div><h1>{lesson.title}</h1><p>{lesson.objective}</p></div><div className="lesson-status">{progress.status==="passed"?<><Check/> ผ่านแล้ว</>:<><CircleDot/> {progress.attempts?`ลองแล้ว ${progress.attempts} ครั้ง`:"กำลังเรียน"}</>}</div></div>
+  return <div className="lesson-page"><div className="lesson-header"><div><button className="back-link" onClick={onExit} aria-label="กลับไปแผนที่"><ChevronRight/> แผนที่ / {lesson.module}</button><div><span className={`track-tag ${lesson.track}`}>{lesson.track==="java"?"JAVA & OOP":"FULL-STACK"}</span><span className="lesson-time">{lesson.minutes} นาที · {lesson.xp} XP ครั้งแรก</span></div><h1>{lesson.title}</h1><p>{lesson.objective}</p></div><div className="lesson-status">{progress.status==="passed"?<><Check/> ผ่านแล้ว</>:<><CircleDot/> {progress.attempts?`ลองแล้ว ${progress.attempts} ครั้ง`:"กำลังเรียน"}</>}</div></div>
     <div className="lesson-tabs" role="tablist">{([["lesson","บทเรียน"],["task","โจทย์"],["code","โค้ด"],["result","ผลทดสอบ"],["notes","บันทึก"]] as const).map(([id,label])=><button role="tab" aria-selected={tab===id} key={id} onClick={()=>setTab(id)}>{label}{id==="result"&&progress.lastResult?<i className={progress.lastResult.passed?"ok":"bad"}/>:null}</button>)}</div>
     <div className="workspace">
       <article className="lesson-reading">

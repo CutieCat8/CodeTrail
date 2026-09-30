@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Activity, BookOpen, Braces, Check, ChevronLeft, ChevronRight, CircleDot, Code2, Download, FlaskConical, FolderGit2, Gauge, Layers3, LayoutDashboard, LockKeyhole, Map, Menu, NotebookPen, Play, Route, Search, Settings, ShieldCheck, Sparkles, Target, Trophy, Upload, X } from "lucide-react";
+import { Activity, BookOpen, Braces, Check, ChevronLeft, ChevronRight, CircleDot, Clock3, Code2, Download, FlaskConical, FolderGit2, Gauge, Layers3, LayoutDashboard, LockKeyhole, Map, Menu, NotebookPen, Play, Route, Search, Settings, ShieldCheck, Sparkles, Target, Trophy, Upload, X } from "lucide-react";
 import { lessons, lessonById, plannedJava } from "@/content/lessons";
 import { curriculumCourses, learningSteps, stepById } from "@/content/curriculum";
 import { accessReason, recommendation, stepRecommendation } from "@/lib/recommendation";
@@ -10,14 +10,20 @@ import { runIsolatedTests } from "@/lib/runner";
 import type { AppData, JournalEntry, Lesson, LessonProgress, StudyMode } from "@/types/domain";
 import { PixelCat } from "./PixelCat";
 import { FullStackRoadmap } from "./FullStackRoadmap";
+import { ExpeditionBase } from "./ExpeditionArt";
 
 type View = "dashboard" | "curriculum" | "roadmap" | "map" | "challenges" | "skills" | "journal" | "projects" | "settings" | "lesson" | "step";
 type SaveState = "idle" | "saving" | "saved" | "error";
+type NavView = Exclude<View, "lesson" | "step">;
+type NavItem = readonly [NavView, string, typeof LayoutDashboard];
 
-const nav = [
-  ["dashboard", "ฐานปฏิบัติการ", LayoutDashboard], ["curriculum", "คอร์สจากพื้นฐาน", Layers3], ["roadmap", "Full-stack Roadmap", Route], ["map", "แผนที่ Lab", Map], ["challenges", "คลังโจทย์", FlaskConical],
-  ["skills", "หลักฐานทักษะ", Gauge], ["journal", "สมุดบันทึก", NotebookPen], ["projects", "โปรเจกต์", FolderGit2], ["settings", "ตั้งค่า", Settings],
-] as const;
+const navGroups: readonly { label: string; items: readonly NavItem[] }[] = [
+  { label: "เริ่มต้น", items: [["dashboard", "ฐานปฏิบัติการ", LayoutDashboard]] },
+  { label: "เรียน", items: [["curriculum", "คอร์ส", Layers3], ["roadmap", "Roadmap", Route], ["map", "Lab", Map], ["challenges", "คลังโจทย์", FlaskConical]] },
+  { label: "ผลงาน", items: [["skills", "หลักฐานทักษะ", Gauge], ["journal", "สมุดบันทึก", NotebookPen], ["projects", "โปรเจกต์", FolderGit2]] },
+];
+const settingsNav: NavItem = ["settings", "ตั้งค่า", Settings];
+const nav: readonly NavItem[] = [...navGroups.flatMap((group) => group.items), settingsNav];
 
 const modules = [
   ["Developer Foundations", "web", "Git, terminal และการคิดเป็นระบบ"],
@@ -67,6 +73,9 @@ export function QuestApp() {
   const [activeLessonId, setActiveLessonId] = useState("web-ts-narrowing");
   const [activeStepId, setActiveStepId] = useState(learningSteps[0]?.id ?? "");
   const [mobileNav, setMobileNav] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const sidebarRef = useRef<HTMLElement>(null);
+  const hadOpenNav = useRef(false);
   const xpMap = useMemo(() => Object.fromEntries(lessons.map((l) => [l.id, l.xp])), []);
   useEffect(() => {
     const restoreRoute = () => {
@@ -82,6 +91,28 @@ export function QuestApp() {
     restoreRoute(); window.addEventListener("hashchange", restoreRoute);
     return () => window.removeEventListener("hashchange", restoreRoute);
   }, []);
+  useEffect(() => {
+    if (!mobileNav) {
+      if (hadOpenNav.current) menuButtonRef.current?.focus();
+      hadOpenNav.current = false;
+      return;
+    }
+    hadOpenNav.current = true;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    requestAnimationFrame(() => sidebarRef.current?.querySelector<HTMLElement>("button")?.focus());
+    const handleDrawerKeys = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobileNav(false);
+      if (event.key !== "Tab") return;
+      const controls = [...(sidebarRef.current?.querySelectorAll<HTMLElement>("button:not([disabled])") ?? [])];
+      if (!controls.length) return;
+      const first = controls[0]; const last = controls[controls.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    };
+    window.addEventListener("keydown", handleDrawerKeys);
+    return () => { document.body.style.overflow = previousOverflow; window.removeEventListener("keydown", handleDrawerKeys); };
+  }, [mobileNav]);
   const goView = (next: View) => { setView(next); setMobileNav(false); window.history.pushState(null, "", `#${next}`); window.scrollTo({ top: 0, behavior: "smooth" }); };
   const openLesson = (id: string) => { setActiveLessonId(id); setView("lesson"); setMobileNav(false); window.history.pushState(null, "", `#lesson/${id}`); setData((d) => ({ ...d, lastLessonId: id })); window.scrollTo({ top: 0, behavior: "smooth" }); };
   const openStep = (id: string) => { setActiveStepId(id); setView("step"); setMobileNav(false); window.history.pushState(null, "", `#step/${id}`); setData((d) => ({ ...d, lastStepId: id })); window.scrollTo({ top: 0, behavior: "smooth" }); };
@@ -91,13 +122,17 @@ export function QuestApp() {
   return (
     <div className="app-shell">
       <a className="skip-link" href="#main">ข้ามไปเนื้อหาหลัก</a>
-      <aside className={`sidebar ${mobileNav ? "open" : ""}`}>
-        <div className="brand"><PixelCat small /><div><strong>SEA’S QUEST</strong><span>FULL-STACK FIELD LOG</span></div><button className="mobile-close" onClick={() => setMobileNav(false)} aria-label="ปิดเมนู"><X /></button></div>
-        <nav aria-label="เมนูหลัก">{nav.map(([id, label, Icon]) => <button key={id} aria-current={view === id ? "page" : undefined} className={view === id ? "active" : ""} onClick={() => goView(id)}><Icon size={18} aria-hidden="true" />{label}</button>)}</nav>
-        <div className="sidebar-foot"><div className="xp-line"><Trophy size={16} /> {xpTotal(data, xpMap)} XP</div><small>{completed}/{lessons.length} บทผ่านแล้ว</small></div>
+      {mobileNav && <button className="nav-backdrop" aria-label="ปิดเมนู" onClick={() => setMobileNav(false)} />}
+      <aside ref={sidebarRef} className={`sidebar ${mobileNav ? "open" : ""}`} aria-label="เมนูแอป">
+        <div className="brand"><PixelCat small decorative /><div><strong>SEA’S QUEST</strong><span>FULL-STACK FIELD LOG</span></div><button className="mobile-close" onClick={() => setMobileNav(false)} aria-label="ปิดเมนู"><X /></button></div>
+        <div className="sidebar-progress"><span><Trophy size={15} aria-hidden="true" /> EXPEDITION LEVEL</span><strong>{xpTotal(data, xpMap)} XP</strong><small>{completed}/{lessons.length} บท Lab ผ่านแล้ว</small></div>
+        <nav aria-label="เมนูหลัก">
+          {navGroups.map((group) => <section key={group.label}><span>{group.label}</span>{group.items.map(([id, label, Icon]) => <button key={id} aria-current={view === id ? "page" : undefined} className={view === id ? "active" : ""} onClick={() => goView(id)}><Icon size={18} aria-hidden="true" />{label}</button>)}</section>)}
+        </nav>
+        <div className="sidebar-foot"><button aria-current={view === "settings" ? "page" : undefined} className={view === "settings" ? "active" : ""} onClick={() => goView("settings")}><Settings size={18} aria-hidden="true" />ตั้งค่า</button></div>
       </aside>
       <div className="content-shell">
-        <header className="topbar"><button className="menu-button" onClick={() => setMobileNav(true)} aria-label="เปิดเมนู" aria-expanded={mobileNav}><Menu aria-hidden="true" /></button><div><span className="eyebrow">CURRENT ROUTE</span><strong>{view === "lesson" ? lessonById(activeLessonId)?.title : view === "step" ? stepById(activeStepId)?.title : nav.find(([id]) => id === view)?.[1]}</strong></div><div className={`save-pill ${saveState}`} aria-live="polite"><CircleDot size={12} aria-hidden="true" /> {saveState === "saving" ? "กำลังบันทึก" : saveState === "error" ? "บันทึกไม่สำเร็จ" : "บันทึกแล้ว"}</div></header>
+        <header className="topbar"><button ref={menuButtonRef} className="menu-button" onClick={() => setMobileNav(true)} aria-label="เปิดเมนู" aria-expanded={mobileNav}><Menu aria-hidden="true" /></button><div className="breadcrumb"><span>Sea’s Full-stack Quest</span><strong>{view === "lesson" ? lessonById(activeLessonId)?.title : view === "step" ? stepById(activeStepId)?.title : nav.find(([id]) => id === view)?.[1]}</strong></div><div className={`save-pill ${saveState}`} aria-live="polite"><CircleDot size={12} aria-hidden="true" /> {saveState === "saving" ? "กำลังบันทึก" : saveState === "error" ? "บันทึกไม่สำเร็จ" : "บันทึกแล้ว"}</div></header>
         <main id="main">
           {view === "dashboard" && <Dashboard data={data} setData={setData} openLesson={openLesson} openStep={openStep} />}
           {view === "curriculum" && <CurriculumView data={data} openStep={openStep} />}
@@ -127,14 +162,59 @@ function Dashboard({ data, setData, openLesson, openStep }: { data: AppData; set
   const lastStep = data.lastStepId ? stepById(data.lastStepId) : undefined;
   const recent = Object.values(data.progress).sort((a,b) => b.updatedAt.localeCompare(a.updatedAt))[0];
   const recentLesson = recent ? lessonById(recent.lessonId) : undefined;
+  const courseSteps = learningSteps.filter((step) => step.courseId === stepRec.step.courseId);
+  const firstIndex = courseSteps.findIndex((step) => step.id === stepRec.step.id);
+  const sessionSteps = courseSteps.slice(Math.max(0, firstIndex), firstIndex + 5);
+  const sessionMinutes = sessionSteps.reduce((sum, step) => sum + step.minutes, 0);
+  const reviewItems = Object.values(data.progress).filter((progress) => progress.attempts >= 3 && progress.status !== "passed");
+  const webPassed = Object.values(data.progress).filter((progress) => progress.status === "passed" && progress.lessonId.startsWith("web-")).length;
+  const bangkokDate = new Intl.DateTimeFormat("th-TH", { dateStyle: "full", timeZone: "Asia/Bangkok" }).format(new Date());
   return <div className="page dashboard-page">
-    <section className="welcome"><div><span className="eyebrow">30 SEP 2026 · ASIA/BANGKOK</span><h1>พร้อมออกสำรวจต่อไหม ซี?</h1><p>วันนี้เลือกหนึ่งภารกิจหลัก ใช้เวลาประมาณหนึ่งชั่วโมง แล้วจบด้วยบันทึกสั้น ๆ ที่อธิบายได้ด้วยตัวเอง</p></div><ModeSwitch data={data} setData={setData} /></section>
-    <section className="mission-panel"><div className="mission-orbit"><Target /><span>ภารกิจวันนี้</span></div><div className="mission-copy"><span className={`track-tag ${stepRec.course?.track==='java'?'java':''}`}>{stepRec.course?.title}</span><h2>{stepRec.step.title}</h2><p>{stepRec.reason}</p><div className="time-plan"><span>แนวคิดเดียว</span><span>{stepRec.step.minutes} นาที</span><span>{stepRec.step.kind}</span><span>บันทึกด้วยคำของซี</span></div></div><button className="primary" onClick={() => openStep(stepRec.step.id)}>เริ่ม micro-step <ChevronRight /></button></section>
-    <div className="metric-strip"><article><Activity /><strong>{streak}</strong><span>วันต่อเนื่อง</span></article><article><BookOpen /><strong>{stepPassed}</strong><span>micro-steps ผ่าน</span></article><article><Sparkles /><strong>{recentLesson?.module ?? stepRec.course?.title ?? "ยังไม่มี"}</strong><span>ทักษะล่าสุด</span></article><article><Target /><strong>{Math.min(stepPassed+passed, data.weeklyGoal)}/{data.weeklyGoal}</strong><span>เป้าหมายสัปดาห์</span></article></div>
-    <div className="dashboard-grid"><section className="surface"><div className="section-title"><div><span className="eyebrow">RESUME LOG</span><h2>กลับไปยังจุดล่าสุด</h2></div></div>{lastStep ? <button className="resume-row" onClick={() => openStep(lastStep.id)}><span className="node-icon"><Layers3 /></span><span><strong>{lastStep.title}</strong><small>คำตอบและ field notes จะกลับมาครบ</small></span><ChevronRight /></button> : last ? <button className="resume-row" onClick={() => openLesson(last.id)}><span className="node-icon"><Code2 /></span><span><strong>{last.title}</strong><small>คำตอบและ checklist จะกลับมาครบ</small></span><ChevronRight /></button> : <div className="empty-inline"><PixelCat small /><p>ยังไม่มีประวัติ เริ่มจากพื้นฐานแล้วเส้นทางจะถูกบันทึกที่นี่</p><button onClick={() => openStep(stepRec.step.id)}>เปิด step แรก</button></div>}</section>
-    <section className="surface"><div className="section-title"><div><span className="eyebrow">REVIEW RADAR</span><h2>เรื่องที่ควรทบทวน</h2></div></div>{Object.values(data.progress).filter((p) => p.attempts >= 3 && p.status !== "passed").length ? Object.values(data.progress).filter((p) => p.attempts >= 3 && p.status !== "passed").map((p) => <button className="text-row" key={p.lessonId} onClick={() => openLesson(p.lessonId)}>{lessonById(p.lessonId)?.title}<span>{p.attempts} ครั้ง</span></button>) : <p className="muted">ยังไม่มีหัวข้อที่ระบบแนะนำให้ทบทวน</p>}</section>
-    <section className="surface project-tease"><span className="eyebrow">ACTIVE PROJECT</span><h2>Friends Activity Planner</h2><p>ประกอบ 12 บทเว็บให้เป็นระบบวางแผนกิจกรรมของเพื่อน 9 คน</p><div className="progress"><i style={{width: `${Math.round(Object.values(data.progress).filter(p => p.status === "passed" && p.lessonId.startsWith("web-")).length / 12 * 100)}%`}} /></div></section>
-    <section className="surface weekly"><span className="eyebrow">WEEKLY TARGET</span><h2>{data.weeklyGoal} ภารกิจ / สัปดาห์</h2><input aria-label="เป้าหมายต่อสัปดาห์" type="range" min="1" max="14" value={data.weeklyGoal} onChange={(e) => setData((d) => ({ ...d, weeklyGoal: Number(e.target.value) }))} /><p className="muted">ปรับได้ตามภาระเรียน ไม่มีการหักคะแนนเมื่อพัก</p></section></div>
+    <section className="dashboard-intro">
+      <div><span className="eyebrow">{bangkokDate} · ASIA/BANGKOK</span><h1>คืนนี้จะออกสำรวจอะไรต่อ ซี?</h1><p>เลือกหนึ่งเส้นทาง แล้วทำให้จบเป็นหลักฐานชิ้นเล็ก ๆ ที่อธิบายด้วยคำของตัวเองได้</p></div>
+      <ModeSwitch data={data} setData={setData} />
+    </section>
+
+    <section className={`mission-hero ${stepRec.course?.track === "java" ? "java" : "web"}`}>
+      <div className="mission-hero-art"><ExpeditionBase /></div>
+      <div className="mission-hero-copy">
+        <span className={`track-tag ${stepRec.course?.track === "java" ? "java" : ""}`}>ภารกิจแนะนำ · {stepRec.course?.title}</span>
+        <h2>{stepRec.step.title}</h2>
+        <p>{stepRec.reason}</p>
+        <div className="mission-meta"><span><Clock3 /> เริ่มด้วยบทสั้น {stepRec.step.minutes} นาที</span><span><Layers3 /> {stepRec.step.kind}</span></div>
+        <button className="primary mission-cta" onClick={() => openStep(stepRec.step.id)}>เริ่มภารกิจนี้ <ChevronRight /></button>
+      </div>
+      <div className="mission-session" aria-label="แผนฝึกประมาณหนึ่งชั่วโมง">
+        <span>แผนฝึก 1 ชั่วโมง</span>
+        <ol><li><b>05</b> ทบทวนโน้ตล่าสุด</li><li><b>{String(sessionMinutes).padStart(2,"0")}</b> เรียน {sessionSteps.length} micro-steps ต่อเนื่อง</li><li><b>{String(Math.max(10,55-sessionMinutes)).padStart(2,"0")}</b> ทดลองและจด Field notes</li></ol>
+        <small>CTA เปิดบทแรก จากนั้นใช้ปุ่มถัดไปเดินต่อในคอร์สเดิม</small>
+      </div>
+    </section>
+
+    <section className="week-brief" aria-label="ภาพรวมสัปดาห์นี้">
+      <div><Activity /><span><strong>{streak} วัน</strong><small>ฝึกต่อเนื่อง</small></span></div>
+      <div><BookOpen /><span><strong>{stepPassed} steps</strong><small>บันทึกหลักฐานแล้ว</small></span></div>
+      <div><Sparkles /><span><strong>{recentLesson?.module ?? (stepPassed ? stepRec.course?.title : "ยังไม่มีทักษะล่าสุด")}</strong><small>เรื่องที่ฝึกล่าสุด</small></span></div>
+      <div className="week-goal"><span><strong>{Math.min(stepPassed + passed, data.weeklyGoal)}/{data.weeklyGoal}</strong><small>เป้าหมายสัปดาห์</small></span><input aria-label="เป้าหมายต่อสัปดาห์" type="range" min="1" max="14" value={data.weeklyGoal} onChange={(event) => setData((current) => ({ ...current, weeklyGoal: Number(event.target.value) }))} /></div>
+    </section>
+
+    <div className="dashboard-columns">
+      <section className="dashboard-section resume-section">
+        <header><div><span className="eyebrow">เรียนต่อ</span><h2>{lastStep || last ? "กลับไปยังจุดล่าสุด" : "เริ่มบันทึกการเดินทาง"}</h2></div></header>
+        {lastStep ? <button className="resume-card" onClick={() => openStep(lastStep.id)}><span className="resume-icon"><Layers3 /></span><span><small>{curriculumCourses.find((course) => course.id === lastStep.courseId)?.title}</small><strong>{lastStep.title}</strong><em>คำตอบและ Field notes ยังอยู่ครบ</em></span><ChevronRight /></button>
+          : last ? <button className="resume-card" onClick={() => openLesson(last.id)}><span className="resume-icon"><Code2 /></span><span><small>{last.module}</small><strong>{last.title}</strong><em>คำตอบและ checklist ยังอยู่ครบ</em></span><ChevronRight /></button>
+          : <div className="first-journey"><PixelCat variant="study" /><div><strong>ยังไม่มีประวัติการเรียน</strong><p>เริ่ม micro-step แรก แล้วฐานฝึกจะจำคำตอบและจุดล่าสุดไว้ใน browser นี้</p><button onClick={() => openStep(stepRec.step.id)}>เปิดจุดเริ่มต้น <ChevronRight /></button></div></div>}
+      </section>
+
+      <section className="dashboard-section review-section">
+        <header><div><span className="eyebrow">ทบทวน</span><h2>สัญญาณที่ควรกลับไปดู</h2></div></header>
+        {reviewItems.length ? reviewItems.map((progress) => <button className="review-row" key={progress.lessonId} onClick={() => openLesson(progress.lessonId)}><span><strong>{lessonById(progress.lessonId)?.title}</strong><small>ลองแล้ว {progress.attempts} ครั้ง · ยังไม่ผ่าน</small></span><ChevronRight /></button>) : <div className="quiet-empty"><PixelCat small variant="rest" decorative /><p>ยังไม่มีหัวข้อที่ต้องทบทวน เมื่อเจอโจทย์ที่ลองหลายครั้ง ระบบจะรวบรวมไว้ตรงนี้</p></div>}
+      </section>
+
+      <section className="dashboard-section project-brief">
+        <div className="project-sigil"><FolderGit2 /></div><div><span className="eyebrow">Portfolio project</span><h2>Friends Activity Planner</h2><p>{webPassed ? `เชื่อมหลักฐาน ${webPassed}/12 บทเว็บเข้าสู่ระบบวางแผนกิจกรรมของเพื่อน 9 คน` : "โปรเจกต์นี้จะเริ่มสะสมหลักฐานเมื่อผ่าน Lab เว็บบทแรก"}</p><div className="project-progress"><i style={{ width: `${Math.round(webPassed / 12 * 100)}%` }} /></div></div>
+      </section>
+    </div>
   </div>;
 }
 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "./pixel-nebula.css";
+import "./home-dashboard.css";
 
 export const metadata: Metadata = {
   title: "Sea’s Full-stack Quest",

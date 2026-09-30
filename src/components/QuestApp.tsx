@@ -1,16 +1,17 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Activity, BookOpen, Braces, Check, ChevronLeft, ChevronRight, CircleDot, Clock3, Code2, Copy, Download, FlaskConical, FolderGit2, Gauge, Layers3, LayoutDashboard, LockKeyhole, Map, Maximize2, Menu, Minimize2, NotebookPen, Play, Route, Search, Settings, ShieldCheck, Sparkles, Target, Trophy, Upload, X } from "lucide-react";
+import { Activity, Braces, Check, ChevronLeft, ChevronRight, CircleDot, Clock3, Code2, Copy, Download, FlaskConical, FolderGit2, Gauge, Layers3, LayoutDashboard, LockKeyhole, Map, Maximize2, Menu, Minimize2, NotebookPen, Play, Route, Search, Settings, ShieldCheck, Sparkles, Target, Trophy, Upload, X } from "lucide-react";
 import { lessons, lessonById, plannedJava } from "@/content/lessons";
 import { curriculumCourses, learningSteps, stepById } from "@/content/curriculum";
 import { accessReason, recommendation, stepRecommendation } from "@/lib/recommendation";
-import { calculateStreak, emptyData, loadData, newProgress, normalizeAppData, saveData, xpTotal } from "@/lib/storage";
+import { emptyData, loadData, newProgress, normalizeAppData, saveData, xpTotal } from "@/lib/storage";
 import { runIsolatedTests } from "@/lib/runner";
 import type { AppData, JournalEntry, Lesson, LessonProgress, StudyMode } from "@/types/domain";
 import { PixelCat } from "./PixelCat";
 import { FullStackRoadmap } from "./FullStackRoadmap";
-import { ExpeditionBase, WorldLandmark } from "./ExpeditionArt";
+import { WorldLandmark } from "./ExpeditionArt";
+import { QuestHome } from "./QuestHome";
 
 type View = "dashboard" | "curriculum" | "roadmap" | "map" | "challenges" | "skills" | "journal" | "projects" | "settings" | "lesson" | "step";
 type SaveState = "idle" | "saving" | "saved" | "error";
@@ -164,65 +165,7 @@ function ModeSwitch({ data, setData }: { data: AppData; setData: React.Dispatch<
 }
 
 function Dashboard({ data, setData, openLesson, openStep }: { data: AppData; setData: React.Dispatch<React.SetStateAction<AppData>>; openLesson: (id: string) => void; openStep: (id:string)=>void }) {
-  const stepRec=stepRecommendation(data); const passed = Object.values(data.progress).filter((p) => p.status === "passed").length; const stepPassed=Object.values(data.stepProgress).filter(p=>p.completed).length; const streak = calculateStreak(data);
-  const last = data.lastLessonId ? lessonById(data.lastLessonId) : undefined;
-  const lastStep = data.lastStepId ? stepById(data.lastStepId) : undefined;
-  const recent = Object.values(data.progress).sort((a,b) => b.updatedAt.localeCompare(a.updatedAt))[0];
-  const recentLesson = recent ? lessonById(recent.lessonId) : undefined;
-  const courseSteps = learningSteps.filter((step) => step.courseId === stepRec.step.courseId);
-  const firstIndex = courseSteps.findIndex((step) => step.id === stepRec.step.id);
-  const sessionSteps = courseSteps.slice(Math.max(0, firstIndex), firstIndex + 5);
-  const sessionMinutes = sessionSteps.reduce((sum, step) => sum + step.minutes, 0);
-  const reviewItems = Object.values(data.progress).filter((progress) => progress.attempts >= 3 && progress.status !== "passed");
-  const webPassed = Object.values(data.progress).filter((progress) => progress.status === "passed" && progress.lessonId.startsWith("web-")).length;
-  const bangkokDate = new Intl.DateTimeFormat("th-TH", { dateStyle: "full", timeZone: "Asia/Bangkok" }).format(new Date());
-  return <div className="page dashboard-page">
-    <section className="dashboard-intro">
-      <div><span className="eyebrow">{bangkokDate} · ASIA/BANGKOK</span><h1>คืนนี้จะออกสำรวจอะไรต่อ ซี?</h1><p>เลือกหนึ่งเส้นทาง แล้วทำให้จบเป็นหลักฐานชิ้นเล็ก ๆ ที่อธิบายด้วยคำของตัวเองได้</p></div>
-      <ModeSwitch data={data} setData={setData} />
-    </section>
-
-    <section className={`mission-hero ${stepRec.course?.track === "java" ? "java" : "web"}`}>
-      <div className="mission-hero-art"><ExpeditionBase /></div>
-      <div className="mission-hero-copy">
-        <span className={`track-tag ${stepRec.course?.track === "java" ? "java" : ""}`}>ภารกิจแนะนำ · {stepRec.course?.title}</span>
-        <h2>{stepRec.step.title}</h2>
-        <p>{stepRec.reason}</p>
-        <div className="mission-meta"><span><Clock3 /> เริ่มด้วยบทสั้น {stepRec.step.minutes} นาที</span><span><Layers3 /> {stepRec.step.kind}</span></div>
-        <button className="primary mission-cta" onClick={() => openStep(stepRec.step.id)}>เริ่มภารกิจนี้ <ChevronRight /></button>
-      </div>
-      <div className="mission-session" aria-label="แผนฝึกประมาณหนึ่งชั่วโมง">
-        <span>แผนฝึก 1 ชั่วโมง</span>
-        <ol><li><b>05</b> ทบทวนโน้ตล่าสุด</li><li><b>{String(sessionMinutes).padStart(2,"0")}</b> เรียน {sessionSteps.length} micro-steps ต่อเนื่อง</li><li><b>{String(Math.max(10,55-sessionMinutes)).padStart(2,"0")}</b> ทดลองและจด Field notes</li></ol>
-        <small>CTA เปิดบทแรก จากนั้นใช้ปุ่มถัดไปเดินต่อในคอร์สเดิม</small>
-      </div>
-    </section>
-
-    <section className="week-brief" aria-label="ภาพรวมสัปดาห์นี้">
-      <div><Activity /><span><strong>{streak} วัน</strong><small>ฝึกต่อเนื่อง</small></span></div>
-      <div><BookOpen /><span><strong>{stepPassed} steps</strong><small>บันทึกหลักฐานแล้ว</small></span></div>
-      <div><Sparkles /><span><strong>{recentLesson?.module ?? (stepPassed ? stepRec.course?.title : "ยังไม่มีทักษะล่าสุด")}</strong><small>เรื่องที่ฝึกล่าสุด</small></span></div>
-      <div className="week-goal"><span><strong>{Math.min(stepPassed + passed, data.weeklyGoal)}/{data.weeklyGoal}</strong><small>เป้าหมายสัปดาห์</small></span><input aria-label="เป้าหมายต่อสัปดาห์" type="range" min="1" max="14" value={data.weeklyGoal} onChange={(event) => setData((current) => ({ ...current, weeklyGoal: Number(event.target.value) }))} /></div>
-    </section>
-
-    <div className="dashboard-columns">
-      <section className="dashboard-section resume-section">
-        <header><div><span className="eyebrow">เรียนต่อ</span><h2>{lastStep || last ? "กลับไปยังจุดล่าสุด" : "เริ่มบันทึกการเดินทาง"}</h2></div></header>
-        {lastStep ? <button className="resume-card" onClick={() => openStep(lastStep.id)}><span className="resume-icon"><Layers3 /></span><span><small>{curriculumCourses.find((course) => course.id === lastStep.courseId)?.title}</small><strong>{lastStep.title}</strong><em>คำตอบและ Field notes ยังอยู่ครบ</em></span><ChevronRight /></button>
-          : last ? <button className="resume-card" onClick={() => openLesson(last.id)}><span className="resume-icon"><Code2 /></span><span><small>{last.module}</small><strong>{last.title}</strong><em>คำตอบและ checklist ยังอยู่ครบ</em></span><ChevronRight /></button>
-          : <div className="first-journey"><PixelCat variant="study" /><div><strong>ยังไม่มีประวัติการเรียน</strong><p>เริ่ม micro-step แรก แล้วฐานฝึกจะจำคำตอบและจุดล่าสุดไว้ใน browser นี้</p><button onClick={() => openStep(stepRec.step.id)}>เปิดจุดเริ่มต้น <ChevronRight /></button></div></div>}
-      </section>
-
-      <section className="dashboard-section review-section">
-        <header><div><span className="eyebrow">ทบทวน</span><h2>สัญญาณที่ควรกลับไปดู</h2></div></header>
-        {reviewItems.length ? reviewItems.map((progress) => <button className="review-row" key={progress.lessonId} onClick={() => openLesson(progress.lessonId)}><span><strong>{lessonById(progress.lessonId)?.title}</strong><small>ลองแล้ว {progress.attempts} ครั้ง · ยังไม่ผ่าน</small></span><ChevronRight /></button>) : <div className="quiet-empty"><PixelCat small variant="rest" decorative /><p>ยังไม่มีหัวข้อที่ต้องทบทวน เมื่อเจอโจทย์ที่ลองหลายครั้ง ระบบจะรวบรวมไว้ตรงนี้</p></div>}
-      </section>
-
-      <section className="dashboard-section project-brief">
-        <div className="project-sigil"><FolderGit2 /></div><div><span className="eyebrow">Portfolio project</span><h2>Friends Activity Planner</h2><p>{webPassed ? `เชื่อมหลักฐาน ${webPassed}/12 บทเว็บเข้าสู่ระบบวางแผนกิจกรรมของเพื่อน 9 คน` : "โปรเจกต์นี้จะเริ่มสะสมหลักฐานเมื่อผ่าน Lab เว็บบทแรก"}</p><div className="project-progress"><i style={{ width: `${Math.round(webPassed / 12 * 100)}%` }} /></div></div>
-      </section>
-    </div>
-  </div>;
+  return <QuestHome data={data} setData={setData} openLesson={openLesson} openStep={openStep} />;
 }
 
 function CurriculumView({ data, openStep }: { data: AppData; openStep: (id: string) => void }) {

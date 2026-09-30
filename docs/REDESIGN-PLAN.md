@@ -26,7 +26,7 @@
 
 ## R2 — Skill Evidence
 
-- สถานะ: **กำลังทำ**
+- สถานะ: **เสร็จ** (`290d49f`, pushed)
 - เป้าหมาย: แสดงภาพรวมตามหมวดและหลักฐานจริงโดยไม่สร้าง Mastery score
 - หน้า/components: `Skills`, progress selectors และ styles ที่เกี่ยวข้อง
 - Dependency: R1 เฉพาะ shared compact-row pattern ถ้านำกลับใช้แล้วเหมาะสม
@@ -35,7 +35,7 @@
 
 ## R3 — Journal list-first
 
-- สถานะ: **ยังไม่เริ่ม**
+- สถานะ: **กำลังทำ**
 - เป้าหมาย: เปิดมาเห็นบันทึกย้อนหลังและเริ่มเขียนได้ ไม่เจอฟอร์มยาวทันที
 - หน้า/components: `Journal`, `JournalEntry`, persistence ใน `QuestApp.tsx`/`src/lib/storage.ts` ถ้าจำเป็น
 - Dependency: ต้องรักษา `JournalEntry` fields และ schema v1

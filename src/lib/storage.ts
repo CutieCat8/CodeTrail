@@ -39,10 +39,15 @@ export function loadData(): AppData {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return emptyData();
     const parsed: unknown = JSON.parse(raw);
-    return isAppData(parsed) ? { ...parsed, stepProgress: parsed.stepProgress ?? {}, projectProgress: parsed.projectProgress ?? {} } : emptyData();
+    return normalizeAppData(parsed) ?? emptyData();
   } catch {
     return emptyData();
   }
+}
+
+export function normalizeAppData(value: unknown): AppData | null {
+  if (!isAppData(value)) return null;
+  return { ...value, stepProgress: value.stepProgress ?? {}, projectProgress: value.projectProgress ?? {} };
 }
 
 export function saveData(data: AppData) {

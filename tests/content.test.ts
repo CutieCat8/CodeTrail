@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { lessons } from "../src/content/lessons";
-import { emptyData, isAppData } from "../src/lib/storage";
+import { emptyData, isAppData, normalizeAppData } from "../src/lib/storage";
 import { recommendation } from "../src/lib/recommendation";
 import { learningSteps, topicSources } from "../src/content/curriculum";
 import { roadmapNodes } from "../src/content/fullstack-roadmap";
@@ -104,6 +104,7 @@ describe("project progress compatibility", () => {
   it("accepts old schema v1 data without project progress", () => {
     const data = emptyData();
     expect(isAppData(data)).toBe(true);
+    expect(normalizeAppData(data)?.projectProgress).toEqual({});
   });
 
   it("validates persisted project links and checklist evidence", () => {

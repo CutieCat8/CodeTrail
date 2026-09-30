@@ -3,7 +3,7 @@
 อัปเดตล่าสุด: 2026-09-30  
 Branch: `main`  
 Remote: `origin` → `https://github.com/CutieCat8/CodeTrail.git`  
-Commit ที่ตรวจเป็นฐาน: `18bdd70a3cc510c03c4af315ecf6b0e759cdc3e9`
+Commit ที่ตรวจเป็นฐาน: `72ff141` (`origin/main` หลังจบ R1)
 
 ไฟล์นี้เป็น **สถานะปัจจุบัน** ของงานรีดีไซน์ ส่วนภาพรวมผลิตภัณฑ์อยู่ที่ `docs/APP-OVERVIEW.md`, คิวงานอยู่ที่ `docs/REDESIGN-PLAN.md` และเหตุผลด้านภาพอยู่ที่ `docs/DESIGN-RESEARCH.md` เมื่อเอกสารขัดกับโค้ด ให้ยืนยันจากโค้ด, tests และ Git ก่อนแก้เอกสาร
 
@@ -42,12 +42,13 @@ Commit ที่ตรวจเป็นฐาน: `18bdd70a3cc510c03c4af315ecf6
 | Lesson split workspace | ใช่ | Production desktop/mobile | tests 12/12 หลังชุดนี้ | `bd25520` | ใช่ | `src/components/QuestApp.tsx`, `src/app/globals.css` |
 | Micro-step three-phase flow | ใช่ | Production desktop/mobile | tests 12/12 หลังชุดนี้ | `54f0564` | ใช่ | `src/components/QuestApp.tsx`, `src/app/globals.css` |
 | Roadmap + drawer visual system | ใช่ | Production desktop + drawer | lint/build ผ่านหลังชุดนี้; ไม่ได้รัน tests ซ้ำเพราะเปลี่ยน UI/CSS | `18bdd70` | ใช่ | `src/components/FullStackRoadmap.tsx`, `src/components/roadmap.css` |
+| Challenge Library mission archive | ใช่ | Production desktop/mobile, filter/empty/clear | lint + tests 12/12 + build ผ่าน | `72ff141` | ใช่ | `src/components/QuestApp.tsx`, `src/app/globals.css` |
 
-`origin/main` และ `HEAD` ตรงกันที่ `18bdd70` ตอนเริ่มเขียนเอกสารนี้
+`origin/main` และ `HEAD` ตรงกันที่ `72ff141` หลังจบ R1
 
 ## สิ่งที่กำลังทำ
 
-หยุดก่อนเริ่ม Challenge Library เพื่อทำเอกสารส่งต่อ จึง **ไม่มีโค้ด Challenge Library ที่ค้างครึ่งทาง** งานถัดไปคือปรับ Challenge Library ให้มี featured challenge, แถวผลลัพธ์กระชับ, จำนวนผลลัพธ์, clear filters และ empty state โดยรักษา search/filter/hash navigation เดิม
+R1 Challenge Library จบและ push แล้ว กำลังเริ่ม audit R2 Skill Evidence; ยังไม่มีโค้ด R2 ที่แก้ค้างในเวลาที่อัปเดตบรรทัดนี้ เป้าหมายคือเปลี่ยน card grid ซ้ำ ๆ เป็นภาพรวมตามหมวดที่เปิดดูหลักฐานได้ โดยคงการคำนวณจาก `data.progress` จริง
 
 ## Worktree ที่ยังไม่ commit ก่อนเอกสารชุดนี้
 
@@ -66,34 +67,32 @@ Commit ที่ตรวจเป็นฐาน: `18bdd70a3cc510c03c4af315ecf6
 
 ## งานที่เหลือตามลำดับ
 
-1. Challenge Library: featured + compact rows + result count + clear/empty state โดยคง filter จริง
-2. Skill Evidence: ภาพรวมตามหมวดและ disclosure; แยก automatic verification กับ self-check อย่างชัดเจน
-3. Journal: list-first, create/edit panel และ empty prompts โดยรักษาทุก field เดิม
-4. Projects: overview/detail และ persistence ของ repository/demo/checklist; ต้องเพิ่ม schema แบบ backward-compatible เพราะ input ปัจจุบันยังไม่บันทึก
-5. Settings: จัดหมวด, import normalization/error feedback และ reset confirmation ที่ชัด
-6. Functional QA ของ persistence/runner/XP/import และ Roadmap states ด้วยข้อมูลทดสอบแยก
-7. Responsive/a11y polish ที่ 1440×900, 1280×800, 768×1024, 390×844 รวม focus, Escape, overflow, contrast และ reduced motion
-8. เก็บ screenshot หลังรีดีไซน์ลง repository, optimize ภาพ และรัน lint/tests/build รอบส่งมอบ
-9. Private hosting ทำภายหลังเมื่อผู้ใช้พร้อม; ห้าม deploy สาธารณะเพื่อให้มี URL
+1. Skill Evidence: ภาพรวมตามหมวดและ disclosure; แยก automatic verification กับ self-check อย่างชัดเจน
+2. Journal: list-first, create/edit panel และ empty prompts โดยรักษาทุก field เดิม
+3. Projects: overview/detail และ persistence ของ repository/demo/checklist; ต้องเพิ่ม schema แบบ backward-compatible เพราะ input ปัจจุบันยังไม่บันทึก
+4. Settings: จัดหมวด, import normalization/error feedback และ reset confirmation ที่ชัด
+5. Functional QA ของ persistence/runner/XP/import และ Roadmap states ด้วยข้อมูลทดสอบแยก
+6. Responsive/a11y polish ที่ 1440×900, 1280×800, 768×1024, 390×844 รวม focus, Escape, overflow, contrast และ reduced motion
+7. optimize ภาพและรัน lint/tests/build รอบส่งมอบ; ผู้ใช้จะตรวจภาพเองและสั่งไม่ให้เรียก Chrome/ถ่าย screenshot เพิ่ม
+8. Private hosting ทำภายหลังเมื่อผู้ใช้พร้อม; ห้าม deploy สาธารณะเพื่อให้มี URL
 
 รายละเอียดและเกณฑ์จบของแต่ละช่วงอยู่ใน `docs/REDESIGN-PLAN.md`
 
 ## งานถัดไปแบบเจาะจง
 
-เริ่มที่ฟังก์ชัน `Challenges` ใน `src/components/QuestApp.tsx` และ style ที่เกี่ยวข้องใน `src/app/globals.css`:
+เริ่มที่ฟังก์ชัน `SkillSummary`/`SkillCard` ใน `src/components/QuestApp.tsx` และ style ที่เกี่ยวข้องใน `src/app/globals.css`:
 
-1. อ่าน challenge data/filter state ปัจจุบันและบันทึก behavior ที่ต้องคง
-2. เลือก featured challenge จากข้อมูลจริง ไม่สร้าง progress จำลอง
-3. เปลี่ยนผลลัพธ์เป็นแถวที่มี title, skill/technology, time, check mode และ status
-4. แสดง result count, ปุ่มล้าง filter และ empty state
-5. ตรวจ keyboard labels และ mobile overflow
-6. รัน lint และ test ที่เกี่ยวข้อง จากนั้น commit/push เป็น feature เดียว
-7. อัปเดต HANDOFF/PLAN เฉพาะสถานะสำคัญใน commit เอกสารแยกหรือรวมกับ commit ช่วงนั้นอย่างซื่อสัตย์
+1. สรุปหลักฐานจาก `lessons` + `data.progress` แยกเว็บ/Java และ automatic/self/local-java
+2. ทำ category overview ที่เลือกหมวดได้ และแสดงรายการทักษะในหมวดเดียวแทน grid ทั้งหมด
+3. แต่ละทักษะเปิดรายละเอียดบทที่เกี่ยวข้อง/ผ่าน/ควรเริ่ม โดยไม่ใช้คำว่า Mastery
+4. ทักษะที่ยังไม่มีบทเต็มต้องแสดง “วางแผนไว้” อย่างสงบและไม่มีปุ่มว่าง
+5. ตรวจ semantic disclosure, focus และ mobile ด้วย code review; ไม่เรียก Chrome ตามคำสั่งล่าสุด
+6. รัน lint/tests/build แล้ว commit/push เป็น feature เดียว
 
 ## ข้อจำกัดและบั๊กที่ทราบ
 
 - `QuestApp.tsx` ยังเป็น component ใหญ่ หลายหน้ารวมในไฟล์เดียว; ห้าม refactor ใหญ่พร้อมรีดีไซน์หน้าหนึ่งโดยไม่มีเหตุจำเป็น
-- Challenge, Skill, Journal, Projects และ Settings ยังใช้ composition รุ่นก่อน
+- Skill, Journal, Projects และ Settings ยังใช้ composition รุ่นก่อน; Challenge Library เปลี่ยนแล้วใน `72ff141`
 - Project URL inputs ปัจจุบันไม่ผูก state/persistence จึงยังไม่ “รักษา project links” ได้จริง ต้องออกแบบ optional field/migration ก่อนแก้
 - Code example มี code styling และ horizontal scroll แต่ยังไม่มี token-level syntax highlighting
 - Lesson ไม่มี draggable splitter; focus mode มีแล้วและ splitter เป็น optional
@@ -128,11 +127,12 @@ npm start -- -p 3100
 
 ## ผลตรวจล่าสุด
 
-- `npm test`: 12 tests ผ่าน หลัง commit `54f0564` (ครอบคลุม content count, 5-step cycle, per-course position, recommendation, schema v1 Roadmap marks และ roadmap references)
-- `npm run lint`: ผ่าน หลังการเปลี่ยน Roadmap ที่ต่อมา commit เป็น `18bdd70`
-- `npm run build`: ผ่านบน Next.js 16.3.6 หลังการเปลี่ยน Roadmap ที่ต่อมา commit เป็น `18bdd70`
+- `npm test`: 12 tests ผ่าน หลัง code ของ R1 Challenge Library ที่ commit เป็น `72ff141`
+- `npm run lint`: ผ่าน หลัง code ของ R1 Challenge Library ที่ commit เป็น `72ff141`
+- `npm run build`: ผ่านบน Next.js 16.3.6 หลัง code ของ R1 Challenge Library ที่ commit เป็น `72ff141`
 - Production browser QA ที่ `localhost:3100`: ตรวจ Dashboard, Curriculum, Lab, Lesson และ Micro-step บน desktop/mobile; ตรวจ Roadmap + drawer บน desktop; direct hash routes ที่เปิดระหว่างตรวจ ได้แก่ `#curriculum`, `#map`, `#lesson/web-ts-narrowing`, `#step/dev-program-concept`, `#roadmap`
 - ยังไม่ถือว่า full regression QA จบ เพราะหน้ารองและ interaction matrix ตามหัวข้อด้านบนยังไม่ครบ
+- หลัง R1 ผู้ใช้สั่งชัดเจนว่าไม่ให้เรียก Chrome หรือถ่าย screenshot เพิ่ม; งานถัดไปใช้ lint/tests/build และให้ผู้ใช้ตรวจภาพเอง
 
 ไม่ต้องรัน tests ทั้งชุดซ้ำเพราะแก้เอกสารอย่างเดียว แต่ทุก feature code ถัดไปต้องตรวจตามความเสี่ยงของมัน
 
@@ -150,4 +150,3 @@ npm start -- -p 3100
 4. ทำหนึ่งช่วงตาม PLAN, ตรวจตามเกณฑ์, commit หนึ่ง feature ต่อหนึ่ง commit และ push
 5. ห้ามเปลี่ยน ID/hash/storage/runner/XP เพื่อแก้ layout; ถ้าจำเป็นต้องเปลี่ยน schema ให้เพิ่ม compatibility test ก่อน
 6. อัปเดต HANDOFF และ PLAN เมื่อจบช่วงหรือก่อนจบรอบ โดยบันทึกเฉพาะหลักฐานสำคัญ
-

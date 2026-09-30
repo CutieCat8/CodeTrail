@@ -17,7 +17,7 @@
 
 ## R1 — Challenge Library
 
-- สถานะ: **ยังไม่เริ่ม**
+- สถานะ: **เสร็จ** (`72ff141`, pushed)
 - เป้าหมาย: ทำคลังโจทย์ให้ค้นและตัดสินใจได้เร็ว ลดรายการยาวจังหวะเดียว
 - หน้า/components: `Challenges` ใน `src/components/QuestApp.tsx`, styles ใน `src/app/globals.css`
 - Dependency: design tokens และ shell จาก `80dc95b`/`3940f3b`
@@ -26,7 +26,7 @@
 
 ## R2 — Skill Evidence
 
-- สถานะ: **ยังไม่เริ่ม**
+- สถานะ: **กำลังทำ**
 - เป้าหมาย: แสดงภาพรวมตามหมวดและหลักฐานจริงโดยไม่สร้าง Mastery score
 - หน้า/components: `Skills`, progress selectors และ styles ที่เกี่ยวข้อง
 - Dependency: R1 เฉพาะ shared compact-row pattern ถ้านำกลับใช้แล้วเหมาะสม
@@ -93,8 +93,8 @@
 - เป้าหมาย: เก็บหลักฐานหน้าจอและลดต้นทุนภาพโดยไม่ทำลาย pixel fidelity
 - หน้า/components: `public/art/`, image usages, docs screenshot destination ที่เลือกใหม่
 - Dependency: R1–R8 จบด้านภาพ
-- เกณฑ์เสร็จ: Dashboard, Curriculum, Lab, Lesson, Roadmap และ Mobile มี viewport/full-page artifacts; ไม่ทับ baseline; ภาพไม่ยืด; dimensions/compression เหมาะสม; asset origin ระบุครบ
-- การทดสอบ: visual review ที่ viewport กำหนด, network/build output audit และ production rendering
+- เกณฑ์เสร็จ: ไม่ทับ baseline; ภาพไม่ยืด; dimensions/compression เหมาะสม; asset origin ระบุครบ; ภาพหน้าจอให้ผู้ใช้เป็นผู้ตรวจ/เก็บตามคำสั่งล่าสุด
+- การทดสอบ: code/layout review, network/build output audit และ production build; ไม่เรียก Chrome หรือถ่าย screenshot เพิ่ม
 
 ## R10 — Release verification (ยังไม่ deploy)
 

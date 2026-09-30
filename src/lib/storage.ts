@@ -18,6 +18,10 @@ export function isAppData(value: unknown): value is AppData {
   if (!["fullstack", "java", "mixed"].includes(candidate.mode as StudyMode)) return false;
   if (!Number.isInteger(candidate.weeklyGoal) || Number(candidate.weeklyGoal) < 1 || Number(candidate.weeklyGoal) > 14) return false;
   if (!candidate.progress || typeof candidate.progress !== "object" || !Array.isArray(candidate.journal)) return false;
+  if (candidate.roadmapMarks !== undefined) {
+    if (!candidate.roadmapMarks || typeof candidate.roadmapMarks !== "object" || Array.isArray(candidate.roadmapMarks)) return false;
+    if (!Object.values(candidate.roadmapMarks).every((mark) => ["learning", "done", "skip"].includes(String(mark)))) return false;
+  }
   return candidate.journal.every((entry) => entry && typeof entry.id === "string" && typeof entry.title === "string");
 }
 

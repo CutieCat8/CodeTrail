@@ -101,7 +101,7 @@ export function QuestApp() {
         <main id="main">
           {view === "dashboard" && <Dashboard data={data} setData={setData} openLesson={openLesson} openStep={openStep} />}
           {view === "curriculum" && <CurriculumView data={data} openStep={openStep} />}
-          {view === "roadmap" && <FullStackRoadmap data={data} openStep={openStep} openLesson={openLesson} />}
+          {view === "roadmap" && <FullStackRoadmap data={data} setData={setData} openStep={openStep} openLesson={openLesson} />}
           {view === "map" && <LearningMap data={data} openLesson={openLesson} />}
           {view === "challenges" && <ChallengeLibrary data={data} openLesson={openLesson} />}
           {view === "skills" && <SkillSummary data={data} openLesson={openLesson} />}

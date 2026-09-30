@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { lessons } from "../src/content/lessons";
-import { emptyData } from "../src/lib/storage";
+import { emptyData, isAppData } from "../src/lib/storage";
 import { recommendation } from "../src/lib/recommendation";
 import { learningSteps, topicSources } from "../src/content/curriculum";
 import { roadmapNodes } from "../src/content/fullstack-roadmap";
@@ -65,6 +65,12 @@ describe("daily recommendation", () => {
 });
 
 describe("personal full-stack roadmap", () => {
+  it("accepts persisted roadmap marks without breaking schema v1", () => {
+    const data = { ...emptyData(), roadmapMarks: { "web-foundations": "learning" as const } };
+    expect(isAppData(data)).toBe(true);
+    expect(isAppData({ ...data, roadmapMarks: { "web-foundations": "mastered" } })).toBe(false);
+  });
+
   it("uses unique nodes with useful learning context", () => {
     expect(roadmapNodes.length).toBeGreaterThanOrEqual(35);
     expect(new Set(roadmapNodes.map((node) => node.id)).size).toBe(roadmapNodes.length);

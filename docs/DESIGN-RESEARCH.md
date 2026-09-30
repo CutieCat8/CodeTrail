@@ -54,6 +54,16 @@
 - สิ่งที่ไม่ใช้: ไม่ clone repository, ไม่เพิ่ม Three.js/R3F/Drei และไม่คัดลอก shader/effect เพราะเพิ่ม dependency/performance cost โดยไม่ช่วยงานเรียนหลัก
 - License/attribution: repository อ้าง MIT แต่ไม่มี code/asset ถูกนำมาใช้ จึงไม่มี attribution artifact ใน bundle
 
+## Amicro Mono Activity Purple
+
+- URL ที่ตรวจจริง: `https://amicro.vercel.app/mono-charts/mono-activity-purple` และ source `https://github.com/Subhan-code/Amicro--Micro-transitions-/blob/main/src/components/mono-charts/MonoActivityHeatmap.tsx`
+- สิ่งที่เข้าถึงได้: หน้าเว็บผ่าน bundle และ source code ใน GitHub; repository license เป็น MIT
+- สิ่งที่สังเกตได้จริง: component จัดข้อมูลเป็นคอลัมน์สัปดาห์ ใช้ระดับความเข้ม 0–4 มี month/day labels, legend และรายละเอียดวันที่เลือก ตัว demo สร้างข้อมูลแบบสุ่มและใช้ `motion/react`
+- การตีความ: โครงสร้าง week-column และ selected-day detail เหมาะกับหน้า Home แต่ข้อมูลสุ่มไม่เหมาะกับผลิตภัณฑ์เรียนที่ต้องแสดงหลักฐานจริง
+- สิ่งที่นำมาใช้: ดัดแปลงโครงสร้างและ interaction ใน `src/components/ActivityHeatmap.tsx`; สร้างข้อมูลจาก timestamps จริงใน `src/lib/activity.ts`; ใช้ CSS transition เดิมของแอปแทน dependency ใหม่
+- สิ่งที่ไม่ใช้: random activity, animation library และ palette แบบแยกจาก Pixel Nebula
+- License/attribution: MIT License, Copyright 2026 SYED SUBHAN UDDIN; notice ฉบับเต็มอยู่ใน `docs/THIRD-PARTY-NOTICES.md`
+
 ## Design system ที่เลือกจริง
 
 Canonical implementation: `src/app/globals.css` โดย token อยู่ใน `:root` และ component ที่ใช้ภาพอยู่ใน `src/components/ExpeditionArt.tsx` / `src/components/PixelCat.tsx`
@@ -130,4 +140,3 @@ Canonical implementation: `src/app/globals.css` โดย token อยู่ใ�
 - Asset origin: `public/art/README.md`
 - Tokens/layout/motion: `src/app/globals.css`
 - Mascot/art components: `src/components/PixelCat.tsx`, `src/components/ExpeditionArt.tsx`
-

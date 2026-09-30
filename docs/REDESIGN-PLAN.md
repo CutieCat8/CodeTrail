@@ -1,7 +1,7 @@
 # Redesign plan
 
 อัปเดต: 2026-10-01
-สถานะรอบ: **Pixel Nebula theme เขียนแล้ว — รอ manual acceptance จากผู้ใช้**
+สถานะรอบ: **Home dashboard + real activity heatmap เขียนและ push แล้ว — รอ manual acceptance จากผู้ใช้**
 
 สถานะที่ใช้: ยังไม่เริ่ม / กำลังทำ / ติดปัญหา / เสร็จ
 คำว่า “เสร็จ” หมายถึงผ่านเกณฑ์ของช่วงนั้นเท่านั้น ไม่ได้ทำให้ browser/visual acceptance ผ่านโดยอัตโนมัติ
@@ -69,6 +69,15 @@
 - เกณฑ์เสร็จ: canvas/surfaces เป็น near-black, gradient ใช้กับองค์ประกอบนำสายตา, primary/secondary text contrast สูง, pixel assets เดิมยัง render
 - การทดสอบ: lint ผ่าน, production build ผ่าน, static contrast ของคู่สีหลัก 6.57:1–18.87:1; visual acceptance อยู่ใน R6
 
+## R5.2 — Daily-return Home และ activity heatmap
+
+- สถานะ: **เสร็จด้าน implementation** (`7e4d7c8`, pushed) / รอ manual visual acceptance
+- เป้าหมาย/ขอบเขต: ทำ `#dashboard` เป็นหน้า Home ที่เห็นจุดเรียนต่อ โปรไฟล์ และความสม่ำเสมอจากข้อมูลจริงทันที โดยยังคง Pixel Nebula และ pixel art
+- หน้า/components: `QuestHome.tsx`, `ActivityHeatmap.tsx`, `activity.ts`, `home-dashboard.css`, Dashboard adapter ใน `QuestApp.tsx`
+- Dependency: schema v1, recommendation rules, lesson/step/project progress และ Asia/Bangkok
+- เกณฑ์เสร็จ: zero state ไม่ปลอมกิจกรรม; heatmap สร้างจาก persisted timestamps; CTA เปิด hash เดิม; mode/goal ใช้ data source เดิม; mobile CSS มี layout stack
+- การทดสอบ: lint ผ่าน, Vitest 18/18, production build ผ่าน; composition, hover/focus/day detail และ responsive layout อยู่ใน R6
+
 ## R6 — Responsive and visual acceptance
 
 - สถานะ: **ติดปัญหา — รอผลตรวจ/ภาพจากผู้ใช้**
@@ -116,7 +125,7 @@
 
 ## การตัดสินใจรอบนี้
 
-- หยุดเพิ่ม feature และ visual refinement
+- หยุดเพิ่ม feature และ visual refinement หลัง Home iteration นี้จนผู้ใช้ส่งผลตรวจ
 - ใช้ `docs/ACCEPTANCE-CHECKLIST.md` เป็น source of truth สำหรับการตรวจรับ
 - หลัง R4 commit/push ให้รอผล/ภาพจากผู้ใช้ก่อน R8
 - Private deployment และ screenshot generation ยังไม่อยู่ในขอบเขตรอบนี้

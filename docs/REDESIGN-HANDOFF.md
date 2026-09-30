@@ -3,8 +3,8 @@
 อัปเดตล่าสุด: 2026-10-01
 Branch: `main`  
 Remote: `origin` → `https://github.com/CutieCat8/CodeTrail.git`  
-ฐาน implementation ที่ push แล้ว: `d2d59d7`
-สถานะรอบ: **ปรับธีมตาม feedback แล้ว และรอผู้ใช้ตรวจรับใน browser**
+ฐาน implementation ที่ push แล้ว: `7e4d7c8`
+สถานะรอบ: **หน้า Home แบบ daily-return พร้อม activity heatmap เขียนและ push แล้ว; รอผู้ใช้ตรวจภาพใน browser**
 
 เอกสารหลักมีหน้าที่แยกกัน:
 
@@ -27,6 +27,16 @@ Remote: `origin` → `https://github.com/CutieCat8/CodeTrail.git`
 - หลักฐาน: commit `d2d59d7` (`feat(theme): align interface with pixel nebula art`), push แล้ว
 - Automated checks: lint ผ่าน; production build ผ่าน; contrast คู่สีหลักที่คำนวณได้อยู่ระหว่าง 6.57:1–18.87:1
 - Manual verification: ยังรอผู้ใช้เปิดดูจริง; ไม่ได้เรียก Chrome หรือถ่าย screenshot
+
+## Home dashboard iteration ล่าสุด
+
+- เป้าหมาย: เปลี่ยน `#dashboard` ให้เป็นหน้า Home สำหรับกลับมาเรียนทุกวัน ไม่ใช่หน้าอธิบายผลิตภัณฑ์ โดยอิง composition จากภาพ Codédex ที่ผู้ใช้แนบ
+- สิ่งที่เขียน: greeting ของ Miso, continue-learning hero, โปรไฟล์ Sea, XP/level/บทที่ผ่าน/streak จากข้อมูลจริง, ตัวเลือกโหมด, project summary, weekly goal และ activity heatmap 20 สัปดาห์
+- Heatmap ใช้เฉพาะ timestamp จริงจาก lesson progress, micro-step, Journal และ Project progress; บัญชีใหม่จึงเริ่มว่างและไม่มี activity จำลอง
+- โครงสร้าง heatmap ดัดแปลงจาก Amicro `MonoActivityHeatmap.tsx` ภายใต้ MIT License โดยไม่คัดลอกข้อมูลสุ่มหรือเพิ่ม `motion/react`; attribution อยู่ใน `docs/THIRD-PARTY-NOTICES.md`
+- หลักฐาน: `src/components/QuestHome.tsx`, `src/components/ActivityHeatmap.tsx`, `src/lib/activity.ts`, `src/app/home-dashboard.css`, commit `7e4d7c8` และ push แล้ว
+- Automated checks หลังเขียนชุดนี้: lint ผ่าน, Vitest 18/18 และ production build ผ่านบน Next.js 16.3.6
+- Manual verification: ยังไม่ได้ตรวจภาพจริงตามคำสั่งไม่ให้เรียก Chrome/ถ่าย screenshot
 
 ## สัญญาที่ต้องรักษา
 
@@ -55,7 +65,7 @@ Tests/build เป็นหลักฐานทางเทคนิคเท�
 | 5 | Design tokens/typography/layout | ทำเสร็จแล้วด้านโค้ด / ต้องตรวจภาพจริง | semantic override ใน `pixel-nebula.css`; คู่สีหลักคำนวณผ่าน 6.57:1 ขึ้นไป แต่ยังต้องตรวจทุก state ใน browser |
 | 6 | ภาพประกอบและมาสคอต | ทำบางส่วน / ต้องตรวจในเบราว์เซอร์ | `expedition-base.png`, `world-landmarks.png`, `miso-sprite-sheet.png`, `PixelCat.tsx`; ยังไม่ได้ optimize responsive variants และไม่มี badge raster แยกทุกชนิด |
 | 7 | App shell/navigation | เขียนโค้ดแล้ว / ต้องตรวจ keyboard/mobile | shell/breadcrumb/drawer/focus code ใน `QuestApp.tsx`, commit `3940f3b` |
-| 8 | Dashboard | เขียนโค้ดแล้ว / ต้องตรวจในเบราว์เซอร์ | mission hero, mode, session plan, resume/review/project ใน `QuestApp.tsx`, commit `3940f3b` |
+| 8 | Dashboard/Home | เขียนโค้ดแล้ว / ต้องตรวจในเบราว์เซอร์ | daily-return hero, profile, real activity heatmap, mode/project/goal ใน `QuestHome.tsx`, commit `7e4d7c8` |
 | 9 | Curriculum | เขียนโค้ดแล้ว / ต้องตรวจในเบราว์เซอร์ | featured course/cards/chapters/named steps, commit `75da2bf` |
 | 10 | Roadmap | ทำบางส่วน / ต้องตรวจในเบราว์เซอร์ | topology/drawer/status/current-location ใน `FullStackRoadmap.tsx` และ `roadmap.css`, commits `18bdd70`, `43943bc`; mobile/readability/state reload รอตรวจ |
 | 11 | Lab Map | เขียนโค้ดแล้ว / ต้องตรวจในเบราว์เซอร์ | illustrated worlds/quest panel/planned states, commit `89fba30` |
@@ -73,7 +83,7 @@ Tests/build เป็นหลักฐานทางเทคนิคเท�
 
 | พื้นที่ | สิ่งที่เขียนไว้จริง | Commit | Manual verification |
 |---|---|---|---|
-| Dashboard | mission-first illustrated hero, mode selector, session plan, current-week/resume/review/project/empty state | `3940f3b` | composition, responsive, mode reload, CTA |
+| Dashboard/Home | greeting, illustrated continue-learning hero, profile, real activity heatmap, mode selector, project/goal/zero state | `7e4d7c8` | composition, responsive, heatmap interaction, mode reload, CTA |
 | Curriculum | featured course, course cards, chapter disclosure, named step rows, planned state | `75da2bf` | filters, long Thai titles, course count/navigation |
 | Roadmap | journey topology, chapter/node/checkpoint styles, current location, drawer, marks | `18bdd70`, `43943bc` | desktop/mobile readability, Escape/focus, status reload |
 | Lab Map | illustrated worlds, current world, real quest panel, planned world without empty CTA | `89fba30` | world selection, mobile stack, Java labels |
@@ -92,7 +102,7 @@ Tests/build เป็นหลักฐานทางเทคนิคเท�
 | ชุดงาน | เขียนโค้ดแล้ว | ตรวจ browser เดิม | Automated checks หลังชุด | Commit แล้ว | Push แล้ว |
 |---|---|---|---|---|---|
 | Tokens + art | ใช่ | เคยดูบางหน้า | build ภายหลังผ่าน | `80dc95b` | ใช่ |
-| Shell + Dashboard | ใช่ | เคยดู desktop/mobile ก่อนข้อห้าม Chrome | lint/build ภายหลังผ่าน | `3940f3b` | ใช่ |
+| Home dashboard iteration | ใช่ | ยังไม่ได้ดูหลังเปลี่ยน Home | lint, tests 18/18, build ผ่าน | `7e4d7c8` | ใช่ |
 | Curriculum | ใช่ | เคยดู desktop/mobile | lint/build ภายหลังผ่าน | `75da2bf` | ใช่ |
 | Lab | ใช่ | เคยดู desktop/mobile | lint/build ภายหลังผ่าน | `89fba30` | ใช่ |
 | Lesson | ใช่ | เคยดู desktop/mobile | tests ภายหลังผ่าน | `bd25520` | ใช่ |
@@ -107,26 +117,36 @@ Tests/build เป็นหลักฐานทางเทคนิคเท�
 
 ## การเปลี่ยนแปลงที่ยังไม่ commit
 
-ก่อนเริ่มเอกสารตรวจรับ `git status --short` มีเฉพาะ input ของผู้ใช้:
+หลัง commit Home `7e4d7c8` ยังมีงานค้างจากชุดขยายเนื้อหาที่ไม่ได้รวมใน commit Home:
 
 ```text
+ M src/app/globals.css
+ M src/components/QuestApp.tsx
+ M src/content/curriculum/generate.ts
+ M src/content/curriculum/index.ts
+ M src/types/curriculum.ts
+ M tests/content.test.ts
+?? AGENTS.md
+?? CLAUDE.md
 ?? docs/APP-OVERVIEW.md
 ?? docs/screenshots/
+?? src/components/StepSections.tsx
+?? src/content/curriculum/lessons/
 ```
 
-ทั้งสองรายการไม่ถูกแก้หรือ stage เอกสารรอบนี้ stage เฉพาะ `ACCEPTANCE-CHECKLIST.md`, `REDESIGN-HANDOFF.md` และ `REDESIGN-PLAN.md`
+รายการเหล่านี้ถูกเก็บไว้ทั้งหมด ไม่ discard/reset/overwrite และไม่ถูก stage ใน commit Home เอกสารรอบนี้จะ stage เฉพาะไฟล์ `docs/` ที่ระบุชัดเจน
 
 ## ผลตรวจล่าสุด
 
-หลังแก้ nested import validation ที่ `a8d12b0`:
+หลังเขียน Home/heatmap ที่ `7e4d7c8` โดยตรวจบน working tree ปัจจุบัน:
 
 - `npm run lint`: ผ่าน
-- `npm test`: ผ่าน 15/15
+- `npm test`: ผ่าน 18/18 (รวม activity tests ใหม่ 2 ข้อและ content tests ใน working tree)
 - `npm run build`: ผ่านบน Next.js 16.3.6
-- ไม่ได้เรียก browser หรือถ่าย screenshot ในรอบตรวจรับนี้
+- ไม่ได้เรียก browser หรือถ่าย screenshot ในรอบ Home นี้
 - ไม่รัน checks ซ้ำหลังแก้เอกสารเท่านั้น
 
-Defect ที่แก้: `src/lib/storage.ts` เดิมตรวจ imported nested progress ไม่ลึกพอ; เพิ่ม validation ของ lesson/step/journal/project/roadmap shapes และ regression test ใน `tests/content.test.ts`
+Activity test ใหม่ยืนยัน zero state และการรวมวันที่ตาม Asia/Bangkok ใน `tests/activity.test.ts` ส่วน manual composition/interaction ยังรอผู้ใช้ตรวจ
 
 ## ภาพหน้าจอ
 
@@ -162,7 +182,7 @@ Production preview: `http://localhost:3100/#dashboard`
 
 ## งานถัดไปที่ควรเริ่ม
 
-**ยังไม่เริ่ม feature หรือ visual refinement ใหม่** ให้รอผลและภาพจากผู้ใช้ตาม `ACCEPTANCE-CHECKLIST.md` แล้ว:
+**รอผลและภาพหน้า Home จากผู้ใช้** ตาม `ACCEPTANCE-CHECKLIST.md` แล้ว:
 
 1. บันทึกเฉพาะข้อที่ไม่ผ่าน พร้อม hash/viewport/ขั้นตอนทำซ้ำ
 2. จัดลำดับ functional/data-loss/accessibility ก่อน visual polish

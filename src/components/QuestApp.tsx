@@ -301,7 +301,32 @@ function LearningMap({ data, openLesson }: { data: AppData; openLesson: (id: str
 function ChallengeLibrary({ data, openLesson }: { data: AppData; openLesson: (id:string)=>void }) {
   const [query,setQuery]=useState(""); const [track,setTrack]=useState("all"); const [mode,setMode]=useState("all");
   const filtered=lessons.filter(l => (track==="all"||l.track===track)&&(mode==="all"||l.checkMode===mode)&&(l.title.toLowerCase().includes(query.toLowerCase())||l.concepts.join(" ").toLowerCase().includes(query.toLowerCase())));
-  return <div className="page"><div className="page-heading"><span className="eyebrow">PRACTICE ARCHIVE</span><h1>คลังโจทย์</h1><p>ค้นจากชื่อหรือแนวคิด แล้วเลือกวิธีตรวจที่ตรงกับงานจริง</p></div><div className="filters"><label><Search/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="ค้นหา เช่น validation, class, JOIN" /></label><select aria-label="เส้นทาง" value={track} onChange={e=>setTrack(e.target.value)}><option value="all">ทุกเส้นทาง</option><option value="web">Full-stack</option><option value="java">Java</option></select><select aria-label="วิธีตรวจ" value={mode} onChange={e=>setMode(e.target.value)}><option value="all">ทุกวิธีตรวจ</option><option value="auto">ตรวจอัตโนมัติ</option><option value="self">เช็กลิสต์</option><option value="local-java">Java ในเครื่อง</option></select></div><div className="challenge-list">{filtered.map(l=><button key={l.id} onClick={()=>openLesson(l.id)}><span className={`challenge-glyph ${l.track}`}>{l.track==="java"?<Braces/>:<Code2/>}</span><div><div><span className={`track-tag ${l.track}`}>{l.module}</span>{data.progress[l.id]?.status==="passed"&&<span className="passed-label"><Check/> ผ่านแล้ว</span>}</div><h2>{l.title}</h2><p>{l.prompt}</p><small>{l.minutes} นาที · {l.checkMode==="auto"?"ระบบทดสอบพฤติกรรม":l.checkMode==="local-java"?"ตรวจในเครื่องด้วยตัวเอง":"ตรวจด้วยหลักฐานและเช็กลิสต์"}</small></div><ChevronRight/></button>)}</div>{filtered.length===0&&<div className="empty-search">ไม่พบโจทย์ ลองลดตัวกรองหรือใช้คำค้นอื่น</div>}</div>;
+  const suggested=recommendation(data).lesson;
+  const featured=filtered.find(lesson=>lesson.id===suggested.id)??filtered[0];
+  const remaining=featured?filtered.filter(lesson=>lesson.id!==featured.id):[];
+  const hasFilters=Boolean(query||track!=="all"||mode!=="all");
+  const clearFilters=()=>{setQuery("");setTrack("all");setMode("all")};
+  const checkLabel=(lesson:Lesson)=>lesson.checkMode==="auto"?"ระบบทดสอบพฤติกรรม":lesson.checkMode==="local-java"?"ตรวจ Java ในเครื่อง":"หลักฐาน + เช็กลิสต์";
+  const statusLabel=(lesson:Lesson)=>data.progress[lesson.id]?.status==="passed"?"ผ่านแล้ว":data.progress[lesson.id]?"กำลังทำ":"ยังไม่เริ่ม";
+  return <div className="page challenge-page">
+    <header className="challenge-intro"><div><span className="eyebrow">PRACTICE ARCHIVE · {lessons.length} MISSIONS</span><h1>คลังโจทย์</h1><p>ค้นจากสิ่งที่อยากฝึก แล้วเลือกโจทย์จากเวลา วิธีตรวจ และหลักฐานที่ต้องส่ง ไม่ต้องเดาจากชื่อเพียงอย่างเดียว</p></div><div className="challenge-count" aria-live="polite"><strong>{filtered.length}</strong><span>โจทย์ที่ตรงเงื่อนไข</span></div></header>
+
+    <form className="challenge-filters" role="search" onSubmit={event=>event.preventDefault()}>
+      <label className="challenge-search"><Search aria-hidden="true"/><span className="sr-only">ค้นหาโจทย์</span><input aria-label="ค้นหาโจทย์จากชื่อหรือแนวคิด" type="search" value={query} onChange={event=>setQuery(event.target.value)} placeholder="ค้นหา เช่น validation, class, JOIN" /></label>
+      <label><span>เส้นทาง</span><select value={track} onChange={event=>setTrack(event.target.value)}><option value="all">ทุกเส้นทาง</option><option value="web">Full-stack</option><option value="java">Java & OOP</option></select></label>
+      <label><span>วิธีตรวจ</span><select value={mode} onChange={event=>setMode(event.target.value)}><option value="all">ทุกวิธีตรวจ</option><option value="auto">ตรวจอัตโนมัติ</option><option value="self">เช็กลิสต์</option><option value="local-java">Java ในเครื่อง</option></select></label>
+      {hasFilters&&<button className="clear-filters" type="button" onClick={clearFilters}><X/>ล้างตัวกรอง</button>}
+    </form>
+
+    {featured?<>
+      <section className={`featured-challenge ${featured.track}`} aria-labelledby="featured-challenge-title">
+        <div className="featured-challenge-copy"><span className={`track-tag ${featured.track}`}>{hasFilters?"ตรงกับตัวกรอง":"แนะนำให้ฝึกต่อ"} · {featured.module}</span><h2 id="featured-challenge-title">{featured.title}</h2><p>{featured.objective}</p><div className="featured-challenge-facts"><span><Clock3/><b>{featured.minutes}</b> นาที</span><span><ShieldCheck/><b>{checkLabel(featured)}</b></span><span><Activity/><b>{statusLabel(featured)}</b></span></div><button className="primary" onClick={()=>openLesson(featured.id)}>เปิดโจทย์นี้ <ChevronRight/></button></div>
+        <div className="featured-challenge-art" aria-hidden="true"><PixelCat variant="study" decorative/><div><span>MISSION BRIEF</span><p>{featured.prompt}</p></div></div>
+      </section>
+
+      <section className="challenge-archive" aria-labelledby="challenge-results-title"><header><div><span className="eyebrow">ALL MATCHES</span><h2 id="challenge-results-title">โจทย์ในผลการค้นหา</h2></div><span>{remaining.length} รายการเพิ่มเติม</span></header><div className="challenge-list-v2">{remaining.map(lesson=>{const progress=data.progress[lesson.id];return <button key={lesson.id} className={`${lesson.track} ${progress?.status==="passed"?"done":progress?"active":""}`} onClick={()=>openLesson(lesson.id)}><span className="challenge-state">{progress?.status==="passed"?<Check/>:lesson.track==="java"?<Braces/>:<Code2/>}</span><span className="challenge-row-copy"><small>{lesson.module}</small><strong>{lesson.title}</strong><em>{lesson.concepts.slice(0,3).join(" · ")}</em></span><span className="challenge-row-meta"><small><Clock3/>{lesson.minutes} นาที</small><small><ShieldCheck/>{checkLabel(lesson)}</small><b>{statusLabel(lesson)}</b></span><ChevronRight/></button>})}</div>{remaining.length===0&&<div className="challenge-single-result"><Check/><p>มีหนึ่งโจทย์ที่ตรงเงื่อนไข และแสดงเป็นภารกิจเด่นด้านบนแล้ว</p></div>}</section>
+    </>:<section className="challenge-empty"><PixelCat variant="rest" decorative/><div><span className="eyebrow">NO MATCHING MISSION</span><h2>ยังไม่พบโจทย์ชุดนี้</h2><p>ลองตัดคำค้นให้สั้นลง หรือกลับไปดูทุกเส้นทางและทุกวิธีตรวจ</p><button className="primary" onClick={clearFilters}>ล้างตัวกรอง</button></div></section>}
+  </div>;
 }
 
 function SkillSummary({ data, openLesson }: { data:AppData; openLesson:(id:string)=>void }) {

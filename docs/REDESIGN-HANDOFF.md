@@ -3,8 +3,8 @@
 อัปเดตล่าสุด: 2026-10-01
 Branch: `main`  
 Remote: `origin` → `https://github.com/CutieCat8/CodeTrail.git`  
-ฐาน implementation ที่ push แล้ว: `a5b0408`
-สถานะรอบ: **แก้กฎภารกิจโหมดผสมและ push แล้ว; รอผู้ใช้ตรวจ Home ล่าสุดใน browser**
+ฐาน implementation ที่ push แล้ว: `46a96e2`
+สถานะรอบ: **Roadmap แบบ skill expedition map เขียนและ push แล้ว; รอผู้ใช้ตรวจภาพจริงใน browser**
 
 เอกสารหลักมีหน้าที่แยกกัน:
 
@@ -47,6 +47,15 @@ Remote: `origin` → `https://github.com/CutieCat8/CodeTrail.git`
 - หลักฐาน: `src/lib/recommendation.ts`, `src/components/QuestHome.tsx`, `tests/recommendation.test.ts`, commit `a5b0408` (pushed)
 - ตรวจแล้ว: regression tests 10/10, lint และ production build ผ่าน; code review ไม่พบ blocking/high issue
 - Manual verification: รอผู้ใช้ตรวจการสลับโหมดและการกลับ Home หลังผ่าน step
+
+## Roadmap iteration ล่าสุด
+
+- เปลี่ยนจาก central timeline ที่มี node กล่องซ้าย/ขวาซ้ำกัน เป็นแผนเดินทางสองระดับ: route overview สำหรับกระโดดข้าม chapter และ detailed chapter network
+- แต่ละ chapter แยก lane จริงตาม Core, Front-end, Back-end, Database, Quality และ Java พร้อมสี, เส้นเชื่อม, checkpoint และจำนวนหลักฐาน
+- current position, filters, Learning/Done/Skip, manual/inferred state, drawer, Escape/focus return และลิงก์เริ่มบทใช้ behavior เดิม
+- Mobile เปลี่ยนเป็น route แนวตั้ง พร้อม overview ที่เลื่อนแนวนอน ไม่บังคับ pinch/drag
+- หลักฐาน: `src/components/FullStackRoadmap.tsx`, `src/components/roadmap.css`, commit `46a96e2` (pushed)
+- ตรวจแล้ว: lint และ production build ผ่าน; ยังไม่ได้เรียก Chrome/ถ่าย screenshot ตามคำสั่งผู้ใช้
 
 ## สัญญาที่ต้องรักษา
 
@@ -95,7 +104,7 @@ Tests/build เป็นหลักฐานทางเทคนิคเท�
 |---|---|---|---|
 | Dashboard/Home | greeting, illustrated continue-learning hero, profile, real activity heatmap, mode selector, project/goal/zero state | `7e4d7c8` | composition, responsive, heatmap interaction, mode reload, CTA |
 | Curriculum | featured course, course cards, chapter disclosure, named step rows, planned state | `75da2bf` | filters, long Thai titles, course count/navigation |
-| Roadmap | journey topology, chapter/node/checkpoint styles, current location, drawer, marks | `18bdd70`, `43943bc` | desktop/mobile readability, Escape/focus, status reload |
+| Roadmap | route overview, chapter lane network, evidence counts, checkpoints, current location, drawer และ marks | `46a96e2` | desktop/mobile composition, lane filtering, Escape/focus, status reload |
 | Lab Map | illustrated worlds, current world, real quest panel, planned world without empty CTA | `89fba30` | world selection, mobile stack, Java labels |
 | Lesson Workspace | side-by-side reading/editor, mobile tabs, focus mode, result panel, copy, Tab indentation, save state | `bd25520` | draft reload, wrong/correct runner, XP, self-check, mobile scroll |
 | Micro-step | compact metadata, understand/respond/notes phases, correct course index, prev/next | `54f0564`, `31868ee` | notes/answer reload, completion and navigation semantics |

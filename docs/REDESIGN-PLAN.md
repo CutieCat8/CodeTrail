@@ -110,6 +110,15 @@ Defect ที่ปิดด้าน implementation:
 - Mixed mode เดิมเดิน Developer Foundations ครบทั้งคอร์สก่อน Java; เปลี่ยนเป็น balanced staged alternation พร้อม tests 10 ข้อ
 - Home เดิมอาจ resume รายการจากโหมดก่อนหน้า; จำกัด resume ให้ตรง route และให้ Mixed ใช้ recommendation ปัจจุบัน
 
+## R8.1 — Roadmap skill expedition redesign
+
+- สถานะ: **เสร็จด้าน implementation** (`46a96e2`, pushed) / รอ manual visual acceptance
+- เป้าหมาย/ขอบเขต: ทำ Roadmap ให้เป็น topology ที่สแกนภาพใหญ่และความสัมพันธ์ของทักษะได้จริง ไม่ใช่รายการกล่องแนวตั้ง
+- หน้า/components: `FullStackRoadmap.tsx`, `roadmap.css`
+- Dependency: roadmap data, evidence mapping และ persisted marks เดิม
+- เกณฑ์เสร็จ: overview กระโดด chapter ได้, lane network อ่านได้, current/status/checkpoint ต่างกันชัด, mobile ใช้รายการแนวตั้งครบ
+- การทดสอบ: lint และ production build ผ่าน; visual hierarchy/overflow/drawer/status reload รอผู้ใช้ตรวจ
+
 ## R9 — Asset optimization
 
 - สถานะ: **ยังไม่เริ่ม**

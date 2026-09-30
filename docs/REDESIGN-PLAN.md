@@ -44,7 +44,7 @@
 
 ## R4 — Projects persistence and detail
 
-- สถานะ: **กำลังทำ**
+- สถานะ: **เสร็จ** (`4fbf3b2`, pushed)
 - เป้าหมาย: เปลี่ยนจากรายละเอียดทุกโปรเจกต์พร้อมกันเป็น overview/detail พร้อมบันทึก repository, demo และ checklist จริง
 - หน้า/components: `Projects`, `AppData`/project types, `src/lib/storage.ts`, related tests
 - Dependency: ตัดสินใจ backward-compatible project state; ต้องเพิ่ม test fixture ของ schema v1 เดิมก่อน implementation
@@ -53,7 +53,7 @@
 
 ## R5 — Settings and backup safety
 
-- สถานะ: **ยังไม่เริ่ม**
+- สถานะ: **กำลังทำ**
 - เป้าหมาย: จัดหมวดการฝึก/ข้อมูลสำรอง/เริ่มใหม่ และทำ feedback ให้ชัด
 - หน้า/components: `Settings`, `ModeSwitch`, `src/lib/storage.ts`
 - Dependency: R4 data model ต้องนิ่งก่อน final import/export validation

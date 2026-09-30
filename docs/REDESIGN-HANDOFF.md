@@ -3,7 +3,7 @@
 อัปเดตล่าสุด: 2026-09-30  
 Branch: `main`  
 Remote: `origin` → `https://github.com/CutieCat8/CodeTrail.git`  
-Commit ที่ตรวจเป็นฐาน: `e6fbfdf` (`origin/main` หลังจบ R3)
+Commit ที่ตรวจเป็นฐาน: `4fbf3b2` (`origin/main` หลังจบ R4)
 
 ไฟล์นี้เป็น **สถานะปัจจุบัน** ของงานรีดีไซน์ ส่วนภาพรวมผลิตภัณฑ์อยู่ที่ `docs/APP-OVERVIEW.md`, คิวงานอยู่ที่ `docs/REDESIGN-PLAN.md` และเหตุผลด้านภาพอยู่ที่ `docs/DESIGN-RESEARCH.md` เมื่อเอกสารขัดกับโค้ด ให้ยืนยันจากโค้ด, tests และ Git ก่อนแก้เอกสาร
 
@@ -45,12 +45,13 @@ Commit ที่ตรวจเป็นฐาน: `e6fbfdf` (`origin/main` ห�
 | Challenge Library mission archive | ใช่ | Production desktop/mobile, filter/empty/clear | lint + tests 12/12 + build ผ่าน | `72ff141` | ใช่ | `src/components/QuestApp.tsx`, `src/app/globals.css` |
 | Skill Evidence explorer | ใช่ | ผู้ใช้จะตรวจภาพเองตามคำสั่งล่าสุด | lint + tests 12/12 + build ผ่าน | `290d49f` | ใช่ | `src/components/QuestApp.tsx`, `src/app/globals.css` |
 | Journal archive-first flow | ใช่ | ผู้ใช้จะตรวจภาพเองตามคำสั่งล่าสุด | lint + tests 12/12 + build ผ่าน | `e6fbfdf` | ใช่ | `src/components/QuestApp.tsx`, `src/app/globals.css` |
+| Projects overview + persisted evidence | ใช่ | ผู้ใช้จะตรวจภาพเองตามคำสั่งล่าสุด | lint + tests 14/14 + build ผ่าน | `4fbf3b2` | ใช่ | `src/types/domain.ts`, `src/lib/storage.ts`, `src/components/QuestApp.tsx`, `tests/content.test.ts` |
 
-`origin/main` และ `HEAD` ตรงกันที่ `e6fbfdf` หลังจบ R3
+`origin/main` และ `HEAD` ตรงกันที่ `4fbf3b2` หลังจบ R4
 
 ## สิ่งที่กำลังทำ
 
-R3 Journal จบและ push แล้ว กำลังเริ่ม audit R4 Projects; ยังไม่มีโค้ด R4 ที่แก้ค้างในเวลาที่อัปเดตบรรทัดนี้ ต้องเพิ่ม project state แบบ backward-compatible ก่อนทำ overview/detail เพราะ URL inputs ปัจจุบันไม่บันทึกจริง
+R4 Projects จบและ push แล้ว กำลังเริ่ม audit R5 Settings; `projectProgress` เป็น optional schema-v1 field ที่ validate ก่อน import และ URL/checklist ใช้ autosave จริง
 
 ## Worktree ที่ยังไม่ commit ก่อนเอกสารชุดนี้
 
@@ -69,31 +70,29 @@ R3 Journal จบและ push แล้ว กำลังเริ่ม audi
 
 ## งานที่เหลือตามลำดับ
 
-1. Projects: overview/detail และ persistence ของ repository/demo/checklist; ต้องเพิ่ม schema แบบ backward-compatible เพราะ input ปัจจุบันยังไม่บันทึก
-2. Settings: จัดหมวด, import normalization/error feedback และ reset confirmation ที่ชัด
-3. Functional QA ของ persistence/runner/XP/import และ Roadmap states ด้วยข้อมูลทดสอบแยก
-4. Responsive/a11y polish ที่ 1440×900, 1280×800, 768×1024, 390×844 รวม focus, Escape, overflow, contrast และ reduced motion
-5. optimize ภาพและรัน lint/tests/build รอบส่งมอบ; ผู้ใช้จะตรวจภาพเองและสั่งไม่ให้เรียก Chrome/ถ่าย screenshot เพิ่ม
-6. Private hosting ทำภายหลังเมื่อผู้ใช้พร้อม; ห้าม deploy สาธารณะเพื่อให้มี URL
+1. Settings: จัดหมวด, import normalization/error feedback และ reset confirmation ที่ชัด
+2. Functional QA ของ persistence/runner/XP/import และ Roadmap states ด้วยข้อมูลทดสอบแยก
+3. Responsive/a11y polish ที่ 1440×900, 1280×800, 768×1024, 390×844 รวม focus, Escape, overflow, contrast และ reduced motion
+4. optimize ภาพและรัน lint/tests/build รอบส่งมอบ; ผู้ใช้จะตรวจภาพเองและสั่งไม่ให้เรียก Chrome/ถ่าย screenshot เพิ่ม
+5. Private hosting ทำภายหลังเมื่อผู้ใช้พร้อม; ห้าม deploy สาธารณะเพื่อให้มี URL
 
 รายละเอียดและเกณฑ์จบของแต่ละช่วงอยู่ใน `docs/REDESIGN-PLAN.md`
 
 ## งานถัดไปแบบเจาะจง
 
-เริ่ม R4 ด้วย data contract ก่อนแก้ UI:
+เริ่มที่ `SettingsView` และ import path:
 
-1. เพิ่ม `ProjectProgress` และ optional `projectProgress` ใน `AppData` โดยคง `version: 1`
-2. เพิ่ม validation/normalization และ test ว่าข้อมูล schema v1 เดิมยังอ่านได้
-3. เปลี่ยน Projects เป็น overview/detail; user stories/criteria ต้องไม่แสดงเหมือนสำเร็จโดยอัตโนมัติ
-4. ผูก repository URL, demo URL และ checklist เข้ากับ `setData`/autosave
-5. ตรวจ invalid imported project state ไม่ผ่าน validation
-6. รัน lint/tests/build แล้ว commit/push เป็น feature เดียว
+1. จัดกลุ่มโหมดฝึก, backup และ danger zone ให้มี hierarchy ชัด
+2. ทำ import normalization ให้ optional `stepProgress`/`projectProgress` จากไฟล์เก่ากลับมาเป็น object พร้อมใช้
+3. รักษา data เดิมเมื่อ import ผิดและให้ feedback ผ่าน live region
+4. reset confirmation ต้องยืนยันชัดและ reset เฉพาะ local browser
+5. รัน lint/tests/build แล้ว commit/push เป็น feature เดียว
 
 ## ข้อจำกัดและบั๊กที่ทราบ
 
 - `QuestApp.tsx` ยังเป็น component ใหญ่ หลายหน้ารวมในไฟล์เดียว; ห้าม refactor ใหญ่พร้อมรีดีไซน์หน้าหนึ่งโดยไม่มีเหตุจำเป็น
-- Projects และ Settings ยังใช้ composition รุ่นก่อน; Challenge, Skills และ Journal เปลี่ยนแล้วใน `72ff141`, `290d49f`, `e6fbfdf`
-- Project URL inputs ปัจจุบันไม่ผูก state/persistence จึงยังไม่ “รักษา project links” ได้จริง ต้องออกแบบ optional field/migration ก่อนแก้
+- Settings ยังใช้ composition รุ่นก่อน; Challenge, Skills, Journal และ Projects เปลี่ยนแล้ว
+- Project state ใช้ optional `projectProgress` ภายใต้ schema v1; ต้องรักษา validator/tests นี้เมื่อแก้ import ใน Settings
 - Code example มี code styling และ horizontal scroll แต่ยังไม่มี token-level syntax highlighting
 - Lesson ไม่มี draggable splitter; focus mode มีแล้วและ splitter เป็น optional
 - ภาพ raster ใน `public/art/` รวมประมาณ 5.7 MB ยังไม่ได้ทำ responsive variants/optimization audit
@@ -127,9 +126,9 @@ npm start -- -p 3100
 
 ## ผลตรวจล่าสุด
 
-- `npm test`: 12 tests ผ่าน หลัง code ของ R3 Journal ที่ commit เป็น `e6fbfdf`
-- `npm run lint`: ผ่าน หลัง code ของ R3 Journal ที่ commit เป็น `e6fbfdf`
-- `npm run build`: ผ่านบน Next.js 16.3.6 หลัง code ของ R3 Journal ที่ commit เป็น `e6fbfdf`
+- `npm test`: 14 tests ผ่าน หลัง code ของ R4 Projects ที่ commit เป็น `4fbf3b2`
+- `npm run lint`: ผ่าน หลัง code ของ R4 Projects ที่ commit เป็น `4fbf3b2`
+- `npm run build`: ผ่านบน Next.js 16.3.6 หลัง code ของ R4 Projects ที่ commit เป็น `4fbf3b2`
 - Production browser QA ที่ `localhost:3100`: ตรวจ Dashboard, Curriculum, Lab, Lesson และ Micro-step บน desktop/mobile; ตรวจ Roadmap + drawer บน desktop; direct hash routes ที่เปิดระหว่างตรวจ ได้แก่ `#curriculum`, `#map`, `#lesson/web-ts-narrowing`, `#step/dev-program-concept`, `#roadmap`
 - ยังไม่ถือว่า full regression QA จบ เพราะหน้ารองและ interaction matrix ตามหัวข้อด้านบนยังไม่ครบ
 - หลัง R1 ผู้ใช้สั่งชัดเจนว่าไม่ให้เรียก Chrome หรือถ่าย screenshot เพิ่ม; งานถัดไปใช้ lint/tests/build และให้ผู้ใช้ตรวจภาพเอง

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowRight, Check, CircleDot, Clock, LocateFixed, LockKeyhole, RotateCcw, SkipForward, X } from "lucide-react";
+import { ArrowRight, Check, CircleDot, Clock, Compass, Flag, LocateFixed, LockKeyhole, RotateCcw, SkipForward, X } from "lucide-react";
 import { fullstackRoadmap, laneLabels, type RoadmapLane, type RoadmapNode } from "@/content/fullstack-roadmap";
 import { learningSteps } from "@/content/curriculum";
 import { lessons } from "@/content/lessons";
@@ -42,14 +42,6 @@ function statusFor(node: RoadmapNode, data: AppData, evidence: Evidence): NodeSt
   if (evidence.total > 0 && evidence.done === evidence.total) return "done";
   if (evidence.started) return "learning";
   return "none";
-}
-
-// Alternate sides so each checkpoint fans out evenly around the central journey.
-function partitionNodes(nodes: RoadmapNode[]) {
-  const left: RoadmapNode[] = [];
-  const right: RoadmapNode[] = [];
-  nodes.forEach((node, index) => (index % 2 === 0 ? left : right).push(node));
-  return { left, right };
 }
 
 export function FullStackRoadmap({ data, setData, openStep, openLesson }: Props) {
@@ -118,22 +110,34 @@ export function FullStackRoadmap({ data, setData, openStep, openLesson }: Props)
     if (nextLesson) openLesson(nextLesson.id);
   }
 
-  function renderNode(node: RoadmapNode, side: "left" | "right") {
-    const status = statusFor(node, data, evidenceFor(node, data));
+  function renderNode(node: RoadmapNode) {
+    const evidence = evidenceFor(node, data);
+    const status = statusFor(node, data, evidence);
     const statusText = markOptions.find((option) => option.id === status)?.label ?? "ยังไม่เริ่ม";
     return (
       <button
         id={`rm-node-${node.id}`}
         key={node.id}
-        className={`rm-node ${node.lane} ${status} ${side}${node.optional ? " optional" : ""}${node.id === selectedId ? " selected" : ""}${node.id === currentNode?.id ? " current" : ""}`}
+        className={`rm-map-node ${node.lane} ${status}${node.optional ? " optional" : ""}${node.id === selectedId ? " selected" : ""}${node.id === currentNode?.id ? " current" : ""}`}
         aria-label={`${node.title} — ${statusText}`}
         onClick={() => setSelectedId(node.id)}
       >
-        <span className="rm-node-title">{node.title}</span>
-        {status === "done" && <Check aria-hidden="true"/>}
-        {status === "learning" && <Clock aria-hidden="true"/>}
+        <span className="rm-map-node-top"><small>{node.optional ? "SIDE QUEST" : laneLabels[node.lane]}</small><i aria-hidden="true"/></span>
+        <strong>{node.title}</strong>
+        <span className="rm-map-node-meta">
+          <em>{statusText}</em>
+          {evidence.total > 0 && <small>{evidence.done}/{evidence.total} หลักฐาน</small>}
+        </span>
+        {status === "done" && <Check className="rm-map-node-status" aria-hidden="true"/>}
+        {status === "learning" && <Clock className="rm-map-node-status" aria-hidden="true"/>}
       </button>
     );
+  }
+
+  function stageProgress(stage: (typeof visibleStages)[number]) {
+    const evidence = stage.nodes.map((node) => ({ node, evidence: evidenceFor(node, data) }));
+    const done = evidence.filter(({ node, evidence: item }) => statusFor(node, data, item) === "done").length;
+    return { done, total: stage.nodes.length };
   }
 
   return (
@@ -158,29 +162,55 @@ export function FullStackRoadmap({ data, setData, openStep, openLesson }: Props)
         <button className="rm-current-button" disabled={!currentNode} onClick={() => { setLane("all"); requestAnimationFrame(() => document.getElementById(`rm-node-${currentNode?.id}`)?.scrollIntoView({ behavior: "smooth", block: "center" })); }}><LocateFixed/>กลับไปตำแหน่งปัจจุบัน</button>
       </div>
 
-      <main className="rm-canvas">
-        <div className="rm-legend" aria-label="คำอธิบายสี">
-          <span><i className="rm-swatch topic"/>ด่านหลัก</span>
-          <span><i className="rm-swatch sub"/>หัวข้อที่ต้องรู้</span>
-          <span><i className="rm-swatch check"/>Checkpoint · โปรเจกต์ฝึก</span>
-          <span><i className="rm-swatch optional"/>เลือกเรียน</span>
-        </div>
-        <div className="rm-journey">
-          <div className="rm-pill"><CircleDot aria-hidden="true"/>Full Stack</div>
+      <main className="rm-map-shell">
+        <header className="rm-map-heading">
+          <div><Compass aria-hidden="true"/><span><small>ROUTE OVERVIEW</small><strong>เลือกด่านเพื่อดูเส้นทางด้านล่าง</strong></span></div>
+          <div className="rm-map-legend" aria-label="คำอธิบายสถานะ"><span className="learning">กำลังเรียน</span><span className="done">ผ่านแล้ว</span><span className="optional">Side quest</span></div>
+        </header>
+
+        <nav className="rm-overview" aria-label="ภาพรวมเส้นทาง Full-stack">
+          <div className="rm-overview-line" aria-hidden="true"/>
           {visibleStages.map((stage) => {
-            const { left, right } = partitionNodes(stage.nodes);
+            const progress = stageProgress(stage);
+            const hasCurrent = stage.nodes.some((node) => node.id === currentNode?.id);
+            return <button key={stage.id} className={hasCurrent ? "current" : progress.done === progress.total ? "done" : ""} onClick={() => document.getElementById(`rm-stage-${stage.id}`)?.scrollIntoView({ behavior: "smooth", block: "start" })}>
+              <span className="rm-overview-marker">{progress.done === progress.total ? <Check aria-hidden="true"/> : stage.number}</span>
+              <strong>{stage.title}</strong>
+              <small>{progress.done}/{progress.total} หัวข้อ</small>
+            </button>;
+          })}
+        </nav>
+
+        <div className="rm-map-route">
+          <div className="rm-map-start"><CircleDot aria-hidden="true"/><span><small>START HERE</small><strong>Full-stack Explorer</strong></span></div>
+          {visibleStages.map((stage) => {
+            const progress = stageProgress(stage);
+            const laneGroups = (Object.keys(laneLabels) as RoadmapLane[])
+              .map((laneId) => ({ laneId, nodes: stage.nodes.filter((node) => node.lane === laneId) }))
+              .filter((group) => group.nodes.length);
             return (
-              <section className="rm-stage" key={stage.id} aria-labelledby={`rm-stage-${stage.id}`}>
-                <div className="rm-topic"><span>{stage.number}</span><h2 id={`rm-stage-${stage.id}`}>{stage.title}</h2></div>
-                <div className="rm-branches">
-                  <div className="rm-column left">{left.map((node) => renderNode(node, "left"))}</div>
-                  <div className="rm-column right">{right.map((node) => renderNode(node, "right"))}</div>
+              <section id={`rm-stage-${stage.id}`} className="rm-map-stage" key={stage.id} aria-labelledby={`rm-stage-title-${stage.id}`}>
+                <div className="rm-stage-brief">
+                  <span className="rm-stage-number">{stage.number}</span>
+                  <small>CHAPTER {stage.number}</small>
+                  <h2 id={`rm-stage-title-${stage.id}`}>{stage.title}</h2>
+                  <p>{stage.outcome}</p>
+                  <div className="rm-stage-progress"><span><i style={{ width: `${progress.total ? progress.done / progress.total * 100 : 0}%` }}/></span><small>{progress.done}/{progress.total}</small></div>
                 </div>
-                <div className="rm-checkpoint"><strong>Checkpoint · {stage.number}</strong><span>{stage.outcome}</span></div>
+                <div className="rm-stage-network">
+                  <span className="rm-network-entry" aria-hidden="true"/>
+                  <div className="rm-lane-groups">
+                    {laneGroups.map((group) => <section className={`rm-lane-group ${group.laneId}`} key={group.laneId} aria-label={laneLabels[group.laneId]}>
+                      <header><i aria-hidden="true"/><span>{laneLabels[group.laneId]}</span><small>{group.nodes.length} ด่าน</small></header>
+                      <div>{group.nodes.map(renderNode)}</div>
+                    </section>)}
+                  </div>
+                  <div className="rm-map-checkpoint"><Flag aria-hidden="true"/><span><small>CHECKPOINT {stage.number}</small><strong>{stage.outcome}</strong></span></div>
+                </div>
               </section>
             );
           })}
-          <div className="rm-pill rm-finish"><Check aria-hidden="true"/>Build · Explain · Ship · Improve</div>
+          <div className="rm-map-finish"><Flag aria-hidden="true"/><span><small>THE JOURNEY CONTINUES</small><strong>Build · Explain · Ship · Improve</strong></span></div>
         </div>
       </main>
 

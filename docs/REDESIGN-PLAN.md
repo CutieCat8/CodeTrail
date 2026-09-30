@@ -98,12 +98,17 @@
 
 ## R8 — Acceptance defect fixes
 
-- สถานะ: **ยังไม่เริ่ม**
+- สถานะ: **กำลังทำ** — แก้ mixed mission defect แรกแล้ว (`a5b0408`); ยังรอ manual acceptance
 - เป้าหมาย/ขอบเขต: แก้เฉพาะข้อไม่ผ่านที่ผู้ใช้รายงาน
 - หน้า/components: จำกัดตาม defect
 - Dependency: R5–R7 มีผลตรวจ
 - เกณฑ์เสร็จ: มี reproduction, root cause, fix และ targeted verification; หนึ่ง defect/feature ต่อหนึ่ง commit
 - การทดสอบ: targeted test + lint/build ตามความเสี่ยง ไม่รันทุกอย่างซ้ำโดยไม่มีเหตุ
+
+Defect ที่ปิดด้าน implementation:
+
+- Mixed mode เดิมเดิน Developer Foundations ครบทั้งคอร์สก่อน Java; เปลี่ยนเป็น balanced staged alternation พร้อม tests 10 ข้อ
+- Home เดิมอาจ resume รายการจากโหมดก่อนหน้า; จำกัด resume ให้ตรง route และให้ Mixed ใช้ recommendation ปัจจุบัน
 
 ## R9 — Asset optimization
 

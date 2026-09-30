@@ -3,8 +3,8 @@
 อัปเดตล่าสุด: 2026-10-01
 Branch: `main`  
 Remote: `origin` → `https://github.com/CutieCat8/CodeTrail.git`  
-ฐาน implementation ที่ push แล้ว: `7e4d7c8`
-สถานะรอบ: **หน้า Home แบบ daily-return พร้อม activity heatmap เขียนและ push แล้ว; รอผู้ใช้ตรวจภาพใน browser**
+ฐาน implementation ที่ push แล้ว: `a5b0408`
+สถานะรอบ: **แก้กฎภารกิจโหมดผสมและ push แล้ว; รอผู้ใช้ตรวจ Home ล่าสุดใน browser**
 
 เอกสารหลักมีหน้าที่แยกกัน:
 
@@ -37,6 +37,16 @@ Remote: `origin` → `https://github.com/CutieCat8/CodeTrail.git`
 - หลักฐาน: `src/components/QuestHome.tsx`, `src/components/ActivityHeatmap.tsx`, `src/lib/activity.ts`, `src/app/home-dashboard.css`, commit `7e4d7c8` และ push แล้ว
 - Automated checks หลังเขียนชุดนี้: lint ผ่าน, Vitest 18/18 และ production build ผ่านบน Next.js 16.3.6
 - Manual verification: ยังไม่ได้ตรวจภาพจริงตามคำสั่งไม่ให้เรียก Chrome/ถ่าย screenshot
+
+### Defect fix: ภารกิจโหมดผสม
+
+- สาเหตุเดิม: `stepRecommendation()` ต่อ steps ทั้งคอร์สด้วย `flatMap` ทำให้ Mixed เรียน Developer Foundations ครบ 40 steps ก่อนเห็น Java จึงมีพฤติกรรมเหมือน Full-stack ช่วงแรก
+- พฤติกรรมใหม่: สลับ Developer Foundations ↔ Java Foundations ตามจำนวนขั้นที่ผ่าน จากนั้น JavaScript Foundations ↔ Java OOP และค่อย Node Foundations โดยไม่ข้าม route ที่ยังไม่จบ
+- Home แสดงภารกิจผสม, step ปัจจุบัน และ route ถัดไปอย่างชัดเจน; CTA เปิดทีละ step ตามจริง และเมื่อกลับ Home หลังผ่านขั้นแรก recommendation จะสลับฝั่ง
+- Full-stack/Java resume เฉพาะ last step/lesson ที่อยู่ใน route ของโหมดที่เลือก ป้องกันการแสดงภารกิจจากโหมดก่อนหน้า
+- หลักฐาน: `src/lib/recommendation.ts`, `src/components/QuestHome.tsx`, `tests/recommendation.test.ts`, commit `a5b0408` (pushed)
+- ตรวจแล้ว: regression tests 10/10, lint และ production build ผ่าน; code review ไม่พบ blocking/high issue
+- Manual verification: รอผู้ใช้ตรวจการสลับโหมดและการกลับ Home หลังผ่าน step
 
 ## สัญญาที่ต้องรักษา
 

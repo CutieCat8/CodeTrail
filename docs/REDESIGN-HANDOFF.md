@@ -3,7 +3,7 @@
 อัปเดตล่าสุด: 2026-09-30  
 Branch: `main`  
 Remote: `origin` → `https://github.com/CutieCat8/CodeTrail.git`  
-Commit ที่ตรวจเป็นฐาน: `4fbf3b2` (`origin/main` หลังจบ R4)
+Commit ที่ตรวจเป็นฐาน: `8475f65` (`origin/main` หลังจบ R5)
 
 ไฟล์นี้เป็น **สถานะปัจจุบัน** ของงานรีดีไซน์ ส่วนภาพรวมผลิตภัณฑ์อยู่ที่ `docs/APP-OVERVIEW.md`, คิวงานอยู่ที่ `docs/REDESIGN-PLAN.md` และเหตุผลด้านภาพอยู่ที่ `docs/DESIGN-RESEARCH.md` เมื่อเอกสารขัดกับโค้ด ให้ยืนยันจากโค้ด, tests และ Git ก่อนแก้เอกสาร
 
@@ -46,12 +46,13 @@ Commit ที่ตรวจเป็นฐาน: `4fbf3b2` (`origin/main` ห�
 | Skill Evidence explorer | ใช่ | ผู้ใช้จะตรวจภาพเองตามคำสั่งล่าสุด | lint + tests 12/12 + build ผ่าน | `290d49f` | ใช่ | `src/components/QuestApp.tsx`, `src/app/globals.css` |
 | Journal archive-first flow | ใช่ | ผู้ใช้จะตรวจภาพเองตามคำสั่งล่าสุด | lint + tests 12/12 + build ผ่าน | `e6fbfdf` | ใช่ | `src/components/QuestApp.tsx`, `src/app/globals.css` |
 | Projects overview + persisted evidence | ใช่ | ผู้ใช้จะตรวจภาพเองตามคำสั่งล่าสุด | lint + tests 14/14 + build ผ่าน | `4fbf3b2` | ใช่ | `src/types/domain.ts`, `src/lib/storage.ts`, `src/components/QuestApp.tsx`, `tests/content.test.ts` |
+| Settings + backup recovery controls | ใช่ | ผู้ใช้จะตรวจภาพเองตามคำสั่งล่าสุด | lint + tests 14/14 + build ผ่าน | `8475f65` | ใช่ | `src/lib/storage.ts`, `src/components/QuestApp.tsx`, `tests/content.test.ts` |
 
-`origin/main` และ `HEAD` ตรงกันที่ `4fbf3b2` หลังจบ R4
+`origin/main` และ `HEAD` ตรงกันที่ `8475f65` หลังจบ R5
 
 ## สิ่งที่กำลังทำ
 
-R4 Projects จบและ push แล้ว กำลังเริ่ม audit R5 Settings; `projectProgress` เป็น optional schema-v1 field ที่ validate ก่อน import และ URL/checklist ใช้ autosave จริง
+R5 Settings จบและ push แล้ว งานถัดไปคือ R6/R7 interaction + responsive audit โดยไม่เรียก Chrome ตามคำสั่งล่าสุด ให้ตรวจจาก code, lint/tests/build และส่งรายการจุดที่ผู้ใช้ควรดูเอง
 
 ## Worktree ที่ยังไม่ commit ก่อนเอกสารชุดนี้
 
@@ -70,28 +71,27 @@ R4 Projects จบและ push แล้ว กำลังเริ่ม aud
 
 ## งานที่เหลือตามลำดับ
 
-1. Settings: จัดหมวด, import normalization/error feedback และ reset confirmation ที่ชัด
-2. Functional QA ของ persistence/runner/XP/import และ Roadmap states ด้วยข้อมูลทดสอบแยก
-3. Responsive/a11y polish ที่ 1440×900, 1280×800, 768×1024, 390×844 รวม focus, Escape, overflow, contrast และ reduced motion
-4. optimize ภาพและรัน lint/tests/build รอบส่งมอบ; ผู้ใช้จะตรวจภาพเองและสั่งไม่ให้เรียก Chrome/ถ่าย screenshot เพิ่ม
-5. Private hosting ทำภายหลังเมื่อผู้ใช้พร้อม; ห้าม deploy สาธารณะเพื่อให้มี URL
+1. Functional QA ของ persistence/runner/XP/import และ Roadmap states ด้วยข้อมูลทดสอบแยก
+2. Responsive/a11y code audit รวม focus, Escape, overflow, contrast และ reduced motion; ผู้ใช้ตรวจ viewport จริงเอง
+3. optimize ภาพและรัน lint/tests/build รอบส่งมอบ
+4. Private hosting ทำภายหลังเมื่อผู้ใช้พร้อม; ห้าม deploy สาธารณะเพื่อให้มี URL
 
 รายละเอียดและเกณฑ์จบของแต่ละช่วงอยู่ใน `docs/REDESIGN-PLAN.md`
 
 ## งานถัดไปแบบเจาะจง
 
-เริ่มที่ `SettingsView` และ import path:
+เริ่ม R6/R7 ที่ shell, Roadmap และ interaction paths:
 
-1. จัดกลุ่มโหมดฝึก, backup และ danger zone ให้มี hierarchy ชัด
-2. ทำ import normalization ให้ optional `stepProgress`/`projectProgress` จากไฟล์เก่ากลับมาเป็น object พร้อมใช้
-3. รักษา data เดิมเมื่อ import ผิดและให้ feedback ผ่าน live region
-4. reset confirmation ต้องยืนยันชัดและ reset เฉพาะ local browser
-5. รัน lint/tests/build แล้ว commit/push เป็น feature เดียว
+1. ตรวจ drawer focus trap/Escape/focus return และ Roadmap drawer ด้วย code review
+2. ตรวจ media queries ของหน้าที่รีดีไซน์ทั้งหมดหา overflow/target ต่ำกว่าเกณฑ์
+3. เพิ่ม unit tests ให้ logic persistence/XP/import ที่ยังตรวจอัตโนมัติได้ โดยไม่จำลอง browser pass
+4. สรุป manual visual checklist ให้ผู้ใช้ตรวจแทน Chrome
+5. commit/push การแก้แต่ละ defect แยกจากเอกสาร
 
 ## ข้อจำกัดและบั๊กที่ทราบ
 
 - `QuestApp.tsx` ยังเป็น component ใหญ่ หลายหน้ารวมในไฟล์เดียว; ห้าม refactor ใหญ่พร้อมรีดีไซน์หน้าหนึ่งโดยไม่มีเหตุจำเป็น
-- Settings ยังใช้ composition รุ่นก่อน; Challenge, Skills, Journal และ Projects เปลี่ยนแล้ว
+- หน้าหลักและหน้ารองทั้งหมดผ่าน composition redesign แล้ว เหลืองาน audit/defect fixing
 - Project state ใช้ optional `projectProgress` ภายใต้ schema v1; ต้องรักษา validator/tests นี้เมื่อแก้ import ใน Settings
 - Code example มี code styling และ horizontal scroll แต่ยังไม่มี token-level syntax highlighting
 - Lesson ไม่มี draggable splitter; focus mode มีแล้วและ splitter เป็น optional
@@ -126,9 +126,9 @@ npm start -- -p 3100
 
 ## ผลตรวจล่าสุด
 
-- `npm test`: 14 tests ผ่าน หลัง code ของ R4 Projects ที่ commit เป็น `4fbf3b2`
-- `npm run lint`: ผ่าน หลัง code ของ R4 Projects ที่ commit เป็น `4fbf3b2`
-- `npm run build`: ผ่านบน Next.js 16.3.6 หลัง code ของ R4 Projects ที่ commit เป็น `4fbf3b2`
+- `npm test`: 14 tests ผ่าน หลัง code ของ R5 Settings ที่ commit เป็น `8475f65`
+- `npm run lint`: ผ่าน หลัง code ของ R5 Settings ที่ commit เป็น `8475f65`
+- `npm run build`: ผ่านบน Next.js 16.3.6 หลัง code ของ R5 Settings ที่ commit เป็น `8475f65`
 - Production browser QA ที่ `localhost:3100`: ตรวจ Dashboard, Curriculum, Lab, Lesson และ Micro-step บน desktop/mobile; ตรวจ Roadmap + drawer บน desktop; direct hash routes ที่เปิดระหว่างตรวจ ได้แก่ `#curriculum`, `#map`, `#lesson/web-ts-narrowing`, `#step/dev-program-concept`, `#roadmap`
 - ยังไม่ถือว่า full regression QA จบ เพราะหน้ารองและ interaction matrix ตามหัวข้อด้านบนยังไม่ครบ
 - หลัง R1 ผู้ใช้สั่งชัดเจนว่าไม่ให้เรียก Chrome หรือถ่าย screenshot เพิ่ม; งานถัดไปใช้ lint/tests/build และให้ผู้ใช้ตรวจภาพเอง

@@ -53,7 +53,7 @@
 
 ## R5 — Settings and backup safety
 
-- สถานะ: **กำลังทำ**
+- สถานะ: **เสร็จ** (`8475f65`, pushed)
 - เป้าหมาย: จัดหมวดการฝึก/ข้อมูลสำรอง/เริ่มใหม่ และทำ feedback ให้ชัด
 - หน้า/components: `Settings`, `ModeSwitch`, `src/lib/storage.ts`
 - Dependency: R4 data model ต้องนิ่งก่อน final import/export validation

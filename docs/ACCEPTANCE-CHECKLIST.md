@@ -1,4 +1,4 @@
-# Acceptance checklist — Midnight Pixel Expedition
+# Acceptance checklist — Modern Developer Adventure
 
 อัปเดต: 2026-09-30
 ขอบเขต: ตรวจ release candidate ในเครื่อง โดยผู้ใช้เป็นผู้ตรวจภาพและพฤติกรรมใน browser
@@ -23,6 +23,8 @@ npm start -- -p 3100
 - หมายเหตุ / ภาพประกอบ / error: ______________________________________________
 
 ลำดับแนะนำ: Dashboard → Curriculum → Lab → Lesson Workspace → Micro-step → Roadmap → หน้ารอง → Mobile/Keyboard
+
+จุดตรวจธีมรอบล่าสุด: พื้นหลักควรเป็น charcoal/olive อุ่นแทนสีน้ำเงินหม่น, ข้อความ ivory/beige ต้องแยกจากพื้นชัด, mint/teal/lavender/amber ใช้เป็น accent ตามหน้าที่ และ pixel art/มาสคอตเดิมต้องยังอยู่ครบ
 
 ## A. Desktop และเส้นทางหลัก
 

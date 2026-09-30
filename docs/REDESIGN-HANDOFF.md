@@ -1,10 +1,10 @@
 # Redesign handoff
 
-อัปเดตล่าสุด: 2026-09-30  
+อัปเดตล่าสุด: 2026-10-01
 Branch: `main`  
 Remote: `origin` → `https://github.com/CutieCat8/CodeTrail.git`  
-ฐาน implementation ที่ push แล้ว: `a8d12b0`
-สถานะรอบ: **ปิด implementation และรอผู้ใช้ตรวจรับใน browser**
+ฐาน implementation ที่ push แล้ว: `f1d22c6`
+สถานะรอบ: **ปรับธีมตาม feedback แล้ว และรอผู้ใช้ตรวจรับใน browser**
 
 เอกสารหลักมีหน้าที่แยกกัน:
 
@@ -16,7 +16,17 @@ Remote: `origin` → `https://github.com/CutieCat8/CodeTrail.git`
 
 ## เป้าหมายและ Art direction
 
-รีดีไซน์แอปเดิมให้เป็น “โลกผจญภัยสำหรับคนเรียนเขียนโปรแกรม” ที่กลับมาฝึกได้วันละประมาณหนึ่งชั่วโมง โดยรักษาระบบเรียนและข้อมูลเดิม Art direction คือ **Midnight Pixel Expedition**: โลก pixel art ยามค่ำคืนผสาน developer workspace ที่อ่านสบาย ใช้ navy/slate แยกระดับพื้นผิว, mint สำหรับ action, lavender สำหรับ Java, cyan สำหรับข้อมูล และ amber สำหรับ checkpoint
+รีดีไซน์แอปเดิมให้เป็น “โลกผจญภัยสำหรับคนเรียนเขียนโปรแกรม” ที่กลับมาฝึกได้วันละประมาณหนึ่งชั่วโมง โดยรักษาระบบเรียนและข้อมูลเดิม Art direction ล่าสุดคือ **Modern Developer Adventure**: developer field guide โทน charcoal/olive อุ่น ๆ ใช้ข้อความ ivory/beige ที่ contrast สูง, mint สำหรับ action, lavender สำหรับ Java, teal สำหรับข้อมูล และ amber สำหรับ checkpoint โดยรักษา pixel art และมาสคอตเดิมทั้งหมด
+
+## Theme iteration ล่าสุด
+
+- Feedback: ธีมเดิมเป็นสีน้ำเงินหม่นเกือบทั้งหน้าและตัวอักษรขาวกลืนกับพื้น ทำให้อ่านยาก
+- การแก้: เพิ่ม `src/app/modern-adventure.css` เป็น visual override หลัง `globals.css` ผ่าน import ใน `src/app/layout.tsx`
+- ขอบเขต: เปลี่ยน semantic palette, shell, Dashboard, Curriculum, Lab, archives, Lesson, Micro-step และ Roadmap เป็นพื้นอุ่นหลายระดับ พร้อมเพิ่ม contrast ของข้อความและ form controls
+- Pixel art: ไม่ลบหรือแทน asset ใด; ยังคง `PixelCat`, `ExpeditionArt` และภาพใน `public/art/` พร้อม `image-rendering: pixelated`
+- หลักฐาน: commit `f1d22c6` (`feat(theme): introduce warm developer adventure palette`), push แล้ว
+- Automated checks: lint ผ่าน; production build ผ่าน; contrast คู่สีหลักที่คำนวณได้อยู่ระหว่าง 6.85:1–16.69:1
+- Manual verification: ยังรอผู้ใช้เปิดดูจริง; ไม่ได้เรียก Chrome หรือถ่าย screenshot
 
 ## สัญญาที่ต้องรักษา
 
@@ -41,8 +51,8 @@ Tests/build เป็นหลักฐานทางเทคนิคเท�
 | 1 | เป้าหมายผลิตภัณฑ์ | ทำบางส่วน / ต้องตรวจในเบราว์เซอร์ | flow หลักอยู่ใน `QuestApp.tsx`; ต้องให้ผู้ใช้ยืนยัน hierarchy, ความอยากกลับมาใช้ และความอ่านสบาย |
 | 2 | ข้อจำกัดโปรเจกต์ | ทำเสร็จแล้วด้าน implementation / ต้องตรวจ persistence | schema v1 ใน `src/lib/storage.ts`, hash routing ใน `QuestApp.tsx`, commits `43943bc`, `a8d12b0` |
 | 3 | ปัญหาจากภาพเดิม | ทำบางส่วน / ต้องตรวจในเบราว์เซอร์ | composition ถูกเปลี่ยนใน commits `3940f3b`–`8475f65`; step index แก้จากข้อมูลจริงที่ `31868ee`; ต้องยืนยันภาพจริงและ XP overlay |
-| 4 | Midnight Pixel Expedition | เขียนโค้ดแล้ว / ต้องตรวจในเบราว์เซอร์ | `src/app/globals.css`, `ExpeditionArt.tsx`, `public/art/`, commit `80dc95b` |
-| 5 | Design tokens/typography/layout | ทำเสร็จแล้วด้านโค้ด / ต้องตรวจ contrast | semantic tokens และ responsive rules ใน `globals.css`; ยังไม่มีหลักฐาน manual contrast ครบทุกคู่ |
+| 4 | Modern Developer Adventure | เขียนโค้ดแล้ว / ต้องตรวจในเบราว์เซอร์ | `src/app/modern-adventure.css`, `src/app/layout.tsx`, pixel art เดิมใน `public/art/`, commits `80dc95b`, `f1d22c6` |
+| 5 | Design tokens/typography/layout | ทำเสร็จแล้วด้านโค้ด / ต้องตรวจภาพจริง | semantic override ใน `modern-adventure.css`; คู่สีหลักคำนวณผ่าน 6.85:1 ขึ้นไป แต่ยังต้องตรวจทุก state ใน browser |
 | 6 | ภาพประกอบและมาสคอต | ทำบางส่วน / ต้องตรวจในเบราว์เซอร์ | `expedition-base.png`, `world-landmarks.png`, `miso-sprite-sheet.png`, `PixelCat.tsx`; ยังไม่ได้ optimize responsive variants และไม่มี badge raster แยกทุกชนิด |
 | 7 | App shell/navigation | เขียนโค้ดแล้ว / ต้องตรวจ keyboard/mobile | shell/breadcrumb/drawer/focus code ใน `QuestApp.tsx`, commit `3940f3b` |
 | 8 | Dashboard | เขียนโค้ดแล้ว / ต้องตรวจในเบราว์เซอร์ | mission hero, mode, session plan, resume/review/project ใน `QuestApp.tsx`, commit `3940f3b` |
@@ -75,7 +85,7 @@ Tests/build เป็นหลักฐานทางเทคนิคเท�
 | Projects | illustrated covers, overview/detail, persisted repo/demo/checklist | `4fbf3b2` | project switching/reload and URL behavior |
 | Settings | training/backup/reset sections, export/import feedback, local-only disclosure | `8475f65`, `a8d12b0` | export/import/reset/mode/goal in browser |
 | Illustration | original base scene, 8 world landmarks, one mascot sheet with welcome/study/success/rest | `80dc95b` | visual consistency, crop/aspect, asset cost |
-| Motion | 150/220/260ms tokens, hover/panel feedback, reduced-motion override | `80dc95b` และ CSS commits | OS reduced-motion and no distracting loop |
+| Motion | 150/220/260ms tokens, hover/panel feedback, reduced-motion override | `80dc95b`, `f1d22c6` | OS reduced-motion and no distracting loop |
 
 ## สถานะ implementation / verification / Git
 

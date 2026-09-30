@@ -3,149 +3,166 @@
 อัปเดตล่าสุด: 2026-09-30  
 Branch: `main`  
 Remote: `origin` → `https://github.com/CutieCat8/CodeTrail.git`  
-Commit ที่ตรวจเป็นฐาน: `8475f65` (`origin/main` หลังจบ R5)
+ฐาน implementation ที่ push แล้ว: `a8d12b0`
+สถานะรอบ: **ปิด implementation และรอผู้ใช้ตรวจรับใน browser**
 
-ไฟล์นี้เป็น **สถานะปัจจุบัน** ของงานรีดีไซน์ ส่วนภาพรวมผลิตภัณฑ์อยู่ที่ `docs/APP-OVERVIEW.md`, คิวงานอยู่ที่ `docs/REDESIGN-PLAN.md` และเหตุผลด้านภาพอยู่ที่ `docs/DESIGN-RESEARCH.md` เมื่อเอกสารขัดกับโค้ด ให้ยืนยันจากโค้ด, tests และ Git ก่อนแก้เอกสาร
+เอกสารหลักมีหน้าที่แยกกัน:
 
-## เป้าหมายและทิศทาง
+- ไฟล์นี้: สถานะจริงและจุดเริ่มทำงานรอบถัดไป
+- `docs/REDESIGN-PLAN.md`: ช่วงงานและ acceptance gate ที่ยังเปิด
+- `docs/ACCEPTANCE-CHECKLIST.md`: ขั้นตอน browser/manual QA สำหรับผู้ใช้
+- `docs/DESIGN-RESEARCH.md`: หลักฐานงานวิจัยและ design decisions
+- `docs/APP-OVERVIEW.md`: เอกสารบริบทจากผู้ใช้ (ยัง untracked; อย่า stage โดยไม่ตั้งใจ)
 
-รีดีไซน์แอปเดิมให้เป็นโลกเรียนเขียนโปรแกรมที่อยากกลับมาใช้วันละประมาณหนึ่งชั่วโมง โดยไม่ลดทอนระบบเรียนและข้อมูลเดิม Art direction คือ **Midnight Pixel Expedition**: โลก pixel art ยามค่ำคืนผสาน developer workspace ที่อ่านสบาย ใช้พื้น navy/slate หลายระดับ, mint สำหรับ action, lavender สำหรับ Java, cyan สำหรับข้อมูล และ amber สำหรับ checkpoint
+## เป้าหมายและ Art direction
 
-ผลลัพธ์ที่ต้องรักษาไว้คือ Dashboard ที่บอกงานถัดไปทันที, Curriculum ที่เลือกจากชื่อและความหมายได้, Roadmap แบบแผนเดินทาง, Lab แบบโลกภารกิจ, Workspace ที่อ่านและเขียนโค้ดต่อเนื่องได้ และหน้ารองที่ไม่ย้อนกลับไปเป็น card grid ซ้ำกันทั้งหมด
+รีดีไซน์แอปเดิมให้เป็น “โลกผจญภัยสำหรับคนเรียนเขียนโปรแกรม” ที่กลับมาฝึกได้วันละประมาณหนึ่งชั่วโมง โดยรักษาระบบเรียนและข้อมูลเดิม Art direction คือ **Midnight Pixel Expedition**: โลก pixel art ยามค่ำคืนผสาน developer workspace ที่อ่านสบาย ใช้ navy/slate แยกระดับพื้นผิว, mint สำหรับ action, lavender สำหรับ Java, cyan สำหรับข้อมูล และ amber สำหรับ checkpoint
 
-## สัญญาที่ห้ามทำพัง
+## สัญญาที่ต้องรักษา
 
-- คง localStorage key `seas-fullstack-quest:v1` และ `AppData.version === 1`; field ใหม่ต้อง optional หรือมี migration ที่อ่านข้อมูลเก่าได้
-- ห้ามล้าง localStorage เพื่อทดสอบ; ใช้ browser profile/ชุดข้อมูลแยก
-- คง Lesson IDs, Topic/Step IDs และ hash routes เดิม เช่น `#dashboard`, `#curriculum`, `#roadmap`, `#map`, `#lesson/<id>`, `#step/<id>`
-- คงโหมด `fullstack`, `java`, `mixed`, weekly goal, answers, notes, reflection, checklist, attempts, last result, journal, last lesson/step และ Roadmap marks
-- คงสถานะ Roadmap `learning | done | skip`; แยกสถานะผู้เรียนตั้งเองจากสถานะที่อนุมาน
-- ระบบ auto-check ต้องรันพฤติกรรมจริงใน Web Worker ผ่าน `src/lib/runner.ts`, timeout 1.5 วินาที และไม่เปลี่ยนเป็น keyword matching หรือ `eval` ใน UI process
-- Java ยังเป็น `local-java`: เว็บไซต์บันทึก source/checklist/notes แต่ห้ามอ้างว่า compile หรือ tests ผ่าน
-- XP มาจาก `completedAt` ของการผ่านครั้งแรก; การรันหรือกดซ้ำต้องไม่เพิ่มรางวัล
-- คง Export/Import JSON และ validation; invalid import ต้องไม่ทำให้แอปล้ม
-- ไม่เพิ่ม backend/database/auth หรือเปลี่ยน routing architecture เพื่อรีดีไซน์
-- ยังไม่ deploy สาธารณะ; localStorage ไม่ใช่ access control และไม่มี private URL ที่ตรวจแล้วในขณะนี้
+- localStorage key `seas-fullstack-quest:v1` และ `AppData.version === 1`; field ใหม่ต้อง optional หรือมี migration
+- Lesson IDs, Topic/Step IDs และ hash routes เดิม เช่น `#dashboard`, `#curriculum`, `#roadmap`, `#map`, `#lesson/<id>`, `#step/<id>`
+- progress, source, notes, reflection, checklist, attempts, last result, journal, project links, last lesson/step และ Roadmap marks เดิม
+- โหมด `fullstack | java | mixed` และ weekly goal
+- Roadmap marks `learning | done | skip` และการแยก manual/inferred state
+- auto-check ใน Web Worker ผ่าน `src/lib/runner.ts`, timeout 1.5 วินาที; ห้ามแทนด้วย keyword matching หรือ `eval` ใน UI process
+- Java เป็น `local-java`; เว็บบันทึกหลักฐานแต่ไม่อ้างว่า compile/tests ผ่าน
+- XP อิง `completedAt` ครั้งแรกและต้องไม่เพิ่มจากการรันซ้ำ
+- Export/Import JSON ต้องอ่าน schema v1 เก่าได้และปฏิเสธข้อมูลผิดโดยไม่ทำแอปล้ม
+- ไม่เพิ่ม backend/database/auth และไม่เปลี่ยน routing architecture เพื่อรีดีไซน์
+- ไม่มี private deployment ขณะนี้; localStorage ไม่ใช่ access control และไม่ sync ข้ามอุปกรณ์
 
-## สถานะรายช่วง
+## เทียบพรอมพ์รีดีไซน์ 20 หัวข้อ
 
-คำว่า “เขียนแล้ว”, “ตรวจใน browser”, “ผ่าน tests/build”, “commit” และ “push” แยกกันตามหลักฐาน ไม่ใช้คำว่าเสร็จแทนทุกสถานะ
+Tests/build เป็นหลักฐานทางเทคนิคเท่านั้น ไม่ใช่หลักฐานว่า UI ผ่าน Visual QA
 
-| ช่วง | เขียนโค้ดแล้ว | ตรวจใน browser แล้ว | Tests / build | Commit | Push | ไฟล์สำคัญ |
-|---|---|---|---|---|---|---|
-| Roadmap marks + schema v1 compatibility | ใช่ | ตรวจ flow หลักแล้ว | test รองรับ schema | `43943bc` | ใช่ | `src/lib/storage.ts`, `src/types/domain.ts`, `src/components/FullStackRoadmap.tsx` |
-| แก้เลข Micro-step ต่อคอร์ส | ใช่ | เห็น `1 / 40` ในคอร์สที่ตรวจ | unit test ครอบคลุม | `31868ee` | ใช่ | `src/content/curriculum/generate.ts`, `tests/content.test.ts` |
-| Design tokens + original pixel assets | ใช่ | ใช้จริงในหน้าที่รีดีไซน์ | build ผ่านภายหลัง | `80dc95b` | ใช่ | `src/app/globals.css`, `src/components/ExpeditionArt.tsx`, `public/art/` |
-| App shell + Dashboard | ใช่ | Production desktop/mobile | lint/build ผ่านภายหลัง | `3940f3b` | ใช่ | `src/components/QuestApp.tsx`, `src/app/globals.css` |
-| Curriculum explorer | ใช่ | Production desktop/mobile | lint/build ผ่านภายหลัง | `75da2bf` | ใช่ | `src/components/QuestApp.tsx`, `src/app/globals.css` |
-| Lab world map | ใช่ | Production desktop/mobile | lint/build ผ่านภายหลัง | `89fba30` | ใช่ | `src/components/QuestApp.tsx`, `src/app/globals.css` |
-| Lesson split workspace | ใช่ | Production desktop/mobile | tests 12/12 หลังชุดนี้ | `bd25520` | ใช่ | `src/components/QuestApp.tsx`, `src/app/globals.css` |
-| Micro-step three-phase flow | ใช่ | Production desktop/mobile | tests 12/12 หลังชุดนี้ | `54f0564` | ใช่ | `src/components/QuestApp.tsx`, `src/app/globals.css` |
-| Roadmap + drawer visual system | ใช่ | Production desktop + drawer | lint/build ผ่านหลังชุดนี้; ไม่ได้รัน tests ซ้ำเพราะเปลี่ยน UI/CSS | `18bdd70` | ใช่ | `src/components/FullStackRoadmap.tsx`, `src/components/roadmap.css` |
-| Challenge Library mission archive | ใช่ | Production desktop/mobile, filter/empty/clear | lint + tests 12/12 + build ผ่าน | `72ff141` | ใช่ | `src/components/QuestApp.tsx`, `src/app/globals.css` |
-| Skill Evidence explorer | ใช่ | ผู้ใช้จะตรวจภาพเองตามคำสั่งล่าสุด | lint + tests 12/12 + build ผ่าน | `290d49f` | ใช่ | `src/components/QuestApp.tsx`, `src/app/globals.css` |
-| Journal archive-first flow | ใช่ | ผู้ใช้จะตรวจภาพเองตามคำสั่งล่าสุด | lint + tests 12/12 + build ผ่าน | `e6fbfdf` | ใช่ | `src/components/QuestApp.tsx`, `src/app/globals.css` |
-| Projects overview + persisted evidence | ใช่ | ผู้ใช้จะตรวจภาพเองตามคำสั่งล่าสุด | lint + tests 14/14 + build ผ่าน | `4fbf3b2` | ใช่ | `src/types/domain.ts`, `src/lib/storage.ts`, `src/components/QuestApp.tsx`, `tests/content.test.ts` |
-| Settings + backup recovery controls | ใช่ | ผู้ใช้จะตรวจภาพเองตามคำสั่งล่าสุด | lint + tests 14/14 + build ผ่าน | `8475f65` | ใช่ | `src/lib/storage.ts`, `src/components/QuestApp.tsx`, `tests/content.test.ts` |
+| # | หัวข้อ | สถานะ | หลักฐาน / สิ่งที่ยังต้องตรวจ |
+|---|---|---|---|
+| 1 | เป้าหมายผลิตภัณฑ์ | ทำบางส่วน / ต้องตรวจในเบราว์เซอร์ | flow หลักอยู่ใน `QuestApp.tsx`; ต้องให้ผู้ใช้ยืนยัน hierarchy, ความอยากกลับมาใช้ และความอ่านสบาย |
+| 2 | ข้อจำกัดโปรเจกต์ | ทำเสร็จแล้วด้าน implementation / ต้องตรวจ persistence | schema v1 ใน `src/lib/storage.ts`, hash routing ใน `QuestApp.tsx`, commits `43943bc`, `a8d12b0` |
+| 3 | ปัญหาจากภาพเดิม | ทำบางส่วน / ต้องตรวจในเบราว์เซอร์ | composition ถูกเปลี่ยนใน commits `3940f3b`–`8475f65`; step index แก้จากข้อมูลจริงที่ `31868ee`; ต้องยืนยันภาพจริงและ XP overlay |
+| 4 | Midnight Pixel Expedition | เขียนโค้ดแล้ว / ต้องตรวจในเบราว์เซอร์ | `src/app/globals.css`, `ExpeditionArt.tsx`, `public/art/`, commit `80dc95b` |
+| 5 | Design tokens/typography/layout | ทำเสร็จแล้วด้านโค้ด / ต้องตรวจ contrast | semantic tokens และ responsive rules ใน `globals.css`; ยังไม่มีหลักฐาน manual contrast ครบทุกคู่ |
+| 6 | ภาพประกอบและมาสคอต | ทำบางส่วน / ต้องตรวจในเบราว์เซอร์ | `expedition-base.png`, `world-landmarks.png`, `miso-sprite-sheet.png`, `PixelCat.tsx`; ยังไม่ได้ optimize responsive variants และไม่มี badge raster แยกทุกชนิด |
+| 7 | App shell/navigation | เขียนโค้ดแล้ว / ต้องตรวจ keyboard/mobile | shell/breadcrumb/drawer/focus code ใน `QuestApp.tsx`, commit `3940f3b` |
+| 8 | Dashboard | เขียนโค้ดแล้ว / ต้องตรวจในเบราว์เซอร์ | mission hero, mode, session plan, resume/review/project ใน `QuestApp.tsx`, commit `3940f3b` |
+| 9 | Curriculum | เขียนโค้ดแล้ว / ต้องตรวจในเบราว์เซอร์ | featured course/cards/chapters/named steps, commit `75da2bf` |
+| 10 | Roadmap | ทำบางส่วน / ต้องตรวจในเบราว์เซอร์ | topology/drawer/status/current-location ใน `FullStackRoadmap.tsx` และ `roadmap.css`, commits `18bdd70`, `43943bc`; mobile/readability/state reload รอตรวจ |
+| 11 | Lab Map | เขียนโค้ดแล้ว / ต้องตรวจในเบราว์เซอร์ | illustrated worlds/quest panel/planned states, commit `89fba30` |
+| 12 | Lesson Workspace | ทำบางส่วน / ต้องตรวจในเบราว์เซอร์ | split workspace, mobile tabs, focus mode, results, save status ใน commit `bd25520`; ไม่มี draggable splitter และ token-level highlighting (ทั้งคู่ไม่บังคับ) |
+| 13 | Micro-step | เขียนโค้ดแล้ว / ต้องตรวจในเบราว์เซอร์ | three-phase flow `54f0564`; per-course count `31868ee`; persistence/navigation รอตรวจ |
+| 14 | หน้ารอง | เขียนโค้ดแล้ว / ต้องตรวจในเบราว์เซอร์ | Challenges `72ff141`, Skills `290d49f`, Journal `e6fbfdf`, Projects `4fbf3b2`, Settings `8475f65` |
+| 15 | Motion/interaction | ทำบางส่วน / ต้องตรวจ reduced motion | motion tokens + global reduced-motion rules ใน `globals.css`; ไม่มีเสียง/custom cursor/scroll hijacking; completion celebration ยังเรียบง่าย |
+| 16 | Reference research | ทำบางส่วน | `docs/DESIGN-RESEARCH.md`: GetLayers/Basement เข้าถึงได้; Codédex ได้ข้อมูลไม่พอ; MotionSites timeout; ไม่คัดลอก external assets/code |
+| 17 | วิธีทำงาน | ทำบางส่วน | feature commits แยกและเอกสารต่อเนื่องมีแล้ว; final browser pass/screenshot งดตามคำสั่งผู้ใช้ |
+| 18 | Visual/Functional QA | ทำบางส่วน / ต้องตรวจในเบราว์เซอร์ | lint + Vitest 15/15 + build ผ่านที่ `a8d12b0`; manual matrix อยู่ใน `ACCEPTANCE-CHECKLIST.md` |
+| 19 | เกณฑ์คุณภาพ | ต้องตรวจในเบราว์เซอร์ | implementation ครอบคลุมหน้าเป้าหมาย แต่ยังห้ามสรุปว่าผ่าน visual acceptance ก่อนผู้ใช้ตรวจ |
+| 20 | ส่งมอบ | ทำบางส่วน | repo/คำสั่ง preview/checklist พร้อม; ยังไม่มี private URL, final screenshots หรือ browser acceptance |
 
-`origin/main` และ `HEAD` ตรงกันที่ `8475f65` หลังจบ R5
+## สถานะจริงรายพื้นที่
 
-## สิ่งที่กำลังทำ
+| พื้นที่ | สิ่งที่เขียนไว้จริง | Commit | Manual verification |
+|---|---|---|---|
+| Dashboard | mission-first illustrated hero, mode selector, session plan, current-week/resume/review/project/empty state | `3940f3b` | composition, responsive, mode reload, CTA |
+| Curriculum | featured course, course cards, chapter disclosure, named step rows, planned state | `75da2bf` | filters, long Thai titles, course count/navigation |
+| Roadmap | journey topology, chapter/node/checkpoint styles, current location, drawer, marks | `18bdd70`, `43943bc` | desktop/mobile readability, Escape/focus, status reload |
+| Lab Map | illustrated worlds, current world, real quest panel, planned world without empty CTA | `89fba30` | world selection, mobile stack, Java labels |
+| Lesson Workspace | side-by-side reading/editor, mobile tabs, focus mode, result panel, copy, Tab indentation, save state | `bd25520` | draft reload, wrong/correct runner, XP, self-check, mobile scroll |
+| Micro-step | compact metadata, understand/respond/notes phases, correct course index, prev/next | `54f0564`, `31868ee` | notes/answer reload, completion and navigation semantics |
+| Challenges | featured real item, compact rows, search/filter/count/clear/empty | `72ff141` | combined filters and keyboard/mobile |
+| Skill Evidence | route selector, skill index/detail, auto vs self/local evidence, planned state | `290d49f` | evidence changes after completion, Java separation |
+| Journal | list-first archive, create/edit/search, lesson and URL fields | `e6fbfdf` | add/edit/search/reload |
+| Projects | illustrated covers, overview/detail, persisted repo/demo/checklist | `4fbf3b2` | project switching/reload and URL behavior |
+| Settings | training/backup/reset sections, export/import feedback, local-only disclosure | `8475f65`, `a8d12b0` | export/import/reset/mode/goal in browser |
+| Illustration | original base scene, 8 world landmarks, one mascot sheet with welcome/study/success/rest | `80dc95b` | visual consistency, crop/aspect, asset cost |
+| Motion | 150/220/260ms tokens, hover/panel feedback, reduced-motion override | `80dc95b` และ CSS commits | OS reduced-motion and no distracting loop |
 
-R5 Settings จบและ push แล้ว งานถัดไปคือ R6/R7 interaction + responsive audit โดยไม่เรียก Chrome ตามคำสั่งล่าสุด ให้ตรวจจาก code, lint/tests/build และส่งรายการจุดที่ผู้ใช้ควรดูเอง
+## สถานะ implementation / verification / Git
 
-## Worktree ที่ยังไม่ commit ก่อนเอกสารชุดนี้
+| ชุดงาน | เขียนโค้ดแล้ว | ตรวจ browser เดิม | Automated checks หลังชุด | Commit แล้ว | Push แล้ว |
+|---|---|---|---|---|---|
+| Tokens + art | ใช่ | เคยดูบางหน้า | build ภายหลังผ่าน | `80dc95b` | ใช่ |
+| Shell + Dashboard | ใช่ | เคยดู desktop/mobile ก่อนข้อห้าม Chrome | lint/build ภายหลังผ่าน | `3940f3b` | ใช่ |
+| Curriculum | ใช่ | เคยดู desktop/mobile | lint/build ภายหลังผ่าน | `75da2bf` | ใช่ |
+| Lab | ใช่ | เคยดู desktop/mobile | lint/build ภายหลังผ่าน | `89fba30` | ใช่ |
+| Lesson | ใช่ | เคยดู desktop/mobile | tests ภายหลังผ่าน | `bd25520` | ใช่ |
+| Micro-step | ใช่ | เคยดู desktop/mobile | tests ภายหลังผ่าน | `54f0564`, `31868ee` | ใช่ |
+| Roadmap | ใช่ | เคยดู desktop/drawer | lint/build ภายหลังผ่าน | `18bdd70`, `43943bc` | ใช่ |
+| Challenges | ใช่ | เคยดู desktop/mobile/search/empty | lint/tests/build ผ่าน | `72ff141` | ใช่ |
+| Skills/Journal/Projects/Settings | ใช่ | ยังไม่มี final manual pass | lint/tests/build ผ่าน | `290d49f`–`8475f65` | ใช่ |
+| Nested import safety | ใช่ | ไม่จำเป็นต่อ visual; flow ยังรอ manual | lint, tests 15/15, build ผ่าน | `a8d12b0` | ใช่ |
+| Acceptance documents | ใช่ | ไม่เกี่ยวข้อง | ไม่รันซ้ำเพราะแก้ docs เท่านั้น | เอกสารชุดนี้คือ commit ของรอบ R4 | ตรวจสถานะจาก `origin/main` |
 
-ผล `git status --short` ก่อนสร้างเอกสาร:
+การดู browser ในอดีตเป็นเพียง intermediate inspection และไม่ใช่ final acceptance หลังทุก commit ผู้ใช้สั่งไม่ให้เรียก Chrome/ถ่าย screenshot เพิ่ม จึงต้องใช้ checklist ให้ผู้ใช้ตรวจเอง
+
+## การเปลี่ยนแปลงที่ยังไม่ commit
+
+ก่อนเริ่มเอกสารตรวจรับ `git status --short` มีเฉพาะ input ของผู้ใช้:
 
 ```text
 ?? docs/APP-OVERVIEW.md
 ?? docs/screenshots/
 ```
 
-`git diff` และ `git diff --stat` ว่าง ไม่มี tracked code ที่แก้ค้าง ไฟล์ด้านบนเป็น input/reference ที่ผู้ใช้ให้มา จึงไม่ถูกแก้, stage หรือ commit รวมกับเอกสารส่งต่อโดยอัตโนมัติ หลังสร้างเอกสารนี้จะ stage เฉพาะ:
+ทั้งสองรายการไม่ถูกแก้หรือ stage เอกสารรอบนี้ stage เฉพาะ `ACCEPTANCE-CHECKLIST.md`, `REDESIGN-HANDOFF.md` และ `REDESIGN-PLAN.md`
 
-- `docs/REDESIGN-HANDOFF.md`
-- `docs/REDESIGN-PLAN.md`
-- `docs/DESIGN-RESEARCH.md`
+## ผลตรวจล่าสุด
 
-## งานที่เหลือตามลำดับ
+หลังแก้ nested import validation ที่ `a8d12b0`:
 
-1. Functional QA ของ persistence/runner/XP/import และ Roadmap states ด้วยข้อมูลทดสอบแยก
-2. Responsive/a11y code audit รวม focus, Escape, overflow, contrast และ reduced motion; ผู้ใช้ตรวจ viewport จริงเอง
-3. optimize ภาพและรัน lint/tests/build รอบส่งมอบ
-4. Private hosting ทำภายหลังเมื่อผู้ใช้พร้อม; ห้าม deploy สาธารณะเพื่อให้มี URL
+- `npm run lint`: ผ่าน
+- `npm test`: ผ่าน 15/15
+- `npm run build`: ผ่านบน Next.js 16.3.6
+- ไม่ได้เรียก browser หรือถ่าย screenshot ในรอบตรวจรับนี้
+- ไม่รัน checks ซ้ำหลังแก้เอกสารเท่านั้น
 
-รายละเอียดและเกณฑ์จบของแต่ละช่วงอยู่ใน `docs/REDESIGN-PLAN.md`
+Defect ที่แก้: `src/lib/storage.ts` เดิมตรวจ imported nested progress ไม่ลึกพอ; เพิ่ม validation ของ lesson/step/journal/project/roadmap shapes และ regression test ใน `tests/content.test.ts`
 
-## งานถัดไปแบบเจาะจง
+## ภาพหน้าจอ
 
-เริ่ม R6/R7 ที่ shell, Roadmap และ interaction paths:
+- `docs/screenshots/` เป็น baseline จากผู้ใช้และยัง untracked ไม่ใช่ผลหลังรีดีไซน์
+- ไม่มี final redesigned screenshots ใน repository
+- ผู้ใช้จะตรวจและส่งภาพ/ผล acceptance เอง; ห้ามอ้างว่า Visual QA ผ่านก่อนรับหลักฐานนั้น
 
-1. ตรวจ drawer focus trap/Escape/focus return และ Roadmap drawer ด้วย code review
-2. ตรวจ media queries ของหน้าที่รีดีไซน์ทั้งหมดหา overflow/target ต่ำกว่าเกณฑ์
-3. เพิ่ม unit tests ให้ logic persistence/XP/import ที่ยังตรวจอัตโนมัติได้ โดยไม่จำลอง browser pass
-4. สรุป manual visual checklist ให้ผู้ใช้ตรวจแทน Chrome
-5. commit/push การแก้แต่ละ defect แยกจากเอกสาร
+## ข้อจำกัดและเรื่องที่ยังเปิด
 
-## ข้อจำกัดและบั๊กที่ทราบ
+- `QuestApp.tsx` ยังใหญ่; ไม่ refactor ในรอบตรวจรับโดยไม่มี defect จริง
+- raster assets ใน `public/art/` รวมประมาณ 5.7 MB ยังไม่ได้ทำ responsive variants/optimization audit
+- code samples ยังไม่มี token-level syntax highlighting และ Lesson ไม่มี draggable splitter; ทั้งคู่เป็น optional
+- runner ลด network APIs และ terminate เมื่อ timeout แต่ Web Worker ไม่ใช่ security container ระดับ server sandbox
+- ข้อมูลอยู่ localStorage เท่านั้น ไม่ sync ข้ามอุปกรณ์
+- ไม่มี private hosting/access control; ผู้ใช้ยังไม่ต้องการ deploy
+- acceptance ที่ยังเปิดทั้งหมดอยู่ใน `docs/ACCEPTANCE-CHECKLIST.md`
 
-- `QuestApp.tsx` ยังเป็น component ใหญ่ หลายหน้ารวมในไฟล์เดียว; ห้าม refactor ใหญ่พร้อมรีดีไซน์หน้าหนึ่งโดยไม่มีเหตุจำเป็น
-- หน้าหลักและหน้ารองทั้งหมดผ่าน composition redesign แล้ว เหลืองาน audit/defect fixing
-- Project state ใช้ optional `projectProgress` ภายใต้ schema v1; ต้องรักษา validator/tests นี้เมื่อแก้ import ใน Settings
-- Code example มี code styling และ horizontal scroll แต่ยังไม่มี token-level syntax highlighting
-- Lesson ไม่มี draggable splitter; focus mode มีแล้วและ splitter เป็น optional
-- ภาพ raster ใน `public/art/` รวมประมาณ 5.7 MB ยังไม่ได้ทำ responsive variants/optimization audit
-- ภาพ QA หลังรีดีไซน์ถูกตรวจผ่าน browser session แต่ยังไม่ได้บันทึกเป็นไฟล์ใน repo เพราะ connector ไม่อนุญาต path ที่ลองใช้; ต้องเก็บใหม่ในช่วง final visual QA
-- `docs/screenshots/` คือ baseline ก่อนรีดีไซน์จากผู้ใช้ ไม่ใช่ภาพผลลัพธ์ปัจจุบัน และยัง untracked
-- แอปเก็บข้อมูลใน localStorage เท่านั้น ไม่ sync ข้ามอุปกรณ์ ไม่มี auth/backend/private deployment
-- Browser production QA ใช้ port 3100 เพราะ port 3000 มี dev server อยู่แล้ว; อย่าฆ่า process ที่ port 3000 โดยไม่ยืนยันเจ้าของ
-- ยังต้องทดสอบ Project persistence (หลังสร้าง), Journal edit, Import old data, invalid import, duplicate XP และ Roadmap persistence แบบ end-to-end ให้ครบ
-
-## คำถามที่ยังไม่ตัดสินใจ
-
-- จะเพิ่ม project fields ลง `AppData` เป็น optional record ภายใต้ schema v1 หรือ bump schema พร้อม migration; แนวทางแรกเล็กและเข้ากันได้ง่ายกว่า แต่ต้องกำหนด validation ให้ครบ
-- จะใช้ highlighter dependency หรือ tokenizer ขนาดเล็กสำหรับ code examples; ยังไม่ควรเพิ่ม dependency จนวัดประโยชน์/ขนาด bundle
-- จะเก็บ final screenshots ใน `docs/screenshots/redesign/` หรือ `docs/qa/redesign/`; ห้ามเขียนทับ baseline เดิม
-- Private hosting provider/access policy ยังไม่เลือก และผู้ใช้สั่งว่ายังไม่ deploy
-
-## วิธีรันและตรวจ
+## วิธีรัน
 
 ต้องใช้ Node.js 20.9+ (README ระบุว่าเคยทดสอบด้วย Node 22.18)
 
-```bash
+```powershell
 npm install
-npm run dev
 npm run lint
 npm test
 npm run build
 npm start -- -p 3100
 ```
 
-เปิด local preview ที่ `http://localhost:3100` เมื่อใช้คำสั่ง production ด้านบน
+Production preview: `http://localhost:3100/#dashboard`
 
-## ผลตรวจล่าสุด
+ลำดับตรวจแนะนำ: Dashboard → Curriculum → Lab → Lesson Workspace → Micro-step → Roadmap → หน้ารอง → Mobile/Keyboard
 
-- `npm test`: 14 tests ผ่าน หลัง code ของ R5 Settings ที่ commit เป็น `8475f65`
-- `npm run lint`: ผ่าน หลัง code ของ R5 Settings ที่ commit เป็น `8475f65`
-- `npm run build`: ผ่านบน Next.js 16.3.6 หลัง code ของ R5 Settings ที่ commit เป็น `8475f65`
-- Production browser QA ที่ `localhost:3100`: ตรวจ Dashboard, Curriculum, Lab, Lesson และ Micro-step บน desktop/mobile; ตรวจ Roadmap + drawer บน desktop; direct hash routes ที่เปิดระหว่างตรวจ ได้แก่ `#curriculum`, `#map`, `#lesson/web-ts-narrowing`, `#step/dev-program-concept`, `#roadmap`
-- ยังไม่ถือว่า full regression QA จบ เพราะหน้ารองและ interaction matrix ตามหัวข้อด้านบนยังไม่ครบ
-- หลัง R1 ผู้ใช้สั่งชัดเจนว่าไม่ให้เรียก Chrome หรือถ่าย screenshot เพิ่ม; งานถัดไปใช้ lint/tests/build และให้ผู้ใช้ตรวจภาพเอง
+## งานถัดไปที่ควรเริ่ม
 
-ไม่ต้องรัน tests ทั้งชุดซ้ำเพราะแก้เอกสารอย่างเดียว แต่ทุก feature code ถัดไปต้องตรวจตามความเสี่ยงของมัน
+**ยังไม่เริ่ม feature หรือ visual refinement ใหม่** ให้รอผลและภาพจากผู้ใช้ตาม `ACCEPTANCE-CHECKLIST.md` แล้ว:
 
-## ภาพหน้าจอ
-
-- Baseline ก่อนรีดีไซน์: `docs/screenshots/01-dashboard.png` ถึง `12-roadmap-drawer.png` และ `docs/screenshots/screenshots.pdf`; เป็นไฟล์ untracked จากผู้ใช้
-- ภาพหลังรีดีไซน์ที่ตรวจใน browser: Dashboard, Curriculum, Lab, Lesson, Micro-step และ Roadmap drawer ถูกดูจริงระหว่าง session แต่ **ไม่มีไฟล์ใน repository**
-- งานค้าง: เก็บทั้ง viewport และ full-page ของ Dashboard, Curriculum, Lab, Lesson และ Mobile โดยไม่เขียนทับ baseline
+1. บันทึกเฉพาะข้อที่ไม่ผ่าน พร้อม hash/viewport/ขั้นตอนทำซ้ำ
+2. จัดลำดับ functional/data-loss/accessibility ก่อน visual polish
+3. แก้หนึ่ง defect ต่อหนึ่ง commit และตรวจเฉพาะขอบเขตที่ได้รับผลกระทบ
+4. อัปเดต HANDOFF/PLAN เมื่อจบชุดแก้สำคัญ
 
 ## วิธีกลับมาทำต่อโดยไม่รื้อของเดิม
 
-1. อ่านไฟล์นี้, `docs/REDESIGN-PLAN.md` และเฉพาะส่วนที่เกี่ยวข้องใน `docs/DESIGN-RESEARCH.md`
-2. รัน `git status --short`, `git diff`, `git log --oneline -15`; อย่า stage `docs/APP-OVERVIEW.md` หรือ `docs/screenshots/` โดยไม่ตั้งใจ
-3. ยืนยันว่า `HEAD` ไม่ถอยหลังจาก commit ที่บันทึกไว้ และตรวจ code จริงหากเอกสารคลาดเคลื่อน
-4. ทำหนึ่งช่วงตาม PLAN, ตรวจตามเกณฑ์, commit หนึ่ง feature ต่อหนึ่ง commit และ push
-5. ห้ามเปลี่ยน ID/hash/storage/runner/XP เพื่อแก้ layout; ถ้าจำเป็นต้องเปลี่ยน schema ให้เพิ่ม compatibility test ก่อน
-6. อัปเดต HANDOFF และ PLAN เมื่อจบช่วงหรือก่อนจบรอบ โดยบันทึกเฉพาะหลักฐานสำคัญ
+1. อ่านไฟล์นี้, PLAN, checklist และผลตรวจจากผู้ใช้
+2. รัน `git status --short`, `git diff`, `git log --oneline -15`
+3. อย่า stage/overwrite `docs/APP-OVERVIEW.md` หรือ `docs/screenshots/`
+4. ยืนยัน defect จาก code และขั้นตอนทำซ้ำก่อนแก้; ห้ามเปลี่ยน ID/hash/storage/runner/XP เพื่อแก้ layout
+5. รักษา workflow หนึ่ง feature/defect ต่อหนึ่ง commit และ push

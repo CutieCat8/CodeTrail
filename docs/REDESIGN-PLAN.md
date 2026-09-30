@@ -1,119 +1,113 @@
 # Redesign plan
 
-อัปเดตล่าสุด: 2026-09-30
+อัปเดต: 2026-09-30
+สถานะรอบ: **implementation freeze — รอ manual acceptance จากผู้ใช้**
 
-ไฟล์นี้เป็น **คิวงานและเกณฑ์จบ** สถานะหลักฐานล่าสุดอยู่ที่ `docs/REDESIGN-HANDOFF.md` แต่ละช่วงควรทำ, ตรวจ, commit และ push แยกกันเมื่อเป็น feature ที่สมบูรณ์ ห้ามรวมงานค้างแล้วตั้งชื่อเหมือนเสร็จ
-
-สถานะที่ใช้: `ยังไม่เริ่ม` / `กำลังทำ` / `ติดปัญหา` / `เสร็จ`
+สถานะที่ใช้: ยังไม่เริ่ม / กำลังทำ / ติดปัญหา / เสร็จ
+คำว่า “เสร็จ” หมายถึงผ่านเกณฑ์ของช่วงนั้นเท่านั้น ไม่ได้ทำให้ browser/visual acceptance ผ่านโดยอัตโนมัติ
 
 ## R0 — Continuity documents
 
 - สถานะ: **เสร็จ**
-- เป้าหมาย: ทำ handoff, plan และ research ให้ AI รอบถัดไปตรวจสถานะและเริ่มงานได้ทันที
-- ขอบเขต: `docs/REDESIGN-HANDOFF.md`, `docs/REDESIGN-PLAN.md`, `docs/DESIGN-RESEARCH.md`
-- Dependency: Git status/diff/log และเอกสารเดิม
-- เกณฑ์เสร็จ: ทั้งสามไฟล์สะท้อน worktree/commits/QA จริง, stage เฉพาะสามไฟล์, commit แยก และ push สำเร็จ
-- การทดสอบ: ตรวจ Markdown/diff และ `git status`; ไม่รัน test suite เพราะไม่มี code change
+- เป้าหมาย/ขอบเขต: HANDOFF, PLAN และ DESIGN-RESEARCH ที่ทำให้รอบถัดไปทำต่อได้
+- หน้า/components: `docs/REDESIGN-HANDOFF.md`, `docs/REDESIGN-PLAN.md`, `docs/DESIGN-RESEARCH.md`
+- Dependency: Git/code state จริง
+- เกณฑ์เสร็จ: แยก code/browser/tests/commit/push และบันทึกข้อจำกัดตรงไปตรงมา
+- การทดสอบ: ตรวจ links/commit hashes กับ Git; ไม่รัน app tests เพราะแก้ docs อย่างเดียว
 
-## R1 — Challenge Library
+## R1 — Core visual redesign
 
-- สถานะ: **เสร็จ** (`72ff141`, pushed)
-- เป้าหมาย: ทำคลังโจทย์ให้ค้นและตัดสินใจได้เร็ว ลดรายการยาวจังหวะเดียว
-- หน้า/components: `Challenges` ใน `src/components/QuestApp.tsx`, styles ใน `src/app/globals.css`
-- Dependency: design tokens และ shell จาก `80dc95b`/`3940f3b`
-- เกณฑ์เสร็จ: featured challenge มาจากข้อมูลจริง; แถวผลลัพธ์แสดงชื่อ หมวด เวลา วิธีตรวจ สถานะ; search/filter เดิมทำงาน; มี result count, clear filters และ empty state; ไม่มีปุ่มเปิดหน้าว่าง
-- การทดสอบ: lint, search หลายคำ, filter แต่ละแกน, clear, zero-result, keyboard focus และ mobile overflow
+- สถานะ: **เสร็จ** ด้าน implementation
+- เป้าหมาย/ขอบเขต: tokens, original art, shell, Dashboard, Curriculum, Lab, Lesson, Micro-step และ Roadmap
+- หน้า/components: `globals.css`, `QuestApp.tsx`, `FullStackRoadmap.tsx`, `roadmap.css`, `ExpeditionArt.tsx`, `PixelCat.tsx`, `public/art/`
+- Dependency: IDs/hash/storage/runner เดิม
+- เกณฑ์เสร็จ: composition ใหม่ครบหน้าหลักโดยไม่ทำลาย data contracts
+- การทดสอบ: commits `80dc95b`, `3940f3b`, `75da2bf`, `89fba30`, `bd25520`, `54f0564`, `18bdd70`, `31868ee`
 
-## R2 — Skill Evidence
+## R2 — Secondary pages
 
-- สถานะ: **เสร็จ** (`290d49f`, pushed)
-- เป้าหมาย: แสดงภาพรวมตามหมวดและหลักฐานจริงโดยไม่สร้าง Mastery score
-- หน้า/components: `Skills`, progress selectors และ styles ที่เกี่ยวข้อง
-- Dependency: R1 เฉพาะ shared compact-row pattern ถ้านำกลับใช้แล้วเหมาะสม
-- เกณฑ์เสร็จ: ลด card grid ซ้ำ; เปิดรายละเอียดได้; แยก automatic verification/self-check/local Java; ทักษะไม่มีหลักฐานแสดงทางเริ่มเรียน; Java progress แยกจากเว็บ
-- การทดสอบ: เปรียบเทียบข้อมูลว่าง/มี progress, ผ่าน auto/self-check, keyboard disclosure, mobile
+- สถานะ: **เสร็จ** ด้าน implementation
+- เป้าหมาย/ขอบเขต: Challenge, Skills, Journal, Projects และ Settings ใช้ composition ที่เหมาะกับงานแต่ละหน้า
+- หน้า/components: sections ที่เกี่ยวข้องใน `QuestApp.tsx`, `globals.css`, persistence types/storage
+- Dependency: R1 design system
+- เกณฑ์เสร็จ: search/filter, evidence, list-first notes, project detail/persistence และ backup controls มีโค้ดใช้งานจริง
+- การทดสอบ: commits `72ff141`, `290d49f`, `e6fbfdf`, `4fbf3b2`, `8475f65`
 
-## R3 — Journal list-first
+## R3 — Persistence and import safety
 
-- สถานะ: **เสร็จ** (`e6fbfdf`, pushed)
-- เป้าหมาย: เปิดมาเห็นบันทึกย้อนหลังและเริ่มเขียนได้ ไม่เจอฟอร์มยาวทันที
-- หน้า/components: `Journal`, `JournalEntry`, persistence ใน `QuestApp.tsx`/`src/lib/storage.ts` ถ้าจำเป็น
-- Dependency: ต้องรักษา `JournalEntry` fields และ schema v1
-- เกณฑ์เสร็จ: list + create/edit flow; ทุก field เดิมอยู่ครบ; search ย้อนหลังถ้ามีเดิมต้องไม่หาย; empty prompts ไม่สร้างข้อมูลปลอม; save/restore หลัง reload
-- การทดสอบ: เพิ่ม, แก้, reload, link/lesson association, empty state, invalid/empty fields ที่กำหนด
+- สถานะ: **เสร็จ** ด้าน automated validation
+- เป้าหมาย/ขอบเขต: รักษา schema v1 และป้องกัน malformed nested import
+- หน้า/components: `src/lib/storage.ts`, `src/types/domain.ts`, `tests/content.test.ts`
+- Dependency: Project/Roadmap optional fields
+- เกณฑ์เสร็จ: old shape ยัง normalize ได้; invalid nested records ถูกปฏิเสธ; current data ไม่ถูกเขียนจาก validator ที่ล้มเหลว
+- การทดสอบ: lint ผ่าน, Vitest 15/15, build ผ่านหลัง `a8d12b0`; browser import flow ยังอยู่ใน R5
 
-## R4 — Projects persistence and detail
+## R4 — Acceptance preparation
 
-- สถานะ: **เสร็จ** (`4fbf3b2`, pushed)
-- เป้าหมาย: เปลี่ยนจากรายละเอียดทุกโปรเจกต์พร้อมกันเป็น overview/detail พร้อมบันทึก repository, demo และ checklist จริง
-- หน้า/components: `Projects`, `AppData`/project types, `src/lib/storage.ts`, related tests
-- Dependency: ตัดสินใจ backward-compatible project state; ต้องเพิ่ม test fixture ของ schema v1 เดิมก่อน implementation
-- เกณฑ์เสร็จ: project covers แตกต่างกัน; overview มีเป้าหมาย/สถานะ/CTA; stories/criteria อยู่ใน detail; bullet ไม่ดูเหมือนเสร็จ; URLs/checklist คืนหลัง reload; import ข้อมูลเก่าได้
-- การทดสอบ: unit validation/migration, add/edit URLs, checklist persistence, reload, old JSON import และ mobile detail
+- สถานะ: **เสร็จ** (เอกสารชุดนี้เป็น commit ของ R4)
+- เป้าหมาย/ขอบเขต: สร้าง manual checklist และปรับ HANDOFF/PLAN ให้สะท้อน implementation freeze
+- หน้า/components: เอกสารสามไฟล์ใน `docs/`
+- Dependency: R1–R3 และสถานะ Git ล่าสุด
+- เกณฑ์เสร็จ: checklist ระบุ hash/ขั้นตอน/ผล/ช่องผล ครบ desktop/mobile/navigation/persistence/runner/XP/checklist/Roadmap/Journal/Projects/Import/keyboard
+- การทดสอบ: review เอกสารเทียบ prompt 20 หัวข้อ; ไม่รัน app checks ซ้ำเมื่อมีเพียง docs change
 
-## R5 — Settings and backup safety
+## R5 — Manual functional acceptance
 
-- สถานะ: **เสร็จ** (`8475f65`, pushed)
-- เป้าหมาย: จัดหมวดการฝึก/ข้อมูลสำรอง/เริ่มใหม่ และทำ feedback ให้ชัด
-- หน้า/components: `Settings`, `ModeSwitch`, `src/lib/storage.ts`
-- Dependency: R4 data model ต้องนิ่งก่อน final import/export validation
-- เกณฑ์เสร็จ: อธิบาย localStorage/no sync ถูกต้อง; mode/goal persist; export ครบ; import success/error ชัด; invalid input ไม่เปลี่ยน data; reset มี confirmation และไม่คลิกพลาดง่าย
-- การทดสอบ: export→reset ใน test profile→import, invalid JSON/schema, cancel reset, mode reload
+- สถานะ: **ติดปัญหา — รอผลตรวจจากผู้ใช้**
+- เป้าหมาย/ขอบเขต: ยืนยัน behavior ใน production preview โดยไม่ใช้ข้อมูลจริง
+- หน้า/components: ทุกหน้า โดยเริ่ม Dashboard → Curriculum → Lab → Lesson → Micro-step
+- Dependency: R4 และผู้ใช้เปิด browser เอง
+- เกณฑ์เสร็จ: hash/back, mode, autosave, wrong/correct tests, XP no duplicate, Java label, checklist, Roadmap marks, search, Journal, Projects, Export/Import ผ่านตาม checklist
+- การทดสอบ: `docs/ACCEPTANCE-CHECKLIST.md` ส่วน A–E
 
-## R6 — Roadmap/mobile interaction audit
+## R6 — Responsive and visual acceptance
 
-- สถานะ: **กำลังทำ**
-- เป้าหมาย: ปิดช่องว่างของ Roadmap รุ่นใหม่ โดยเฉพาะ mobile list/drawer และ manual state persistence
-- หน้า/components: `FullStackRoadmap.tsx`, `roadmap.css`
-- Dependency: visual redesign commit `18bdd70`
-- เกณฑ์เสร็จ: topology/readability desktop; list view mobile เข้าถึงทุก node; drawer Escape/focus return; Learning/Done/Skip/clear persist; current-location control ใช้ได้; inferred/manual status แยกกัน
-- การทดสอบ: direct `#roadmap`, keyboard-only, refresh state, 390/768 viewports, reduced motion
+- สถานะ: **ติดปัญหา — รอผลตรวจ/ภาพจากผู้ใช้**
+- เป้าหมาย/ขอบเขต: ตรวจ hierarchy, typography, art, overflow, drawers และ states ที่ viewport เป้าหมาย
+- หน้า/components: ทุกหน้าที่รีดีไซน์และ assets
+- Dependency: R5 หรือทดสอบคู่ขนานโดยผู้ใช้
+- เกณฑ์เสร็จ: 1440×900, 1280×800, 768×1024, 390×844 ไม่มีปัญหารุนแรง; user ยืนยัน visual acceptance หรือส่ง defect ที่ทำซ้ำได้
+- การทดสอบ: checklist ส่วน A/F และภาพจากผู้ใช้; AI ไม่เรียก Chrome/ถ่าย screenshot ตามข้อจำกัด
 
-## R7 — Cross-page responsive and accessibility polish
+## R7 — Keyboard, focus and reduced-motion acceptance
 
-- สถานะ: **กำลังทำ**
-- เป้าหมาย: ตรวจ shell และหน้าที่รีดีไซน์แล้วให้ครบ viewport/keyboard/contrast
-- หน้า/components: App shell, Dashboard, Curriculum, Lab, Lesson, Micro-step, Roadmap; `globals.css`
-- Dependency: R1–R6 เพื่อไม่แก้ซ้ำ; ตรวจหน้าที่มีแล้วระหว่างทางได้
-- เกณฑ์เสร็จ: 1440×900, 1280×800, 768×1024, 390×844 ไม่มี page overflow/text clipping; drawer/modal ไม่ถูกตัด; focus visible; Escape/focus return; reduced motion; sidebar scroll ใช้ได้ใน viewport เตี้ย
-- การทดสอบ: production preview, keyboard path, automated lint และ manual contrast checks
+- สถานะ: **ติดปัญหา — รอผลตรวจจากผู้ใช้**
+- เป้าหมาย/ขอบเขต: ยืนยัน keyboard-only, Escape/focus return, visible focus และ reduced motion
+- หน้า/components: shell drawers, Roadmap drawer, Lesson controls, Settings modal, global CSS
+- Dependency: R4
+- เกณฑ์เสร็จ: action หลักเข้าถึงด้วย keyboard, focus ไม่สูญ, drawer คืน focus, reduced-motion ไม่รบกวนการเรียน
+- การทดสอบ: checklist ส่วน G
 
-## R8 — Functional regression
-
-- สถานะ: **ยังไม่เริ่ม**
-- เป้าหมาย: ยืนยันว่า visual redesign ไม่ทำลาย product behavior
-- หน้า/components: ทุกหน้า, `storage.ts`, `runner.ts`, recommendation, hash navigation
-- Dependency: R1–R7 จบ
-- เกณฑ์เสร็จ: hash/back, mode, autosave/reload, wrong/correct tests, XP no duplicate, Java self-check label, checklist/Roadmap persistence, search/filter, Journal/Projects, export/import old and invalid data, step count ≤ course total ทำงานตามจริง
-- การทดสอบ: Vitest เพิ่มเฉพาะ logic ที่ควร automate + production browser matrix ด้วย test profile แยก
-
-## R9 — Visual artifacts and asset optimization
+## R8 — Acceptance defect fixes
 
 - สถานะ: **ยังไม่เริ่ม**
-- เป้าหมาย: เก็บหลักฐานหน้าจอและลดต้นทุนภาพโดยไม่ทำลาย pixel fidelity
-- หน้า/components: `public/art/`, image usages, docs screenshot destination ที่เลือกใหม่
-- Dependency: R1–R8 จบด้านภาพ
-- เกณฑ์เสร็จ: ไม่ทับ baseline; ภาพไม่ยืด; dimensions/compression เหมาะสม; asset origin ระบุครบ; ภาพหน้าจอให้ผู้ใช้เป็นผู้ตรวจ/เก็บตามคำสั่งล่าสุด
-- การทดสอบ: code/layout review, network/build output audit และ production build; ไม่เรียก Chrome หรือถ่าย screenshot เพิ่ม
+- เป้าหมาย/ขอบเขต: แก้เฉพาะข้อไม่ผ่านที่ผู้ใช้รายงาน
+- หน้า/components: จำกัดตาม defect
+- Dependency: R5–R7 มีผลตรวจ
+- เกณฑ์เสร็จ: มี reproduction, root cause, fix และ targeted verification; หนึ่ง defect/feature ต่อหนึ่ง commit
+- การทดสอบ: targeted test + lint/build ตามความเสี่ยง ไม่รันทุกอย่างซ้ำโดยไม่มีเหตุ
 
-## R10 — Release verification (ยังไม่ deploy)
+## R9 — Asset optimization
 
 - สถานะ: **ยังไม่เริ่ม**
-- เป้าหมาย: ทำ local release candidate ให้ตรวจได้ โดยไม่เผยแพร่สาธารณะ
-- หน้า/components: ทั้ง repo และเอกสารส่งมอบ
-- Dependency: R1–R9
-- เกณฑ์เสร็จ: lint/tests/build ผ่าน; local production preview เปิดได้; git clean ยกเว้น input ที่ตั้งใจ untracked; HANDOFF/PLAN อัปเดต; limitations ซื่อสัตย์
-- การทดสอบ: `npm run lint`, `npm test`, `npm run build`, smoke test production
-- หมายเหตุ: Private hosting เป็นงานแยกเมื่อผู้ใช้อนุญาตและเลือก access control แล้ว
+- เป้าหมาย/ขอบเขต: ลดต้นทุน raster assets โดยไม่ทำลาย pixel fidelity
+- หน้า/components: `public/art/`, image usages
+- Dependency: visual acceptance ยืนยัน crop/สัดส่วนก่อน
+- เกณฑ์เสร็จ: dimensions/format/compression เหมาะสม, ไม่มีภาพยืด, origin/attribution ครบ
+- การทดสอบ: build output/asset-size audit และผู้ใช้ตรวจภาพ
 
-## ช่วงที่เขียน/ตรวจ/commit/push แล้วก่อนแผนนี้
+## R10 — Private delivery
 
-- Design system + art — `80dc95b`
-- App shell + Dashboard — `3940f3b`
-- Curriculum — `75da2bf`
-- Lab — `89fba30`
-- Lesson Workspace — `bd25520`
-- Micro-step — `54f0564`
-- Roadmap visual redesign — `18bdd70`
+- สถานะ: **ยังไม่เริ่มตามคำสั่งผู้ใช้**
+- เป้าหมาย/ขอบเขต: private hosting/access control เมื่อผู้ใช้พร้อม
+- หน้า/components: deployment configuration และเอกสารส่งมอบ
+- Dependency: R5–R9 ผ่านและเลือก hosting/access policy
+- เกณฑ์เสร็จ: private URL ถูกตรวจ access จริง; ไม่ใช้ URL เดายาก/noindex แทน auth
+- การทดสอบ: authorized/unauthorized access และ production smoke test
 
-รายละเอียดหลักฐานและข้อจำกัดของแต่ละช่วงอยู่ใน `docs/REDESIGN-HANDOFF.md`
+## การตัดสินใจรอบนี้
+
+- หยุดเพิ่ม feature และ visual refinement
+- ใช้ `docs/ACCEPTANCE-CHECKLIST.md` เป็น source of truth สำหรับการตรวจรับ
+- หลัง R4 commit/push ให้รอผล/ภาพจากผู้ใช้ก่อน R8
+- Private deployment และ screenshot generation ยังไม่อยู่ในขอบเขตรอบนี้

@@ -1,7 +1,7 @@
 # Redesign plan
 
 อัปเดต: 2026-10-01
-สถานะรอบ: **theme iteration เขียนแล้ว — รอ manual acceptance จากผู้ใช้**
+สถานะรอบ: **Pixel Nebula theme เขียนแล้ว — รอ manual acceptance จากผู้ใช้**
 
 สถานะที่ใช้: ยังไม่เริ่ม / กำลังทำ / ติดปัญหา / เสร็จ
 คำว่า “เสร็จ” หมายถึงผ่านเกณฑ์ของช่วงนั้นเท่านั้น ไม่ได้ทำให้ browser/visual acceptance ผ่านโดยอัตโนมัติ
@@ -60,14 +60,14 @@
 - เกณฑ์เสร็จ: hash/back, mode, autosave, wrong/correct tests, XP no duplicate, Java label, checklist, Roadmap marks, search, Journal, Projects, Export/Import ผ่านตาม checklist
 - การทดสอบ: `docs/ACCEPTANCE-CHECKLIST.md` ส่วน A–E
 
-## R5.1 — Modern Developer Adventure theme iteration
+## R5.1 — Pixel Nebula theme iteration
 
-- สถานะ: **เสร็จ** ด้าน implementation (`f1d22c6`, pushed)
-- เป้าหมาย/ขอบเขต: แก้ปัญหาหน้าจอสีน้ำเงินหม่นและข้อความกลืนพื้น โดยไม่ลบ pixel art
-- หน้า/components: `src/app/modern-adventure.css`, import ใน `src/app/layout.tsx`; ครอบ shell และทุกหน้าที่รีดีไซน์
+- สถานะ: **เสร็จ** ด้าน implementation (`d2d59d7`, pushed)
+- เป้าหมาย/ขอบเขต: ใช้สีดำเป็นฐานและ blue→violet gradient โดยให้ภาพรวมกลับมาเข้ากับ pixel art
+- หน้า/components: `src/app/pixel-nebula.css`, import ใน `src/app/layout.tsx`; ครอบ shell และทุกหน้าที่รีดีไซน์
 - Dependency: design system เดิมและ pixel assets จาก R1
-- เกณฑ์เสร็จ: canvas/surfaces เปลี่ยนเป็น warm charcoal/olive, primary/secondary text contrast สูงขึ้น, accent มีหน้าที่ชัด, pixel assets เดิมยัง render
-- การทดสอบ: lint ผ่าน, production build ผ่าน, static contrast ของคู่สีหลัก 6.85:1–16.69:1; visual acceptance อยู่ใน R6
+- เกณฑ์เสร็จ: canvas/surfaces เป็น near-black, gradient ใช้กับองค์ประกอบนำสายตา, primary/secondary text contrast สูง, pixel assets เดิมยัง render
+- การทดสอบ: lint ผ่าน, production build ผ่าน, static contrast ของคู่สีหลัก 6.57:1–18.87:1; visual acceptance อยู่ใน R6
 
 ## R6 — Responsive and visual acceptance
 

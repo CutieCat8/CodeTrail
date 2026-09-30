@@ -1,4 +1,4 @@
-# Acceptance checklist — Modern Developer Adventure
+# Acceptance checklist — Pixel Nebula
 
 อัปเดต: 2026-09-30
 ขอบเขต: ตรวจ release candidate ในเครื่อง โดยผู้ใช้เป็นผู้ตรวจภาพและพฤติกรรมใน browser
@@ -24,7 +24,7 @@ npm start -- -p 3100
 
 ลำดับแนะนำ: Dashboard → Curriculum → Lab → Lesson Workspace → Micro-step → Roadmap → หน้ารอง → Mobile/Keyboard
 
-จุดตรวจธีมรอบล่าสุด: พื้นหลักควรเป็น charcoal/olive อุ่นแทนสีน้ำเงินหม่น, ข้อความ ivory/beige ต้องแยกจากพื้นชัด, mint/teal/lavender/amber ใช้เป็น accent ตามหน้าที่ และ pixel art/มาสคอตเดิมต้องยังอยู่ครบ
+จุดตรวจธีมรอบล่าสุด: พื้นหลักต้องเป็นดำเกือบสนิท, gradient น้ำเงิน→ม่วงใช้กับจุดนำสายตาโดยไม่ย้อมทุกพื้นผิว, ข้อความ neutral ต้องแยกจากพื้นชัด และ pixel art/มาสคอตเดิมต้องยังอยู่ครบ
 
 ## A. Desktop และเส้นทางหลัก
 

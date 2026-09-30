@@ -11,27 +11,53 @@ export const emptyData = (): AppData => ({
   stepProgress: {},
 });
 
+const isRecord = (value: unknown): value is Record<string, unknown> => Boolean(value) && typeof value === "object" && !Array.isArray(value);
+const isBooleanArray = (value: unknown): value is boolean[] => Array.isArray(value) && value.every((item) => typeof item === "boolean");
+
 export function isAppData(value: unknown): value is AppData {
-  if (!value || typeof value !== "object") return false;
+  if (!isRecord(value)) return false;
   const candidate = value as Partial<AppData>;
   if (candidate.version !== 1) return false;
   if (!["fullstack", "java", "mixed"].includes(candidate.mode as StudyMode)) return false;
   if (!Number.isInteger(candidate.weeklyGoal) || Number(candidate.weeklyGoal) < 1 || Number(candidate.weeklyGoal) > 14) return false;
-  if (!candidate.progress || typeof candidate.progress !== "object" || !Array.isArray(candidate.journal)) return false;
+  if (!isRecord(candidate.progress) || !Array.isArray(candidate.journal)) return false;
+  for (const progress of Object.values(candidate.progress)) {
+    if (!isRecord(progress)) return false;
+    if (typeof progress.lessonId !== "string" || typeof progress.code !== "string" || typeof progress.notes !== "string" || typeof progress.reflection !== "string") return false;
+    if (!isBooleanArray(progress.checklist) || !["not-started", "in-progress", "passed", "review"].includes(String(progress.status))) return false;
+    if (!Number.isInteger(progress.attempts) || typeof progress.updatedAt !== "string") return false;
+    if (progress.completedAt !== undefined && typeof progress.completedAt !== "string") return false;
+    if (progress.solutionViewed !== undefined && typeof progress.solutionViewed !== "boolean") return false;
+    if (progress.lastResult !== undefined) {
+      if (!isRecord(progress.lastResult) || typeof progress.lastResult.passed !== "boolean" || typeof progress.lastResult.at !== "string" || !Array.isArray(progress.lastResult.details)) return false;
+      if (!progress.lastResult.details.every((detail) => isRecord(detail) && typeof detail.name === "string" && typeof detail.passed === "boolean" && typeof detail.expected === "string" && typeof detail.actual === "string" && (detail.error === undefined || typeof detail.error === "string"))) return false;
+    }
+  }
+  if (candidate.stepProgress !== undefined) {
+    if (!isRecord(candidate.stepProgress)) return false;
+    for (const progress of Object.values(candidate.stepProgress)) {
+      if (!isRecord(progress) || typeof progress.stepId !== "string" || typeof progress.answer !== "string" || typeof progress.notes !== "string" || typeof progress.completed !== "boolean" || typeof progress.updatedAt !== "string") return false;
+      if (progress.answerRevealed !== undefined && typeof progress.answerRevealed !== "boolean") return false;
+    }
+  }
   if (candidate.roadmapMarks !== undefined) {
-    if (!candidate.roadmapMarks || typeof candidate.roadmapMarks !== "object" || Array.isArray(candidate.roadmapMarks)) return false;
+    if (!isRecord(candidate.roadmapMarks)) return false;
     if (!Object.values(candidate.roadmapMarks).every((mark) => ["learning", "done", "skip"].includes(String(mark)))) return false;
   }
   if (candidate.projectProgress !== undefined) {
-    if (!candidate.projectProgress || typeof candidate.projectProgress !== "object" || Array.isArray(candidate.projectProgress)) return false;
+    if (!isRecord(candidate.projectProgress)) return false;
     for (const progress of Object.values(candidate.projectProgress)) {
-      if (!progress || typeof progress !== "object") return false;
+      if (!isRecord(progress)) return false;
       const item = progress as { repositoryUrl?: unknown; demoUrl?: unknown; checklist?: unknown; updatedAt?: unknown };
       if (typeof item.repositoryUrl !== "string" || typeof item.demoUrl !== "string" || typeof item.updatedAt !== "string") return false;
-      if (!Array.isArray(item.checklist) || !item.checklist.every((checked) => typeof checked === "boolean")) return false;
+      if (!isBooleanArray(item.checklist)) return false;
     }
   }
-  return candidate.journal.every((entry) => entry && typeof entry.id === "string" && typeof entry.title === "string");
+  if (candidate.lastLessonId !== undefined && typeof candidate.lastLessonId !== "string") return false;
+  if (candidate.lastStepId !== undefined && typeof candidate.lastStepId !== "string") return false;
+  return candidate.journal.every((entry) => isRecord(entry)
+    && [entry.id, entry.date, entry.title, entry.learned, entry.bug, entry.fix, entry.unclear, entry.link, entry.updatedAt].every((field) => typeof field === "string")
+    && (entry.lessonId === undefined || typeof entry.lessonId === "string"));
 }
 
 export function loadData(): AppData {

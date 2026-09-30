@@ -122,4 +122,10 @@ describe("project progress compatibility", () => {
     expect(isAppData(data)).toBe(true);
     expect(isAppData({ ...data, projectProgress: { broken: { ...data.projectProgress["friends-activity-planner"], checklist: ["yes"] } } })).toBe(false);
   });
+
+  it("rejects nested progress shapes that could crash imported data", () => {
+    expect(isAppData({ ...emptyData(), progress: { broken: null } })).toBe(false);
+    expect(isAppData({ ...emptyData(), stepProgress: { broken: { stepId: "x", answer: [], notes: "", completed: false, updatedAt: "now" } } })).toBe(false);
+    expect(isAppData({ ...emptyData(), journal: [{ id: "x", title: "missing fields" }] })).toBe(false);
+  });
 });

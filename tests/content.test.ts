@@ -40,6 +40,15 @@ describe("zero-beginner micro curriculum", () => {
       expect(step.objective.length).toBeGreaterThan(20);
     }
   });
+
+  it("numbers steps inside each course and never exceeds its course total", () => {
+    for (const courseId of new Set(learningSteps.map((step) => step.courseId))) {
+      const courseSteps = learningSteps.filter((step) => step.courseId === courseId);
+      expect(courseSteps.map((step) => step.position)).toEqual(
+        Array.from({ length: courseSteps.length }, (_, index) => index + 1),
+      );
+    }
+  });
 });
 
 describe("daily recommendation", () => {

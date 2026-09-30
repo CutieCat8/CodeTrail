@@ -4,8 +4,11 @@ const kinds: StepKind[] = ["concept", "trace", "practice", "debug", "checkpoint"
 const labels: Record<StepKind, string> = { concept: "ทำความเข้าใจ", trace: "อ่านและทำนาย", practice: "ลงมือเขียน", debug: "ตามหาบั๊ก", checkpoint: "อธิบายโดยไม่ลอก" };
 
 export function expandTopics(topics: TopicSource[]): LearningStep[] {
-  return topics.flatMap((topic, topicIndex) => kinds.map((kind, index) => {
-    const shared = { id: `${topic.id}-${kind}`, topicId: topic.id, courseId: topic.courseId, unit: topic.unit, position: topicIndex * 5 + index + 1, kind, title: `${labels[kind]}: ${topic.title}`, objective: topic.objective, minutes: kind === "practice" || kind === "debug" ? 12 : 7, vocabulary: topic.vocabulary };
+  const coursePositions = new Map<string, number>();
+  return topics.flatMap((topic) => kinds.map((kind) => {
+    const position = (coursePositions.get(topic.courseId) ?? 0) + 1;
+    coursePositions.set(topic.courseId, position);
+    const shared = { id: `${topic.id}-${kind}`, topicId: topic.id, courseId: topic.courseId, unit: topic.unit, position, kind, title: `${labels[kind]}: ${topic.title}`, objective: topic.objective, minutes: kind === "practice" || kind === "debug" ? 12 : 7, vocabulary: topic.vocabulary };
     if (kind === "concept") return { ...shared, body: [topic.explanation, topic.why], code: topic.example };
     if (kind === "trace") return { ...shared, body: ["อย่าเพิ่งรันโค้ด อ่านจากบนลงล่างและเขียนค่าที่เปลี่ยนในแต่ละบรรทัด การทำนายก่อนรันฝึก mental model ของภาษา"], code: topic.example, prompt: topic.tracePrompt, reveal: topic.traceAnswer };
     if (kind === "practice") return { ...shared, body: ["เขียนด้วยตัวเองจาก starter code ก่อนเปิดคำตอบ เป้าหมายคืออธิบายได้ว่าแต่ละบรรทัดมีหน้าที่อะไร"], starter: topic.starter, prompt: topic.practicePrompt, reveal: topic.solution };

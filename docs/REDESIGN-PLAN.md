@@ -35,7 +35,7 @@
 
 ## R3 — Journal list-first
 
-- สถานะ: **กำลังทำ**
+- สถานะ: **เสร็จ** (`e6fbfdf`, pushed)
 - เป้าหมาย: เปิดมาเห็นบันทึกย้อนหลังและเริ่มเขียนได้ ไม่เจอฟอร์มยาวทันที
 - หน้า/components: `Journal`, `JournalEntry`, persistence ใน `QuestApp.tsx`/`src/lib/storage.ts` ถ้าจำเป็น
 - Dependency: ต้องรักษา `JournalEntry` fields และ schema v1
@@ -44,7 +44,7 @@
 
 ## R4 — Projects persistence and detail
 
-- สถานะ: **ยังไม่เริ่ม**
+- สถานะ: **กำลังทำ**
 - เป้าหมาย: เปลี่ยนจากรายละเอียดทุกโปรเจกต์พร้อมกันเป็น overview/detail พร้อมบันทึก repository, demo และ checklist จริง
 - หน้า/components: `Projects`, `AppData`/project types, `src/lib/storage.ts`, related tests
 - Dependency: ตัดสินใจ backward-compatible project state; ต้องเพิ่ม test fixture ของ schema v1 เดิมก่อน implementation

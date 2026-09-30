@@ -34,6 +34,57 @@ export function accessReason(data: AppData, lesson: Lesson) {
   return `แนะนำให้ผ่านก่อน: ${names.join(", ")} — แต่ซีข้ามเข้าเรียนได้`;
 }
 
+const mixedStages = [
+  ["developer-foundations", "java-foundations"],
+  ["javascript-foundations", "java-oop"],
+  ["node-foundations"],
+] as const;
+
+function hasDraft(data: AppData, stepId: string) {
+  const progress = data.stepProgress[stepId];
+  return Boolean(progress && !progress.completed && (progress.answer.trim() || progress.notes.trim()));
+}
+
+function nextMixedSteps(data: AppData) {
+  for (const courseIds of mixedStages) {
+    const stageSteps = courseIds.flatMap((courseId) =>
+      learningSteps.filter((step) => step.courseId === courseId),
+    );
+    if (stageSteps.every((step) => data.stepProgress[step.id]?.completed)) continue;
+
+    const routes = courseIds
+      .map((courseId) => ({
+        courseId,
+        steps: stageSteps.filter((step) => step.courseId === courseId),
+      }))
+      .map((route) => ({
+        ...route,
+        completed: route.steps.filter((step) => data.stepProgress[step.id]?.completed).length,
+        next: route.steps.find((step) => !data.stepProgress[step.id]?.completed),
+      }))
+      .filter((route) => route.next);
+
+    const draftRoute = routes
+      .filter((route) => hasDraft(data, route.next!.id))
+      .sort((left, right) =>
+        data.stepProgress[right.next!.id].updatedAt.localeCompare(data.stepProgress[left.next!.id].updatedAt),
+      )[0];
+    const selected = draftRoute ?? routes
+      .sort((left, right) => {
+        return left.completed - right.completed;
+      })[0];
+    if (selected?.next) {
+      const companion = routes.find((route) => route.courseId !== selected.courseId)?.next;
+      return { step: selected.next, companion };
+    }
+  }
+
+  return {
+    step: learningSteps.find((step) => step.courseId === mixedStages[0][0]) ?? learningSteps[0],
+    companion: undefined,
+  };
+}
+
 export function stepRecommendation(data: AppData) {
   const courseOrder = data.mode === "java"
     ? ["java-foundations", "java-oop"]
@@ -41,8 +92,25 @@ export function stepRecommendation(data: AppData) {
       ? ["developer-foundations", "javascript-foundations", "node-foundations"]
       : ["developer-foundations", "java-foundations", "javascript-foundations", "java-oop", "node-foundations"];
   const pool = courseOrder.flatMap((courseId) => learningSteps.filter((step) => step.courseId === courseId));
-  const step = pool.find((candidate) => !data.stepProgress[candidate.id]?.completed) ?? pool[0] ?? learningSteps[0];
+  const mixed = data.mode === "mixed" ? nextMixedSteps(data) : undefined;
+  const step = mixed?.step
+    ?? pool.find((candidate) => !data.stepProgress[candidate.id]?.completed)
+    ?? pool[0]
+    ?? learningSteps[0];
   const course = curriculumCourses.find((candidate) => candidate.id === step.courseId);
+  const companionStep = mixed?.companion;
+  const companionCourse = companionStep
+    ? curriculumCourses.find((candidate) => candidate.id === companionStep.courseId)
+    : undefined;
   const started = data.stepProgress[step.id];
-  return { step, course, reason: started ? "กลับมาต่อจากคำตอบที่บันทึกไว้" : `เรียนตามลำดับพื้นฐานของ ${course?.title ?? "เส้นทางนี้"} โดยไม่ข้าม mental model` };
+  const reason = data.mode === "mixed"
+    ? hasDraft(data, step.id)
+      ? "กลับมาทำต่อจากคำตอบหรือบันทึกที่เก็บไว้ในเส้นทางผสม"
+      : companionStep
+        ? `ภารกิจผสมวันนี้เริ่ม ${course?.title ?? "เส้นทางแรก"} แล้วสลับไป ${companionCourse?.title ?? "อีกเส้นทาง"} เพื่อให้พื้นฐานทั้งสองฝั่งเดินคู่กัน`
+        : `เรียน ${course?.title ?? "เส้นทางนี้"} ให้จบช่วงปัจจุบันก่อนเปิดช่วงถัดไป`
+    : started
+      ? "กลับมาต่อจากคำตอบที่บันทึกไว้"
+      : `เรียนตามลำดับพื้นฐานของ ${course?.title ?? "เส้นทางนี้"} โดยไม่ข้าม mental model`;
+  return { step, course, companionStep, companionCourse, reason };
 }

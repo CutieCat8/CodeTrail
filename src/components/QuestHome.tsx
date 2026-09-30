@@ -19,6 +19,8 @@ type Props = {
 };
 
 const modeOptions: [StudyMode, string][] = [["fullstack", "Full-stack"], ["java", "Java & OOP"], ["mixed", "ผสมสองเส้นทาง"]];
+const fullstackCourseIds = new Set(["developer-foundations", "javascript-foundations", "node-foundations"]);
+const javaCourseIds = new Set(["java-foundations", "java-oop"]);
 
 export function QuestHome({ data, setData, openLesson, openStep }: Props) {
   const recommended = stepRecommendation(data);
@@ -30,12 +32,28 @@ export function QuestHome({ data, setData, openLesson, openStep }: Props) {
   const level = Math.floor(xp / 500) + 1;
   const lastStep = data.lastStepId ? stepById(data.lastStepId) : undefined;
   const lastLesson = data.lastLessonId ? lessonById(data.lastLessonId) : undefined;
-  const continueTitle = lastStep?.title ?? lastLesson?.title ?? recommended.step.title;
-  const continueCourse = lastStep
-    ? curriculumCourses.find((course) => course.id === lastStep.courseId)?.title
-    : lastLesson?.module ?? recommended.course?.title;
-  const continueMinutes = lastStep?.minutes ?? lastLesson?.minutes ?? recommended.step.minutes;
-  const openContinue = () => lastStep ? openStep(lastStep.id) : lastLesson ? openLesson(lastLesson.id) : openStep(recommended.step.id);
+  const isMixedMode = data.mode === "mixed";
+  const resumableStep = lastStep && (data.mode === "fullstack" ? fullstackCourseIds : javaCourseIds).has(lastStep.courseId)
+    ? lastStep
+    : undefined;
+  const resumableLesson = lastLesson && lastLesson.track === (data.mode === "java" ? "java" : "web")
+    ? lastLesson
+    : undefined;
+  const isMixedMission = isMixedMode && recommended.companionStep;
+  const continueTitle = isMixedMode
+    ? `ภารกิจผสม: ${recommended.step.title}`
+    : resumableStep?.title ?? resumableLesson?.title ?? recommended.step.title;
+  const continueCourse = isMixedMission
+    ? `เส้นทางผสม · ${recommended.course?.title} + ${recommended.companionCourse?.title}`
+    : resumableStep
+    ? curriculumCourses.find((course) => course.id === resumableStep.courseId)?.title
+    : resumableLesson?.module ?? recommended.course?.title;
+  const continueMinutes = isMixedMode
+    ? recommended.step.minutes
+    : resumableStep?.minutes ?? resumableLesson?.minutes ?? recommended.step.minutes;
+  const openContinue = () => isMixedMode
+    ? openStep(recommended.step.id)
+    : resumableStep ? openStep(resumableStep.id) : resumableLesson ? openLesson(resumableLesson.id) : openStep(recommended.step.id);
   const totalLearningItems = lessons.length + learningSteps.length;
   const completedItems = passedLessons + completedSteps;
   const progressPercent = totalLearningItems ? Math.round((completedItems / totalLearningItems) * 100) : 0;
@@ -58,9 +76,9 @@ export function QuestHome({ data, setData, openLesson, openStep }: Props) {
             <div className="continue-progress"><span><i style={{ width: `${progressPercent}%` }}/></span><b>{progressPercent}%</b></div>
             <span className={`track-tag ${recommended.course?.track === "java" ? "java" : ""}`}>กลับไปเรียนต่อ · {continueCourse}</span>
             <h1>{continueTitle}</h1>
-            <p>{lastStep || lastLesson ? "กลับไปยังคำตอบและ Field notes ที่บันทึกไว้" : recommended.reason}</p>
-            <div className="continue-meta"><span><Clock3 /> {continueMinutes} นาที</span><span><Layers3 /> {lastStep ? "Micro-step" : lastLesson ? "Lab" : recommended.step.kind}</span></div>
-            <div className="continue-actions"><button className="primary" onClick={openContinue}>เรียนต่อ <ChevronRight /></button><button className="home-quiet-action" onClick={() => openStep(recommended.step.id)}>ภารกิจแนะนำวันนี้</button></div>
+            <p>{isMixedMode ? recommended.reason : resumableStep || resumableLesson ? "กลับไปยังคำตอบและ Field notes ที่บันทึกไว้" : recommended.reason}</p>
+            <div className="continue-meta"><span><Clock3 /> ขั้นนี้ {continueMinutes} นาที</span><span><Layers3 /> {isMixedMission ? `ถัดไป ${recommended.companionCourse?.title}` : resumableStep ? "Micro-step" : resumableLesson ? "Lab" : recommended.step.kind}</span></div>
+            <div className="continue-actions"><button className="primary" onClick={openContinue}>{isMixedMode ? "เริ่มขั้นนี้" : "เรียนต่อ"} <ChevronRight /></button>{!isMixedMode && <button className="home-quiet-action" onClick={() => openStep(recommended.step.id)}>ภารกิจแนะนำวันนี้</button>}</div>
           </div>
         </section>
 

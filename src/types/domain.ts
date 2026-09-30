@@ -76,6 +76,13 @@ export type JournalEntry = {
 
 export type RoadmapMark = "learning" | "done" | "skip";
 
+export type ProjectProgress = {
+  repositoryUrl: string;
+  demoUrl: string;
+  checklist: boolean[];
+  updatedAt: string;
+};
+
 export type AppData = {
   version: 1;
   mode: StudyMode;
@@ -86,4 +93,5 @@ export type AppData = {
   stepProgress: Record<string, import("./curriculum").StepProgress>;
   lastStepId?: string;
   roadmapMarks?: Record<string, RoadmapMark>;
+  projectProgress?: Record<string, ProjectProgress>;
 };

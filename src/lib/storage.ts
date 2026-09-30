@@ -22,6 +22,15 @@ export function isAppData(value: unknown): value is AppData {
     if (!candidate.roadmapMarks || typeof candidate.roadmapMarks !== "object" || Array.isArray(candidate.roadmapMarks)) return false;
     if (!Object.values(candidate.roadmapMarks).every((mark) => ["learning", "done", "skip"].includes(String(mark)))) return false;
   }
+  if (candidate.projectProgress !== undefined) {
+    if (!candidate.projectProgress || typeof candidate.projectProgress !== "object" || Array.isArray(candidate.projectProgress)) return false;
+    for (const progress of Object.values(candidate.projectProgress)) {
+      if (!progress || typeof progress !== "object") return false;
+      const item = progress as { repositoryUrl?: unknown; demoUrl?: unknown; checklist?: unknown; updatedAt?: unknown };
+      if (typeof item.repositoryUrl !== "string" || typeof item.demoUrl !== "string" || typeof item.updatedAt !== "string") return false;
+      if (!Array.isArray(item.checklist) || !item.checklist.every((checked) => typeof checked === "boolean")) return false;
+    }
+  }
   return candidate.journal.every((entry) => entry && typeof entry.id === "string" && typeof entry.title === "string");
 }
 
@@ -30,7 +39,7 @@ export function loadData(): AppData {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return emptyData();
     const parsed: unknown = JSON.parse(raw);
-    return isAppData(parsed) ? { ...parsed, stepProgress: parsed.stepProgress ?? {} } : emptyData();
+    return isAppData(parsed) ? { ...parsed, stepProgress: parsed.stepProgress ?? {}, projectProgress: parsed.projectProgress ?? {} } : emptyData();
   } catch {
     return emptyData();
   }

@@ -99,3 +99,26 @@ describe("personal full-stack roadmap", () => {
     }
   });
 });
+
+describe("project progress compatibility", () => {
+  it("accepts old schema v1 data without project progress", () => {
+    const data = emptyData();
+    expect(isAppData(data)).toBe(true);
+  });
+
+  it("validates persisted project links and checklist evidence", () => {
+    const data = {
+      ...emptyData(),
+      projectProgress: {
+        "friends-activity-planner": {
+          repositoryUrl: "https://github.com/sea/activity-planner",
+          demoUrl: "",
+          checklist: [true, false],
+          updatedAt: "2026-09-30T10:00:00.000Z",
+        },
+      },
+    };
+    expect(isAppData(data)).toBe(true);
+    expect(isAppData({ ...data, projectProgress: { broken: { ...data.projectProgress["friends-activity-planner"], checklist: ["yes"] } } })).toBe(false);
+  });
+});

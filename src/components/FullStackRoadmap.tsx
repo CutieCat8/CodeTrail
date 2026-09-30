@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, Check, CircleDot, Clock, LockKeyhole, RotateCcw, SkipForward, X } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ArrowRight, Check, CircleDot, Clock, LocateFixed, LockKeyhole, RotateCcw, SkipForward, X } from "lucide-react";
 import { fullstackRoadmap, laneLabels, type RoadmapLane, type RoadmapNode } from "@/content/fullstack-roadmap";
 import { learningSteps } from "@/content/curriculum";
 import { lessons } from "@/content/lessons";
@@ -44,7 +44,7 @@ function statusFor(node: RoadmapNode, data: AppData, evidence: Evidence): NodeSt
   return "none";
 }
 
-// Alternate sides so each checkpoint fans out evenly, like roadmap.sh.
+// Alternate sides so each checkpoint fans out evenly around the central journey.
 function partitionNodes(nodes: RoadmapNode[]) {
   const left: RoadmapNode[] = [];
   const right: RoadmapNode[] = [];
@@ -55,6 +55,7 @@ function partitionNodes(nodes: RoadmapNode[]) {
 export function FullStackRoadmap({ data, setData, openStep, openLesson }: Props) {
   const [lane, setLane] = useState<RoadmapLane | "all">("all");
   const [selectedId, setSelectedId] = useState<string>();
+  const drawerRef = useRef<HTMLElement>(null);
   const allNodes = useMemo(() => fullstackRoadmap.flatMap((stage) => stage.nodes), []);
   const selected = allNodes.find((node) => node.id === selectedId);
   const selectedEvidence = selected ? evidenceFor(selected, data) : undefined;
@@ -69,14 +70,29 @@ export function FullStackRoadmap({ data, setData, openStep, openLesson }: Props)
     if (status !== "none") counts[status] += 1;
   }
   const settled = counts.done + counts.skip;
+  const currentNode = allNodes.find((node) => statusFor(node, data, evidenceFor(node, data)) === "learning")
+    ?? allNodes.find((node) => evidenceFor(node, data).started)
+    ?? allNodes.find((node) => evidenceFor(node, data).total > 0);
+
+  const closeDrawer = useCallback(() => {
+    const previousId = selectedId;
+    setSelectedId(undefined);
+    if (previousId) requestAnimationFrame(() => document.getElementById(`rm-node-${previousId}`)?.focus());
+  }, [selectedId]);
 
   useEffect(() => {
-    function closeOnEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") setSelectedId(undefined);
+    function handleDrawerKeys(event: KeyboardEvent) {
+      if (event.key === "Escape") closeDrawer();
+      if (event.key !== "Tab" || !selectedId) return;
+      const controls = [...(drawerRef.current?.querySelectorAll<HTMLElement>("button:not([disabled])") ?? [])];
+      if (!controls.length) return;
+      const first = controls[0]; const last = controls[controls.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
     }
-    window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
-  }, []);
+    window.addEventListener("keydown", handleDrawerKeys);
+    return () => window.removeEventListener("keydown", handleDrawerKeys);
+  }, [selectedId, closeDrawer]);
 
   useEffect(() => {
     if (!selectedId) return;
@@ -107,8 +123,9 @@ export function FullStackRoadmap({ data, setData, openStep, openLesson }: Props)
     const statusText = markOptions.find((option) => option.id === status)?.label ?? "ยังไม่เริ่ม";
     return (
       <button
+        id={`rm-node-${node.id}`}
         key={node.id}
-        className={`rm-node ${node.lane} ${status} ${side}${node.optional ? " optional" : ""}${node.id === selectedId ? " selected" : ""}`}
+        className={`rm-node ${node.lane} ${status} ${side}${node.optional ? " optional" : ""}${node.id === selectedId ? " selected" : ""}${node.id === currentNode?.id ? " current" : ""}`}
         aria-label={`${node.title} — ${statusText}`}
         onClick={() => setSelectedId(node.id)}
       >
@@ -136,8 +153,9 @@ export function FullStackRoadmap({ data, setData, openStep, openLesson }: Props)
       </header>
 
       <div className="rm-filters" aria-label="กรองสายทักษะ">
-        <button aria-pressed={lane === "all"} onClick={() => setLane("all")}>ภาพรวม</button>
-        {(Object.keys(laneLabels) as RoadmapLane[]).map((key) => <button key={key} aria-pressed={lane === key} onClick={() => setLane(key)}>{laneLabels[key]}</button>)}
+        <div><button aria-pressed={lane === "all"} onClick={() => setLane("all")}>ภาพรวม</button>
+          {(Object.keys(laneLabels) as RoadmapLane[]).map((key) => <button key={key} aria-pressed={lane === key} onClick={() => setLane(key)}>{laneLabels[key]}</button>)}</div>
+        <button className="rm-current-button" disabled={!currentNode} onClick={() => { setLane("all"); requestAnimationFrame(() => document.getElementById(`rm-node-${currentNode?.id}`)?.scrollIntoView({ behavior: "smooth", block: "center" })); }}><LocateFixed/>กลับไปตำแหน่งปัจจุบัน</button>
       </div>
 
       <main className="rm-canvas">
@@ -167,9 +185,9 @@ export function FullStackRoadmap({ data, setData, openStep, openLesson }: Props)
       </main>
 
       {selected && selectedEvidence && <>
-        <button className="rm-backdrop" aria-label="ปิดรายละเอียดหัวข้อ" onClick={() => setSelectedId(undefined)}/>
-        <aside className="rm-drawer" role="dialog" aria-modal="true" aria-labelledby="rm-drawer-title">
-          <button autoFocus className="rm-drawer-close" onClick={() => setSelectedId(undefined)} aria-label="ปิดรายละเอียด"><X/></button>
+        <button className="rm-backdrop" aria-label="ปิดรายละเอียดหัวข้อ" onClick={closeDrawer}/>
+        <aside ref={drawerRef} className="rm-drawer" role="dialog" aria-modal="true" aria-labelledby="rm-drawer-title">
+          <button autoFocus className="rm-drawer-close" onClick={closeDrawer} aria-label="ปิดรายละเอียด"><X/></button>
           <span className="rm-drawer-lane">{laneLabels[selected.lane]}{selected.optional ? " · เลือกเรียน" : " · เส้นทางหลัก"}</span>
           <h2 id="rm-drawer-title">{selected.title}</h2>
           <p className="rm-drawer-description">{selected.description}</p>

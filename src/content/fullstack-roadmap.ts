@@ -42,9 +42,9 @@ export const fullstackRoadmap: RoadmapStage[] = [
   {
     id: "web-language", number: "02", title: "เข้าใจภาษาของเว็บ", outcome: "อธิบายได้ว่า browser ขอข้อมูลอย่างไร และสร้างหน้าเว็บด้วยพื้นฐานก่อนพึ่ง framework",
     nodes: [
-      { id: "internet-http", title: "Internet, DNS & HTTP", lane: "core", description: "request/response, URL, method, headers, body และ status code", why: "ทุกหน้าเว็บและ API วิ่งผ่านสัญญา HTTP", evidence: "trace request ตั้งแต่ URL จน server จบ response", topicIds: ["node-http"] },
-      { id: "html", title: "Semantic HTML", lane: "frontend", description: "โครงสร้างเอกสาร form, label, button และความหมายของ element", why: "React ยังสร้าง HTML; semantic ที่ดีช่วย keyboard และ screen reader", evidence: "สร้างหน้าที่ใช้งานได้โดยไม่พึ่ง div ทุกอย่าง" },
-      { id: "css", title: "CSS Layout & Responsive", lane: "frontend", description: "cascade, box model, Flexbox, Grid และ responsive constraints", why: "UI ที่ทำงานจริงต้องอ่านได้หลายขนาดและไม่ล้น container", evidence: "สร้าง layout desktop/mobile โดยไม่ fix ขนาดตามหน้าจอเดียว" },
+      { id: "internet-http", title: "Internet, DNS & HTTP", lane: "core", description: "request/response, URL, method, headers, body และ status code", why: "ทุกหน้าเว็บและ API วิ่งผ่านสัญญา HTTP", evidence: "trace request ตั้งแต่ URL จน server จบ response", topicIds: ["web-request", "web-url", "node-http"] },
+      { id: "html", title: "Semantic HTML", lane: "frontend", description: "โครงสร้างเอกสาร form, label, button และความหมายของ element", why: "React ยังสร้าง HTML; semantic ที่ดีช่วย keyboard และ screen reader", evidence: "สร้างหน้าที่ใช้งานได้โดยไม่พึ่ง div ทุกอย่าง", topicIds: ["web-semantics", "web-forms", "web-accessibility"] },
+      { id: "css", title: "CSS Layout & Responsive", lane: "frontend", description: "cascade, box model, Flexbox, Grid และ responsive constraints", why: "UI ที่ทำงานจริงต้องอ่านได้หลายขนาดและไม่ล้น container", evidence: "สร้าง layout desktop/mobile โดยไม่ fix ขนาดตามหน้าจอเดียว", topicIds: ["web-selector", "web-box", "web-flex", "web-grid", "web-responsive"] },
       { id: "javascript-values", title: "JavaScript Values & Control Flow", lane: "frontend", description: "types, variables, condition, loop และการแปลงชนิด", why: "เป็นฐานของโค้ด React, Node และ TypeScript ตอน runtime", evidence: "ทำนาย output และเขียน branch โดยไม่พึ่ง trial-and-error", topicIds: ["js-runtime", "js-values", "js-variables"] },
     ],
   },

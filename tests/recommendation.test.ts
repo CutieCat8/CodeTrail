@@ -81,7 +81,7 @@ describe("stepRecommendation", () => {
     expect(result.reason).toMatch(/กลับมาทำต่อ/);
   });
 
-  it("finishes both foundation routes before entering the JavaScript and OOP stage", () => {
+  it("finishes both foundation routes before entering Web Platform and OOP", () => {
     const data = emptyData();
     data.mode = "mixed";
     completeCourse(data, "developer-foundations");
@@ -90,7 +90,7 @@ describe("stepRecommendation", () => {
 
     completeCourse(data, "java-foundations");
 
-    expect(stepRecommendation(data).step.courseId).toBe("javascript-foundations");
+    expect(stepRecommendation(data).step.courseId).toBe("web-platform-foundations");
   });
 
   it("does not skip the longer Java route when Developer Foundations is complete", () => {
@@ -121,16 +121,20 @@ describe("stepRecommendation", () => {
     expect(stepRecommendation(data).step.id).toBe("dev-program-concept");
   });
 
-  it("finishes both second-stage routes before entering Node Foundations", () => {
+  it("finishes Web Platform and OOP before JavaScript, then Node", () => {
     const data = emptyData();
     data.mode = "mixed";
     completeCourse(data, "developer-foundations");
     completeCourse(data, "java-foundations");
-    completeCourse(data, "javascript-foundations");
+    completeCourse(data, "web-platform-foundations");
 
     expect(stepRecommendation(data).step.courseId).toBe("java-oop");
 
     completeCourse(data, "java-oop");
+
+    expect(stepRecommendation(data).step.courseId).toBe("javascript-foundations");
+
+    completeCourse(data, "javascript-foundations");
 
     expect(stepRecommendation(data).step.courseId).toBe("node-foundations");
   });

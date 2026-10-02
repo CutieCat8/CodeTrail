@@ -6,6 +6,7 @@ import { curriculumCourses, learningSteps, stepById } from "@/content/curriculum
 import { lessonById, lessons } from "@/content/lessons";
 import { stepRecommendation } from "@/lib/recommendation";
 import { calculateStreak, xpTotal } from "@/lib/storage";
+import { weeklyActivityCount } from "@/lib/activity";
 import type { AppData, StudyMode } from "@/types/domain";
 import { ActivityHeatmap } from "./ActivityHeatmap";
 import { ExpeditionBase } from "./ExpeditionArt";
@@ -19,7 +20,7 @@ type Props = {
 };
 
 const modeOptions: [StudyMode, string][] = [["fullstack", "Full-stack"], ["java", "Java & OOP"], ["mixed", "ผสมสองเส้นทาง"]];
-const fullstackCourseIds = new Set(["developer-foundations", "javascript-foundations", "node-foundations"]);
+const fullstackCourseIds = new Set(["developer-foundations", "web-platform-foundations", "javascript-foundations", "node-foundations"]);
 const javaCourseIds = new Set(["java-foundations", "java-oop"]);
 
 export function QuestHome({ data, setData, openLesson, openStep }: Props) {
@@ -105,7 +106,7 @@ export function QuestHome({ data, setData, openLesson, openStep }: Props) {
         </section>
 
         <section className="weekly-mini-card">
-          <div><span className="eyebrow">Weekly target</span><strong>{Math.min(completedItems, data.weeklyGoal)}/{data.weeklyGoal} หลักฐาน</strong></div>
+          <div><span className="eyebrow">Weekly target</span><strong>{Math.min(weeklyActivityCount(data), data.weeklyGoal)}/{data.weeklyGoal} กิจกรรมสัปดาห์นี้</strong></div>
           <input aria-label="เป้าหมายต่อสัปดาห์" type="range" min="1" max="14" value={data.weeklyGoal} onChange={(event) => setData((current) => ({ ...current, weeklyGoal: Number(event.target.value) }))}/>
         </section>
       </aside>

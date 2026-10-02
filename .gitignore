@@ -9,3 +9,5 @@ coverage/
 qa-artifacts/
 .vercel/
 *.tsbuildinfo
+playwright-report/
+test-results/

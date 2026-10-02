@@ -83,6 +83,13 @@ export type ProjectProgress = {
   updatedAt: string;
 };
 
+export type ActivityEvent = {
+  id: string;
+  occurredAt: string;
+  type: "step-completed" | "lab-attempt" | "journal-saved" | "project-evidence" | "legacy-snapshot";
+  sourceId: string;
+};
+
 export type AppData = {
   version: 1;
   mode: StudyMode;
@@ -94,4 +101,5 @@ export type AppData = {
   lastStepId?: string;
   roadmapMarks?: Record<string, RoadmapMark>;
   projectProgress?: Record<string, ProjectProgress>;
+  activityEvents?: ActivityEvent[];
 };

@@ -14,6 +14,7 @@
 - โจทย์เช็กลิสต์และ Java ที่ตรวจในเครื่องมากกว่า 3 ข้อ
 - Dashboard, Learning Map, Challenge Library, Skill Evidence, Journal, Projects และ Settings
 - Auto-save, คืนคำตอบหลัง refresh, attempts, latest result, checklist, Export/Import JSON
+- บันทึกกิจกรรมเมื่อจบ micro-step, ทดลอง Lab, บันทึก Journal หรือยืนยันหลักฐานโปรเจกต์; streak, heatmap และเป้าหมายรายสัปดาห์อ่านจากเหตุการณ์ชุดเดียวกัน
 
 ## รันในเครื่อง
 
@@ -37,6 +38,11 @@ Tests:
 
 ```bash
 npm test
+npm run typecheck
+npm run lint
+npm run build
+npx playwright install chromium
+npm run test:e2e  # ต้อง build และติดตั้ง Playwright Chromium ก่อน
 ```
 
 ## โครงสร้าง
@@ -68,7 +74,7 @@ Runner ทำงานใน Web Worker แยก UI, ปิด `fetch`, `XMLHtt
 
 ## Java
 
-ใช้ **JDK 21 LTS** บท Java ให้ผู้เรียนรันในเครื่อง:
+ใช้ **JDK 25 LTS** บท Java ให้ผู้เรียนรันในเครื่อง:
 
 ```bash
 javac Main.java
@@ -80,6 +86,8 @@ java Main
 ## การจัดเก็บข้อมูล
 
 ใช้ key `seas-fullstack-quest:v1` ใน `localStorage` และ validate schema ก่อน Import ข้อมูลอยู่เฉพาะ browser/profile ปัจจุบัน:
+
+ข้อมูลเก่าที่ไม่มี activity events จะถูกแปลงจากเวลาแก้ไขล่าสุดของแต่ละรายการเมื่อโหลดหรือ Import จึงรักษาหลักฐานที่ยังมีอยู่ได้ แต่ไม่สามารถย้อนสร้างประวัติวันที่ถูกเขียนทับไปก่อนหน้านั้น
 
 - ไม่ซิงก์ข้ามอุปกรณ์
 - ไม่มีบัญชีผู้ใช้หรือฐานข้อมูล

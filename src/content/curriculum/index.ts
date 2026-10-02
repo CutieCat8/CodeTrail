@@ -1,5 +1,6 @@
 import { expandTopics } from "./generate";
 import { developerFoundationTopics } from "./developer-foundations";
+import { webPlatformFoundationTopics } from "./web-platform-foundations";
 import { javaFoundationTopics } from "./java-foundations";
 import { javaOopTopics } from "./java-oop";
 import { javascriptFoundationTopics } from "./javascript-foundations";
@@ -9,6 +10,7 @@ export { curriculumCourses } from "./courses";
 
 export const topicSources = [
   ...developerFoundationTopics,
+  ...webPlatformFoundationTopics,
   ...javaFoundationTopics,
   ...javaOopTopics,
   ...javascriptFoundationTopics,

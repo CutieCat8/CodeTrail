@@ -1,4 +1,5 @@
 import type { AppData, LessonProgress, StudyMode } from "@/types/domain";
+import { activityTimestamps, withLegacyActivityEvents } from "./activity";
 
 export const STORAGE_KEY = "seas-fullstack-quest:v1";
 
@@ -9,6 +10,7 @@ export const emptyData = (): AppData => ({
   progress: {},
   journal: [],
   stepProgress: {},
+  activityEvents: [],
 });
 
 const isRecord = (value: unknown): value is Record<string, unknown> => Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -53,6 +55,12 @@ export function isAppData(value: unknown): value is AppData {
       if (!isBooleanArray(item.checklist)) return false;
     }
   }
+  if (candidate.activityEvents !== undefined) {
+    if (!Array.isArray(candidate.activityEvents)) return false;
+    if (!candidate.activityEvents.every((event) => isRecord(event)
+      && typeof event.id === "string" && typeof event.occurredAt === "string" && typeof event.sourceId === "string"
+      && ["step-completed", "lab-attempt", "journal-saved", "project-evidence", "legacy-snapshot"].includes(String(event.type)))) return false;
+  }
   if (candidate.lastLessonId !== undefined && typeof candidate.lastLessonId !== "string") return false;
   if (candidate.lastStepId !== undefined && typeof candidate.lastStepId !== "string") return false;
   return candidate.journal.every((entry) => isRecord(entry)
@@ -73,7 +81,7 @@ export function loadData(): AppData {
 
 export function normalizeAppData(value: unknown): AppData | null {
   if (!isAppData(value)) return null;
-  return { ...value, stepProgress: value.stepProgress ?? {}, projectProgress: value.projectProgress ?? {} };
+  return withLegacyActivityEvents({ ...value, stepProgress: value.stepProgress ?? {}, projectProgress: value.projectProgress ?? {} });
 }
 
 export function saveData(data: AppData) {
@@ -97,12 +105,9 @@ const bangkokDay = (iso: string) => new Intl.DateTimeFormat("en-CA", {
   timeZone: "Asia/Bangkok", year: "numeric", month: "2-digit", day: "2-digit",
 }).format(new Date(iso));
 
-export function calculateStreak(data: AppData) {
-  const activeDays = new Set<string>();
-  Object.values(data.progress).forEach((p) => activeDays.add(bangkokDay(p.updatedAt)));
-  data.journal.forEach((j) => activeDays.add(bangkokDay(j.updatedAt)));
+export function calculateStreak(data: AppData, today = new Date()) {
+  const activeDays = new Set(activityTimestamps(data).map(bangkokDay));
   if (!activeDays.size) return 0;
-  const today = new Date();
   const todayKey = bangkokDay(today.toISOString());
   const yesterday = new Date(today.getTime() - 86_400_000);
   let cursor = activeDays.has(todayKey) ? today : yesterday;

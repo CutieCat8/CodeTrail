@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { lessons } from "../src/content/lessons";
 import { emptyData, isAppData, normalizeAppData } from "../src/lib/storage";
-import { recommendation } from "../src/lib/recommendation";
-import { learningSteps, topicSources } from "../src/content/curriculum";
+import { recommendation, stepRecommendation } from "../src/lib/recommendation";
+import { curriculumCourses, learningSteps, topicSources } from "../src/content/curriculum";
 import { roadmapNodes } from "../src/content/fullstack-roadmap";
 
 describe("curriculum", () => {
@@ -25,6 +25,27 @@ describe("curriculum", () => {
 });
 
 describe("zero-beginner micro curriculum", () => {
+  it("places authored Web Platform lessons before JavaScript in the full-stack route", () => {
+    const data = { ...emptyData(), mode: "fullstack" as const };
+    for (const step of learningSteps.filter((candidate) => candidate.courseId === "developer-foundations")) {
+      data.stepProgress[step.id] = { stepId: step.id, answer: "", notes: "", completed: true, updatedAt: "2026-10-01T00:00:00.000Z" };
+    }
+    expect(stepRecommendation(data).step.courseId).toBe("web-platform-foundations");
+    expect(learningSteps.filter((step) => step.courseId === "web-platform-foundations")).toHaveLength(60);
+  });
+
+  it("marks unfinished courses as partial and shows authored counts honestly", () => {
+    for (const course of curriculumCourses) {
+      const authored = learningSteps.filter((step) => step.courseId === course.id).length;
+      if (course.status === "complete") expect(authored).toBeGreaterThanOrEqual(course.targetSteps);
+      if (course.status === "partial") {
+        expect(authored).toBeGreaterThan(0);
+        expect(authored).toBeLessThan(course.targetSteps);
+      }
+      if (course.status === "planned") expect(authored).toBe(0);
+    }
+  });
+
   it("ships five distinct interactions for every authored topic", () => {
     expect(topicSources.length).toBeGreaterThanOrEqual(40);
     expect(learningSteps).toHaveLength(topicSources.length * 5);

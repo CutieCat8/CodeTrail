@@ -706,3 +706,20 @@
     transition: none;
   }
 }
+
+/* rounded corners — override the square pixel-style edges */
+.home-speech{border-radius:var(--radius-xl)}
+.continue-quest{border-radius:var(--radius-xl)}
+.continue-quest::after{border-radius:inherit}
+.continue-copy .track-tag{border-radius:999px}
+.continue-progress>span,.continue-progress i,.home-project-progress>span,.home-project-progress i{border-radius:999px}
+.continue-actions .primary,.home-quiet-action{border-radius:var(--radius-md)}
+.profile-card,.home-project-card,.weekly-mini-card{border-radius:var(--radius-xl);overflow:hidden}
+.profile-avatar{border-radius:var(--radius-lg);overflow:hidden}
+.profile-mode button{border-radius:var(--radius-md)}
+.profile-mode button[aria-pressed="true"]{box-shadow:none;border-color:#76bfff}
+.activity-card{border-radius:var(--radius-xl)}
+.activity-stage,.activity-detail{border-radius:var(--radius-lg)}
+.activity-cell{border-radius:6px}
+.activity-legend i{border-radius:4px}
+.weekly-mini-card input{accent-color:#8f7bff}

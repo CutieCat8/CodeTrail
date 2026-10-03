@@ -31,15 +31,15 @@ export function ActivityHeatmap({ data }: { data: AppData }) {
     return index === 0 || month !== previousMonth ? MONTHS[month - 1] : "";
   });
   const summary = active
-    ? `${active.count} หลักฐาน · ${formatDay(active.date)}`
+    ? `${active.count} done · ${formatDay(active.date)}`
     : total
-      ? "เลือกช่องเพื่อดูจำนวนหลักฐานในวันนั้น"
-      : "เริ่มบทแรก แล้วกิจกรรมจริงจะปรากฏตรงนี้";
+      ? "กดที่ช่องเพื่อดูว่าวันนั้นทำไปกี่อัน"
+      : "พอเริ่มเรียน ช่องสีจะขึ้นตรงนี้";
 
   return <section className="activity-card" aria-labelledby="activity-title">
     <header className="activity-card-head">
-      <div><span className="eyebrow">Activity log</span><h2 id="activity-title">จังหวะการฝึก 20 สัปดาห์</h2></div>
-      <div className="activity-totals"><strong>{activeDays}</strong><span>วันที่มีหลักฐาน</span><strong>{total}</strong><span>รายการบันทึก</span></div>
+      <div><span className="eyebrow">Activity log</span><h2 id="activity-title">Last 20 weeks</h2></div>
+      <div className="activity-totals"><strong>{activeDays}</strong><span>active days</span><strong>{total}</strong><span>completed</span></div>
     </header>
     <div className="activity-stage">
       <div className="activity-months" aria-hidden="true">{monthLabels.map((month, index) => <span key={`${month}-${index}`}>{month}</span>)}</div>
@@ -49,7 +49,7 @@ export function ActivityHeatmap({ data }: { data: AppData }) {
             type="button"
             key={day.date}
             className={`activity-cell level-${day.level}`}
-            aria-label={`${formatDay(day.date)} มี ${day.count} หลักฐาน`}
+            aria-label={`${formatDay(day.date)} ทำเสร็จ ${day.count} อัน`}
             aria-pressed={active?.date === day.date}
             onPointerEnter={() => setActive(day)}
             onFocus={() => setActive(day)}
@@ -59,6 +59,6 @@ export function ActivityHeatmap({ data }: { data: AppData }) {
       </div>
       <p className="activity-detail" aria-live="polite">{summary}</p>
     </div>
-    <footer><span>ข้อมูลจาก progress, micro-step, journal และ project ที่บันทึกใน browser นี้</span><div className="activity-legend"><small>น้อย</small>{[0,1,2,3,4].map((level) => <i className={`level-${level}`} key={level}/>)}<small>มาก</small></div></footer>
+    <footer><span>นับจาก step, Lab, journal และ project ที่บันทึกไว้ใน browser นี้</span><div className="activity-legend"><small>Less</small>{[0,1,2,3,4].map((level) => <i className={`level-${level}`} key={level}/>)}<small>More</small></div></footer>
   </section>;
 }

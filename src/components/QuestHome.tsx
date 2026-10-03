@@ -18,7 +18,7 @@ type Props = {
   openStep: (id: string) => void;
 };
 
-const modeOptions: [StudyMode, string][] = [["fullstack", "Full-stack"], ["java", "Java & OOP"], ["mixed", "ผสมสองเส้นทาง"]];
+const modeOptions: [StudyMode, string][] = [["fullstack", "Full-stack"], ["java", "Java & OOP"], ["mixed", "Mixed"]];
 const fullstackCourseIds = new Set(["developer-foundations", "javascript-foundations", "node-foundations"]);
 const javaCourseIds = new Set(["java-foundations", "java-oop"]);
 
@@ -41,7 +41,7 @@ export function QuestHome({ data, setData, openLesson, openStep }: Props) {
     : undefined;
   const isMixedMission = isMixedMode && recommended.companionStep;
   const continueTitle = isMixedMode
-    ? `ภารกิจผสม: ${recommended.step.title}`
+    ? recommended.step.title
     : resumableStep?.title ?? resumableLesson?.title ?? recommended.step.title;
   const continueCourse = isMixedMission
     ? `เส้นทางผสม · ${recommended.course?.title} + ${recommended.companionCourse?.title}`
@@ -64,7 +64,7 @@ export function QuestHome({ data, setData, openLesson, openStep }: Props) {
   return <div className="page home-page">
     <section className="home-greeting">
       <PixelCat variant="welcome" decorative />
-      <div className="home-speech"><span>{today}</span><strong>{streak ? `กลับมาเดินทางต่อเป็นวันที่ ${streak} แล้วนะ ซี` : "พร้อมเริ่มภารกิจแรกหรือยัง ซี?"}</strong><p>{streak ? "คำตอบและบันทึกครั้งล่าสุดยังอยู่ครบ เลือกภารกิจเดียวแล้วไปต่อได้เลย" : "เริ่มจากบทสั้นหนึ่งบท แล้วฐานฝึกจะจำจุดที่ค้างไว้ให้"}</p></div>
+      <div className="home-speech"><span>{today}</span><strong>{streak ? `เรียนต่อเนื่องมา ${streak} วันแล้ว เก่งมากเลย ซี` : "พร้อมเริ่มเรียนหรือยัง ซี?"}</strong><p>{streak ? "คำตอบและโน้ตที่จดไว้ยังอยู่ครบ เลือกมาหนึ่งอันแล้วไปต่อได้เลย" : "เริ่มจาก step สั้น ๆ สักอัน เดี๋ยวระบบจะจำให้ว่าเรียนถึงไหนแล้ว"}</p></div>
     </section>
 
     <div className="home-layout">
@@ -74,11 +74,11 @@ export function QuestHome({ data, setData, openLesson, openStep }: Props) {
           <div className="continue-overlay" />
           <div className="continue-copy">
             <div className="continue-progress"><span><i style={{ width: `${progressPercent}%` }}/></span><b>{progressPercent}%</b></div>
-            <span className={`track-tag ${recommended.course?.track === "java" ? "java" : ""}`}>กลับไปเรียนต่อ · {continueCourse}</span>
+            <span className={`track-tag ${recommended.course?.track === "java" ? "java" : ""}`}>{isMixedMode ? "Today's mission" : "Continue"} · {continueCourse}</span>
             <h1>{continueTitle}</h1>
-            <p>{isMixedMode ? recommended.reason : resumableStep || resumableLesson ? "กลับไปยังคำตอบและ Field notes ที่บันทึกไว้" : recommended.reason}</p>
-            <div className="continue-meta"><span><Clock3 /> ขั้นนี้ {continueMinutes} นาที</span><span><Layers3 /> {isMixedMission ? `ถัดไป ${recommended.companionCourse?.title}` : resumableStep ? "Micro-step" : resumableLesson ? "Lab" : recommended.step.kind}</span></div>
-            <div className="continue-actions"><button className="primary" onClick={openContinue}>{isMixedMode ? "เริ่มขั้นนี้" : "เรียนต่อ"} <ChevronRight /></button>{!isMixedMode && <button className="home-quiet-action" onClick={() => openStep(recommended.step.id)}>ภารกิจแนะนำวันนี้</button>}</div>
+            <p>{isMixedMode ? recommended.reason : resumableStep || resumableLesson ? "กลับไปต่อจากคำตอบและโน้ตที่จดไว้" : recommended.reason}</p>
+            <div className="continue-meta"><span><Clock3 /> {continueMinutes} นาที</span><span><Layers3 /> {isMixedMission ? `Next: ${recommended.companionCourse?.title}` : resumableStep ? "Micro-step" : resumableLesson ? "Lab" : recommended.step.kind}</span></div>
+            <div className="continue-actions"><button className="primary" onClick={openContinue}>{isMixedMode ? "เริ่มเลย" : "เรียนต่อ"} <ChevronRight /></button>{!isMixedMode && <button className="home-quiet-action" onClick={() => openStep(recommended.step.id)}>ดูภารกิจแนะนำ</button>}</div>
           </div>
         </section>
 
@@ -91,21 +91,21 @@ export function QuestHome({ data, setData, openLesson, openStep }: Props) {
           <div className="profile-stats">
             <div><Trophy /><span><strong>{xp}</strong><small>Total XP</small></span></div>
             <div><Sparkles /><span><strong>Level {level}</strong><small>Journey level</small></span></div>
-            <div><BookOpen /><span><strong>{passedLessons}</strong><small>บท Lab ผ่านแล้ว</small></span></div>
+            <div><BookOpen /><span><strong>{passedLessons}</strong><small>Labs passed</small></span></div>
             <div><Flame /><span><strong>{streak}</strong><small>Day streak</small></span></div>
           </div>
-          <div className="profile-mode"><span>เส้นทางที่ใช้จัดภารกิจ</span><div>{modeOptions.map(([mode,label]) => <button key={mode} aria-pressed={data.mode === mode} onClick={() => setData((current) => ({ ...current, mode }))}>{label}</button>)}</div></div>
+          <div className="profile-mode"><span>Learning path</span><div>{modeOptions.map(([mode,label]) => <button key={mode} aria-pressed={data.mode === mode} onClick={() => setData((current) => ({ ...current, mode }))}>{label}</button>)}</div></div>
         </section>
 
         <section className="home-project-card">
           <div className="home-project-head"><FolderGit2 /><span><small>PROJECT IN PROGRESS</small><strong>Friends Activity Planner</strong></span></div>
-          <p>{project ? "มีหลักฐานโปรเจกต์บันทึกอยู่ กลับไปต่อจาก milestone ล่าสุดได้" : "เชื่อมบทเว็บแต่ละบทเป็นระบบวางแผนกิจกรรมสำหรับเพื่อน 9 คน"}</p>
+          <p>{project ? "มีงานโปรเจกต์ที่บันทึกไว้แล้ว กลับไปทำต่อจาก milestone ล่าสุดได้" : "เชื่อมบทเว็บแต่ละบทเป็นระบบวางแผนกิจกรรมสำหรับเพื่อน 9 คน"}</p>
           <div className="home-project-progress"><span><i style={{ width: `${Math.round(projectChecks / 4 * 100)}%` }}/></span><small>{projectChecks}/4 milestones</small></div>
-          <div className="home-project-links"><span className={project?.repositoryUrl ? "ready" : ""}><Code2 /> Repository {project?.repositoryUrl ? "แนบแล้ว" : "ยังไม่แนบ"}</span></div>
+          <div className="home-project-links"><span className={project?.repositoryUrl ? "ready" : ""}><Code2 /> {project?.repositoryUrl ? "Repository linked" : "Repository not linked yet"}</span></div>
         </section>
 
         <section className="weekly-mini-card">
-          <div><span className="eyebrow">Weekly target</span><strong>{Math.min(completedItems, data.weeklyGoal)}/{data.weeklyGoal} หลักฐาน</strong></div>
+          <div><span className="eyebrow">Weekly target</span><strong>{Math.min(completedItems, data.weeklyGoal)}/{data.weeklyGoal} steps done</strong></div>
           <input aria-label="เป้าหมายต่อสัปดาห์" type="range" min="1" max="14" value={data.weeklyGoal} onChange={(event) => setData((current) => ({ ...current, weeklyGoal: Number(event.target.value) }))}/>
         </section>
       </aside>

@@ -41,6 +41,17 @@ describe("zero-beginner micro curriculum", () => {
     }
   });
 
+  it("gives every rich topic a full plain-language concept step", () => {
+    const rich = topicSources.filter((topic) => topic.lesson);
+    expect(rich.length).toBeGreaterThanOrEqual(8);
+    for (const topic of rich) {
+      const concept = learningSteps.find((step) => step.id === `${topic.id}-concept`)!;
+      const kinds = concept.sections!.map((section) => section.kind);
+      expect(kinds).toEqual(expect.arrayContaining(["hook", "analogy", "text", "code", "walkthrough", "pitfall", "recap"]));
+      expect(topic.lesson!.explain.length).toBeGreaterThanOrEqual(3);
+    }
+  });
+
   it("numbers steps inside each course and never exceeds its course total", () => {
     for (const courseId of new Set(learningSteps.map((step) => step.courseId))) {
       const courseSteps = learningSteps.filter((step) => step.courseId === courseId);

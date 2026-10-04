@@ -1,4 +1,5 @@
 import type { TestResult, TestSpec } from "@/types/domain";
+import { compareTestValue } from "@/lib/compare";
 
 export type SnippetRunResult = {
   output: string[];
@@ -51,13 +52,15 @@ export async function runIsolatedSnippet(source: string): Promise<SnippetRunResu
   });
 }
 
-export async function runIsolatedTests(source: string, functionName: string, tests: TestSpec[]): Promise<TestResult[]> {
-  const workerSource = `
+// The Worker embeds compareTestValue's source, so tests that run this string exercise
+// the same comparison the browser uses.
+export function buildTestWorkerSource() {
+  return `
     self.fetch = () => Promise.reject(new Error("network access is disabled"));
     self.XMLHttpRequest = undefined;
     self.WebSocket = undefined;
     self.importScripts = () => { throw new Error("imports are disabled"); };
-    const stable = (value) => JSON.stringify(value, Object.keys(value && typeof value === "object" && !Array.isArray(value) ? value : {}).sort());
+    const compareTestValue = (${compareTestValue.toString()});
     self.onmessage = ({ data }) => {
       const results = [];
       try {
@@ -67,9 +70,11 @@ export async function runIsolatedTests(source: string, functionName: string, tes
           try {
             const clonedArgs = structuredClone(test.args);
             const actual = fn(...clonedArgs);
-            if (actual && typeof actual.then === "function") throw new Error("โจทย์นี้ยังไม่รองรับ async function");
-            const passed = stable(actual) === stable(test.expected);
-            results.push({ name: test.name, passed, expected: JSON.stringify(test.expected), actual: JSON.stringify(actual) });
+            if (actual instanceof Promise) throw new Error("โจทย์นี้ยังไม่รองรับ async function");
+            const comparison = compareTestValue(actual, test.expected);
+            const result = { name: test.name, passed: comparison.passed, expected: JSON.stringify(test.expected), actual: comparison.actual };
+            if (comparison.error) result.error = comparison.error;
+            results.push(result);
           } catch (error) {
             results.push({ name: test.name, passed: false, expected: JSON.stringify(test.expected), actual: "—", error: error instanceof Error ? error.message : String(error) });
           }
@@ -80,7 +85,10 @@ export async function runIsolatedTests(source: string, functionName: string, tes
       }
     };
   `;
-  const url = URL.createObjectURL(new Blob([workerSource], { type: "text/javascript" }));
+}
+
+export async function runIsolatedTests(source: string, functionName: string, tests: TestSpec[]): Promise<TestResult[]> {
+  const url = URL.createObjectURL(new Blob([buildTestWorkerSource()], { type: "text/javascript" }));
   const worker = new Worker(url);
   return new Promise((resolve) => {
     const timeout = window.setTimeout(() => {

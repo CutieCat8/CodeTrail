@@ -151,3 +151,14 @@ button{min-width:24px;min-height:24px}
   .lesson-mobile-panel .ai-companion{margin-top:28px}.lesson-mobile-panel .ai-companion-body>p{font-size:12px}.lesson-mobile-panel .ai-prompt-chips{padding:0}.lesson-mobile-panel .ai-prompt-chips button{width:auto;padding:7px 9px}
 }
 @media(max-width:560px){.lab-brief-card{grid-template-columns:1fr}.micro-practice-pane .task-actions{align-items:stretch;flex-direction:column-reverse}.micro-practice-pane .task-actions button{justify-content:center;width:100%}.ai-companion-toggle{grid-template-columns:38px 1fr 18px;padding-inline:12px}.ai-orb{width:36px;height:36px}.ai-companion-body{padding-inline:12px}.ai-prompt-chips{display:grid}.ai-prompt-chips button{text-align:left}.micro-answer-workspace textarea{min-height:260px}}
+
+/* Collapsible desktop navigation */
+.sidebar{transition:transform var(--motion-panel) var(--ease-standard)}
+.content-shell{transition:margin-left var(--motion-panel) var(--ease-standard)}
+.breadcrumb{display:grid}
+.desktop-nav-toggle{width:40px;height:40px;display:grid;flex:0 0 auto;place-items:center;margin-right:12px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-surface-soft);color:var(--color-text-secondary);cursor:pointer;transition:background var(--motion-fast) var(--ease-standard),border-color var(--motion-fast) var(--ease-standard),color var(--motion-fast) var(--ease-standard)}
+.desktop-nav-toggle:hover{border-color:var(--color-info);background:var(--color-surface-raised);color:var(--color-text-primary)}
+.desktop-nav-toggle svg{width:18px;height:18px}
+.app-shell:has(.lesson-v2.focus-mode) .desktop-nav-toggle{display:none}
+@media(min-width:761px){.app-shell.sidebar-collapsed>.sidebar{transform:translateX(-100%)}.app-shell.sidebar-collapsed>.content-shell{margin-left:0}}
+@media(max-width:760px){.desktop-nav-toggle{display:none}}

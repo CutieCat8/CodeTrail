@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Activity, Bot, Braces, Check, ChevronDown, ChevronLeft, ChevronRight, CircleDot, Clock3, Code2, Copy, Download, FlaskConical, FolderGit2, Gauge, Layers3, LayoutDashboard, Lightbulb, LockKeyhole, Map, Maximize2, Menu, Minimize2, NotebookPen, Play, Route, Search, Send, Settings, ShieldCheck, Sparkles, Target, Trophy, Upload, X } from "lucide-react";
+import { Activity, Bot, Braces, Check, ChevronDown, ChevronLeft, ChevronRight, CircleDot, Clock3, Code2, Copy, Download, FlaskConical, FolderGit2, Gauge, Layers3, LayoutDashboard, Lightbulb, LockKeyhole, Map, Maximize2, Menu, Minimize2, NotebookPen, PanelLeftClose, PanelLeftOpen, Play, Route, Search, Send, Settings, ShieldCheck, Sparkles, Target, Trophy, Upload, X } from "lucide-react";
 import { lessons, lessonById, plannedJava } from "@/content/lessons";
 import { curriculumCourses, learningSteps, stepById } from "@/content/curriculum";
 import { accessReason, recommendation, stepRecommendation } from "@/lib/recommendation";
@@ -106,6 +106,7 @@ export function QuestApp() {
   const [activeLessonId, setActiveLessonId] = useState("web-ts-narrowing");
   const [activeStepId, setActiveStepId] = useState(learningSteps[0]?.id ?? "");
   const [mobileNav, setMobileNav] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const sidebarRef = useRef<HTMLElement>(null);
   const hadOpenNav = useRef(false);
@@ -115,11 +116,11 @@ export function QuestApp() {
       const hash = window.location.hash.slice(1);
       if (hash.startsWith("lesson/")) {
         const id = hash.slice(7);
-        if (lessonById(id)) { setActiveLessonId(id); setView("lesson"); }
+        if (lessonById(id)) { setActiveLessonId(id); setView("lesson"); setSidebarCollapsed(true); }
       } else if (hash.startsWith("step/")) {
         const id = hash.slice(5);
-        if (stepById(id)) { setActiveStepId(id); setView("step"); }
-      } else if (nav.some(([id]) => id === hash)) setView(hash as View);
+        if (stepById(id)) { setActiveStepId(id); setView("step"); setSidebarCollapsed(true); }
+      } else if (nav.some(([id]) => id === hash)) { setView(hash as View); setSidebarCollapsed(false); }
     };
     restoreRoute(); window.addEventListener("hashchange", restoreRoute);
     return () => window.removeEventListener("hashchange", restoreRoute);
@@ -146,17 +147,17 @@ export function QuestApp() {
     window.addEventListener("keydown", handleDrawerKeys);
     return () => { document.body.style.overflow = previousOverflow; window.removeEventListener("keydown", handleDrawerKeys); };
   }, [mobileNav]);
-  const goView = (next: View) => { setView(next); setMobileNav(false); window.history.pushState(null, "", `#${next}`); window.scrollTo({ top: 0, behavior: "smooth" }); };
-  const openLesson = (id: string) => { setActiveLessonId(id); setView("lesson"); setMobileNav(false); window.history.pushState(null, "", `#lesson/${id}`); setData((d) => ({ ...d, lastLessonId: id })); window.scrollTo({ top: 0, behavior: "smooth" }); };
-  const openStep = (id: string) => { setActiveStepId(id); setView("step"); setMobileNav(false); window.history.pushState(null, "", `#step/${id}`); setData((d) => ({ ...d, lastStepId: id })); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const goView = (next: View) => { setView(next); setMobileNav(false); setSidebarCollapsed(false); window.history.pushState(null, "", `#${next}`); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const openLesson = (id: string) => { setActiveLessonId(id); setView("lesson"); setMobileNav(false); setSidebarCollapsed(true); window.history.pushState(null, "", `#lesson/${id}`); setData((d) => ({ ...d, lastLessonId: id })); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const openStep = (id: string) => { setActiveStepId(id); setView("step"); setMobileNav(false); setSidebarCollapsed(true); window.history.pushState(null, "", `#step/${id}`); setData((d) => ({ ...d, lastStepId: id })); window.scrollTo({ top: 0, behavior: "smooth" }); };
   if (!ready) return <div className="loading-screen"><PixelCat /><p>กำลังเปิดสมุดภารกิจของซี…</p></div>;
   const completed = Object.values(data.progress).filter((p) => p.status === "passed").length;
   const rec = recommendation(data);
   return (
-    <div className="app-shell">
+    <div className={`app-shell ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
       <a className="skip-link" href="#main">ข้ามไปเนื้อหาหลัก</a>
       {mobileNav && <button className="nav-backdrop" aria-label="ปิดเมนู" onClick={() => setMobileNav(false)} />}
-      <aside ref={sidebarRef} className={`sidebar ${mobileNav ? "open" : ""}`} aria-label="เมนูแอป">
+      <aside id="app-sidebar" ref={sidebarRef} className={`sidebar ${mobileNav ? "open" : ""}`} aria-label="เมนูแอป" aria-hidden={sidebarCollapsed && !mobileNav ? true : undefined} inert={sidebarCollapsed && !mobileNav ? true : undefined}>
         <div className="brand"><PixelCat small decorative /><div><strong>SEA’S QUEST</strong><span>FULL-STACK FIELD LOG</span></div><button className="mobile-close" onClick={() => setMobileNav(false)} aria-label="ปิดเมนู"><X /></button></div>
         <div className="sidebar-progress"><span><Trophy size={15} aria-hidden="true" /> EXPEDITION LEVEL</span><strong>{xpTotal(data, xpMap)} XP</strong><small>{completed}/{lessons.length} Labs passed</small></div>
         <nav aria-label="เมนูหลัก">
@@ -165,7 +166,7 @@ export function QuestApp() {
         <div className="sidebar-foot"><button aria-current={view === "settings" ? "page" : undefined} className={view === "settings" ? "active" : ""} onClick={() => goView("settings")}><Settings size={18} aria-hidden="true" />ตั้งค่า</button></div>
       </aside>
       <div className="content-shell">
-        <header className="topbar"><button ref={menuButtonRef} className="menu-button" onClick={() => setMobileNav(true)} aria-label="เปิดเมนู" aria-expanded={mobileNav}><Menu aria-hidden="true" /></button><div className="breadcrumb"><span>Sea’s Full-stack Quest</span><strong>{view === "lesson" ? lessonById(activeLessonId)?.title : view === "step" ? stepById(activeStepId)?.title : nav.find(([id]) => id === view)?.[1]}</strong></div><div className={`save-pill ${saveState}`} aria-live="polite"><CircleDot size={12} aria-hidden="true" /> {saveState === "saving" ? "กำลังบันทึก" : saveState === "error" ? "บันทึกไม่สำเร็จ" : "บันทึกแล้ว"}</div></header>
+        <header className="topbar"><button className="desktop-nav-toggle" onClick={() => setSidebarCollapsed(value => !value)} aria-label={sidebarCollapsed ? "กางเมนูด้านข้าง" : "พับเมนูด้านข้าง"} aria-controls="app-sidebar" aria-expanded={!sidebarCollapsed} title={sidebarCollapsed ? "กางเมนูด้านข้าง" : "พับเมนูด้านข้าง"}>{sidebarCollapsed ? <PanelLeftOpen aria-hidden="true" /> : <PanelLeftClose aria-hidden="true" />}</button><button ref={menuButtonRef} className="menu-button" onClick={() => setMobileNav(true)} aria-label="เปิดเมนู" aria-expanded={mobileNav}><Menu aria-hidden="true" /></button><div className="breadcrumb"><span>Sea’s Full-stack Quest</span><strong>{view === "lesson" ? lessonById(activeLessonId)?.title : view === "step" ? stepById(activeStepId)?.title : nav.find(([id]) => id === view)?.[1]}</strong></div><div className={`save-pill ${saveState}`} aria-live="polite"><CircleDot size={12} aria-hidden="true" /> {saveState === "saving" ? "กำลังบันทึก" : saveState === "error" ? "บันทึกไม่สำเร็จ" : "บันทึกแล้ว"}</div></header>
         <main id="main">
           {view === "dashboard" && <Dashboard data={data} setData={setData} openLesson={openLesson} openStep={openStep} />}
           {view === "curriculum" && <CurriculumView data={data} openStep={openStep} />}

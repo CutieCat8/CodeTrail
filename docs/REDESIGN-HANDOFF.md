@@ -4,7 +4,7 @@
 Branch: `fix/runner-comparator` (แตกจาก `main` ที่ `f9a7613`; commit ในสำเนา Linux `~/work/sea-fullstack-quest` เท่านั้น ยังไม่ push/merge)  
 Remote: `origin` → `https://github.com/CutieCat8/CodeTrail.git`  
 ฐาน implementation ที่ push แล้ว: `f9a7613` บน `main`
-สถานะรอบล่าสุด: **แก้ตัวเปรียบเทียบผลของ auto runner แล้ว; automated checks และ Codex review ผ่าน; ยังไม่ได้ตรวจใน browser Worker จริง** (ดู “Defect fix: ตัวเปรียบเทียบผลของ auto runner”)  
+สถานะรอบล่าสุด: **แก้ตัวเปรียบเทียบผลของ auto runner แล้ว; automated checks และ Codex review ผ่าน; ผลตรวจ Chrome ที่ผู้ใช้ส่งต่อมายืนยัน auto lessons 3 บทบน production preview แล้ว (ไม่ใช่ final acceptance); พบ defect แยกเรื่อง XP หายเมื่อส่งคำตอบผิดหลังผ่าน รอตรวจยืนยัน** (ดู “Defect fix: ตัวเปรียบเทียบผลของ auto runner”)  
 สถานะรอบก่อน: Roadmap แบบ skill expedition map เขียนและ push แล้ว; รอผู้ใช้ตรวจภาพจริงใน browser
 
 เอกสารหลักมีหน้าที่แยกกัน:
@@ -64,7 +64,28 @@ Remote: `origin` → `https://github.com/CutieCat8/CodeTrail.git`
   - รอบ 3 (05:08–05:11, snapshot สุดท้าย): ไม่พบปัญหาใหม่; Node harness จำลองชุดทดสอบผ่าน 42/42, reference ผ่านและ `return "WRONG"` ไม่ผ่านทั้ง 3 auto lessons / 9 cases
 - ผลตรวจ Claude: ยืนยัน false positive เดิมด้วย node; mutation check ใส่ comparator เวอร์ชันก่อนหน้ากลับชั่วคราวแล้ว regression tests ล้ม (เวอร์ชันเดิม 5, หลังรอบ 1 → 6, หลังรอบ 2 → 3) แล้วคืนไฟล์และตรวจ `cmp`
 - ข้อจำกัดที่ตั้งใจไม่แก้: Proxy ที่ trap โกหก descriptor และโค้ดผู้เรียนที่แทนที่ built-in เช่น `Object.getOwnPropertyDescriptors` ยังทำให้ผลผ่านได้ เพราะโค้ดผู้เรียนรันใน Worker/realm เดียวกับตัวตรวจ (เป็นการโกงผลตัวเอง; runner ไม่ใช่ security boundary)
-- Manual verification: **ยังไม่ได้ตรวจใน browser Worker จริง**; ไม่ได้เรียก Chrome หรือถ่าย screenshot ตามข้อกำหนดเดิม tests และ Codex ใช้ Node harness เท่านั้น
+- Automated verification: tests และ Codex ใช้ Node harness เท่านั้น; Claude ในสำเนา Linux ไม่ได้เรียก Chrome หรือถ่าย screenshot ตามข้อกำหนดเดิม
+
+#### ผลตรวจเบราว์เซอร์ (2026-10-05, ส่งต่อจากผู้ใช้)
+
+แหล่งที่มา: ผลตรวจผ่าน Chrome โดย Claude อีก session ที่ผู้ใช้ส่งต่อมา **ไม่ใช่การตรวจที่ทำใน session ที่แก้โค้ดนี้** และ **ไม่ใช่ final acceptance ของเว็บไซต์ทั้งหมด** ตรวจบน production preview `http://localhost:3100` จาก build ของ commit `d51e7ca` ด้วยคำตอบผิดและคำตอบถูกที่เตรียมไว้ล่วงหน้า (คำตอบผิดของ filter/form เคยผ่านครบ 3/3 กับ comparator เดิม)
+
+| Lesson | คำตอบผิด | คำตอบถูก |
+|---|---|---|
+| `web-react-filter` | ผ่าน 1/3 (เฉพาะ “รายการว่าง” ซึ่งถูกต้องจริง) | ผ่าน 3/3 |
+| `web-react-form` | ผ่าน 0/3 พร้อม error ค่า `undefined` ที่ runner ไม่รองรับ | ผ่าน 3/3 |
+| `web-ts-narrowing` | ผ่าน 2/3 (“กิจกรรมที่มีห้อง” ไม่ผ่าน) | ผ่าน 3/3 |
+
+- expected/actual ที่แสดงตรงตามค่าที่เตรียมไว้
+- หลังผ่านครบสามบท Dashboard แสดง 300 XP; รันคำตอบถูกของ `web-ts-narrowing` ซ้ำแล้ว XP ยังเป็น 300
+- ยังไม่ได้ตรวจ: XP เริ่มต้นเป็น 0 ก่อนทดสอบ; การพิมพ์ด้วยมือและ auto-save/reload; การส่งคำตอบผิดหลังผ่านบทแล้ว
+- ข้อมูลทดสอบอยู่ใน Chrome profile หลักที่ origin `localhost:3100`: **ห้ามล้าง site data หรือ localStorage ทั้ง origin** เพราะยังไม่ยืนยันว่ามีข้อมูลเดิมใน origin นี้หรือไม่
+
+#### Defect แยก (รอตรวจยืนยัน, ยังไม่แก้): XP หายเมื่อส่งคำตอบผิดหลังผ่านบท
+
+- อาการที่คาด: ผ่านบทแล้ว (`completedAt` ถูกตั้ง, XP +100) จากนั้นกด Run tests ด้วยคำตอบผิด `run()` ใน `src/components/QuestApp.tsx:386` ตั้ง `completedAt: passed ? (progress.completedAt ?? now) : undefined` ทำให้ `completedAt` ถูกล้าง และ `xpTotal()` (`src/lib/storage.ts:117-118`) นับ XP ของบทนั้นเป็น 0 สถานะกลับเป็น `in-progress`
+- หลักฐาน: อ่านจากโค้ดเท่านั้น ยังไม่ได้ทำซ้ำใน browser; พฤติกรรมนี้มีก่อนการแก้ runner ไม่ได้เกิดจาก `d51e7ca`
+- รอบถัดไป: ยืนยันใน browser ด้วยข้อมูลทดสอบแยก แล้วให้ผู้ใช้ตัดสินว่าการผ่านบทควรคงอยู่หรือไม่เมื่อรันไม่ผ่านภายหลัง ก่อนแก้พร้อม regression test
 
 ## Roadmap iteration ล่าสุด
 
@@ -149,7 +170,7 @@ Tests/build เป็นหลักฐานทางเทคนิคเท�
 | Skills/Journal/Projects/Settings | ใช่ | ยังไม่มี final manual pass | lint/tests/build ผ่าน | `290d49f`–`8475f65` | ใช่ |
 | Nested import safety | ใช่ | ไม่จำเป็นต่อ visual; flow ยังรอ manual | lint, tests 15/15, build ผ่าน | `a8d12b0` | ใช่ |
 | Acceptance documents | ใช่ | ไม่เกี่ยวข้อง | ไม่รันซ้ำเพราะแก้ docs เท่านั้น | เอกสารชุดนี้คือ commit ของรอบ R4 | ตรวจสถานะจาก `origin/main` |
-| Runner comparator (2026-10-05) | ใช่ | **ยังไม่ได้ตรวจ browser Worker จริง** | lint, tsc, tests 70/70, build ผ่าน; production comparator 12/12 | branch `fix/runner-comparator` ในสำเนา Linux | ไม่ |
+| Runner comparator (2026-10-05) | ใช่ | ผลตรวจ Chrome ส่งต่อจากผู้ใช้: 3 auto lessons ตามคาด (ไม่ใช่ final acceptance) | lint, tsc, tests 70/70, build ผ่าน; production comparator 12/12 | branch `fix/runner-comparator` ในสำเนา Linux | ไม่ |
 
 การดู browser ในอดีตเป็นเพียง intermediate inspection และไม่ใช่ final acceptance หลังทุก commit ผู้ใช้สั่งไม่ให้เรียก Chrome/ถ่าย screenshot เพิ่ม จึงต้องใช้ checklist ให้ผู้ใช้ตรวจเอง
 
@@ -186,7 +207,8 @@ Tests/build เป็นหลักฐานทางเทคนิคเท�
 - `npm run build`: ผ่าน (clean `.next`) บน Next.js 16.3.6
 - Production check: ดึง comparator ที่ minify (`eM`) จาก chunk แล้วรันแยก module scope ผ่าน 12/12 และยืนยันว่า Worker ใช้ `instanceof Promise` ไม่อ่าน `.then`
 - Codex read-only review รอบสุดท้าย: ไม่พบปัญหาใหม่
-- **ยังไม่ได้ตรวจใน browser Worker จริง**; ไม่ได้เรียก Chrome หรือถ่าย screenshot
+- Session ที่แก้โค้ดไม่ได้เรียก Chrome หรือถ่าย screenshot
+- Browser: ผลตรวจ Chrome ที่ผู้ใช้ส่งต่อมา (ไม่ใช่ final acceptance) — ดู “ผลตรวจเบราว์เซอร์ (2026-10-05, ส่งต่อจากผู้ใช้)” ในหัวข้อ runner
 - หลังจากนั้นแก้เฉพาะเอกสาร จึงไม่รัน checks ซ้ำ
 
 ### ประวัติ: ผลตรวจรอบ Home/heatmap (`7e4d7c8`)
@@ -213,7 +235,8 @@ Activity test ใหม่ยืนยัน zero state และการรว
 - raster assets ใน `public/art/` รวมประมาณ 5.7 MB ยังไม่ได้ทำ responsive variants/optimization audit
 - code samples ยังไม่มี token-level syntax highlighting และ Lesson ไม่มี draggable splitter; ทั้งคู่เป็น optional
 - runner ลด network APIs และ terminate เมื่อ timeout แต่ Web Worker ไม่ใช่ security container ระดับ server sandbox; โค้ดผู้เรียนกับ comparator อยู่ realm เดียวกัน จึงปลอมผลผ่านได้ด้วย Proxy/แทนที่ built-in
-- งานค้างจาก runner (ยังไม่ทำ): ตรวจ auto lesson ใน browser จริงโดยผู้ใช้; timeout 1.5 วินาทีเดียวรวมทุก test case และรวมเวลา start Worker; `runIsolatedSnippet` ทิ้ง output async และไม่รายงาน unhandled rejection; `EventSource`/`indexedDB`/`caches` ยังไม่ถูกปิด; ถ้าต้องกันการปลอมผลต้องแยก realm ระหว่างโค้ดผู้เรียนกับตัวตรวจ
+- Defect รอตรวจยืนยัน: XP หายเมื่อส่งคำตอบผิดหลังผ่านบท (`QuestApp.tsx:386` ล้าง `completedAt`) — รายละเอียดในหัวข้อ runner
+- งานค้างจาก runner (ยังไม่ทำ): ตรวจ browser ส่วนที่ยังไม่ครอบคลุม (XP เริ่มต้น, พิมพ์ด้วยมือ, auto-save/reload); timeout 1.5 วินาทีเดียวรวมทุก test case และรวมเวลา start Worker; `runIsolatedSnippet` ทิ้ง output async และไม่รายงาน unhandled rejection; `EventSource`/`indexedDB`/`caches` ยังไม่ถูกปิด; ถ้าต้องกันการปลอมผลต้องแยก realm ระหว่างโค้ดผู้เรียนกับตัวตรวจ
 - งานค้างจากการตรวจ storage (ยังไม่แก้ในรอบ runner): import `updatedAt` ที่ไม่ใช่วันที่ทำให้ `calculateStreak` โยน `RangeError`; schema ยอมรับ enum ที่เป็น array ผ่าน `String(...)`; XP นับซ้ำเมื่อ `lessonId` ซ้ำและอ่าน key จาก prototype; นิยาม streak ไม่รวม step/project และเก็บเฉพาะ `updatedAt` ล่าสุด (ต้องให้ผู้ใช้ตัดสินใจก่อนเปลี่ยน schema)
 - ข้อมูลอยู่ localStorage เท่านั้น ไม่ sync ข้ามอุปกรณ์
 - ไม่มี private hosting/access control; ผู้ใช้ยังไม่ต้องการ deploy

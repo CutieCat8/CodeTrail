@@ -1,0 +1,28 @@
+
+> seas-fullstack-quest@0.1.0 test
+> vitest run --reporter=dot
+
+
+ RUN  v3.2.4 /home/cnux/work/sea-fullstack-quest
+
+·······················································································································································································stdout | tests/curriculum-quality.test.ts > auto-checked practice > js-function-basics: solution passes, starter and known wrong answers fail
+รับแล้ว: ใบสมัคร
+undefined
+รับแล้ว: ใบสมัคร
+รับแล้ว: 
+
+stdout | tests/curriculum-quality.test.ts > auto-checked practice > js-functions: solution passes, starter and known wrong answers fail
+0
+250
+275
+55
+34
+383
+
+········································································································································································································································
+
+ Test Files  8 passed (8)
+      Tests  415 passed (415)
+   Start at  16:47:04
+   Duration  29.96s (transform 1.43s, setup 0ms, collect 2.62s, tests 24.77s, environment 892ms, prepare 547ms)
+

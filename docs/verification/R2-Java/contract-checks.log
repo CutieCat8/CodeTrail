@@ -1,0 +1,9 @@
+PASS java-array-basics: normal, boundary, input preservation; plausible wrong algorithm rejected
+PASS java-array-minimum: normal, boundary, input preservation; plausible wrong algorithm rejected
+PASS java-array-copy: normal, boundary, input preservation; plausible wrong algorithm rejected
+PASS java-arrays: normal, boundary, input preservation; plausible wrong algorithm rejected
+PASS equipment: normal and quit
+PASS equipment: invalid commands preserve state and continue
+PASS equipment: empty EOF
+PASS equipment: bad arguments do not quit or list
+PASS equipment: wrong state transition rejected

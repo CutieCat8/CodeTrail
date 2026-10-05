@@ -642,7 +642,7 @@ command -v javac`, output: "java แสดง openjdk 21...; javac แสดง 
       {
         heading: "3) ทดสอบโดยไม่ต้องพิมพ์",
         text: [
-          "บันทึก input ลงไฟล์แล้วรัน java Main.java < input.txt หรือ printf 'Sea\\n3\\n' | java Main.java ได้ผลเหมือนเดิมทุกครั้ง",
+          "บันทึก input ลงไฟล์ input.txt แล้วรัน (PowerShell: Get-Content input.txt | java Main.java ; Bash/WSL: java Main.java < input.txt) ได้ผลเหมือนเดิมทุกครั้ง",
           "เมื่อ input มาจากไฟล์ ข้อความคำถาม (print) จะอยู่ติดกันเพราะไม่มีการกด Enter ของผู้ใช้แทรก — expected output ของบทนี้จึงมี ชื่อ: จำนวนเล่ม: อยู่บรรทัดเดียว",
         ],
       },
@@ -661,7 +661,7 @@ command -v javac`, output: "java แสดง openjdk 21...; javac แสดง 
     ],
     checks: [
       { question: "input คือ 5 ⏎ (บรรทัดเดียว) แล้วโปรแกรมเรียก nextLine สองครั้ง ครั้งที่สองเกิดอะไร", answer: "NoSuchElementException: No line found เพราะไม่มีบรรทัดเหลือ ควรตรวจ hasNextLine ก่อน" },
-      { question: "ทำไมการทดสอบด้วย < input.txt ดีกว่าพิมพ์เอง", answer: "รันซ้ำได้ผลเดิมทุกครั้ง เก็บกรณีทดสอบไว้ และเทียบ output กับไฟล์ที่คาดไว้ได้" },
+      { question: "ทำไมการทดสอบด้วยไฟล์ input.txt ดีกว่าพิมพ์เอง", answer: "รันซ้ำได้ผลเดิมทุกครั้ง เก็บกรณีทดสอบไว้ และเทียบ output กับไฟล์ที่คาดไว้ได้" },
     ],
     recap: [
       "nextLine ทุกครั้ง + parse เอง",
@@ -672,7 +672,7 @@ command -v javac`, output: "java แสดง openjdk 21...; javac แสดง 
     practiceHints: [
       "อ่านสามครั้งด้วย nextLine().strip()",
       "บรรทัดที่สองใช้ Integer.parseInt บรรทัดที่สามใช้ Double.parseDouble",
-      "พิมพ์ด้วย printf(\"%s: %d วัน ค่าปรับ %.2f บาท%n\", ...) และทดสอบ printf 'Clean Code\\n3\\n2.5\\n' | java Main.java",
+      "พิมพ์ด้วย printf(\"%s: %d วัน ค่าปรับ %.2f บาท%n\", ...) และทดสอบด้วยไฟล์ input.txt สามบรรทัด (Clean Code, 3, 2.5) โดย PowerShell ใช้ Get-Content input.txt | java Main.java ส่วน Bash/WSL ใช้ java Main.java < input.txt",
     ],
     acceptance: [
       local,
@@ -1246,7 +1246,7 @@ command -v javac`, output: "java แสดง openjdk 21...; javac แสดง 
     practiceHints: [
       "ย้ายการตรวจ add/done และการสร้างบรรทัดของ list ไปที่ Wishlist ให้ทุก method รับ list เป็น parameter",
       "Commands.run แยกคำสั่งด้วย split(\" \", 2) แล้วใช้ switch expression ที่คืนข้อความ (\"\" เมื่อไม่ต้องพิมพ์)",
-      "Main แค่วน nextLine เรียก Commands.run และพิมพ์ถ้าไม่ว่าง จากนั้น javac -d out src/wishlist/*.java และ java -cp out wishlist.Main < input.txt",
+      "Main แค่วน nextLine เรียก Commands.run และพิมพ์ถ้าไม่ว่าง จากนั้น javac -d out src/wishlist/*.java และ java -cp out wishlist.Main โดยป้อน input.txt (PowerShell: Get-Content input.txt | java -cp out wishlist.Main ; Bash/WSL: java -cp out wishlist.Main < input.txt)",
     ],
     acceptance: [
       local,
@@ -1270,7 +1270,7 @@ command -v javac`, output: "java แสดง openjdk 21...; javac แสดง 
         heading: "1) ทำให้ผลทดสอบได้ก่อนเขียนโค้ด",
         text: [
           "ข้อความตอบกลับทุกแบบถูกกำหนดไว้ตายตัวในคำอธิบายบท จึงเขียน test-input.txt และ expected-output.txt ได้ตั้งแต่ก่อนเขียนโค้ด",
-          "รันซ้ำ: java -cp out library.Main < test-input.txt > actual.txt แล้ว diff expected-output.txt actual.txt (Windows ใช้ fc)",
+          "รันซ้ำแล้วเทียบ — PowerShell: Get-Content test-input.txt | java -cp out library.Main | Set-Content -Encoding utf8 actual.txt แล้ว Compare-Object (Get-Content expected-output.txt) (Get-Content actual.txt) (ไม่มีผลลัพธ์ = ตรงกัน); Bash/WSL: java -cp out library.Main < test-input.txt > actual.txt แล้ว diff expected-output.txt actual.txt (ไม่มีผลลัพธ์ = ตรงกัน)",
         ],
       },
       {
@@ -1297,7 +1297,7 @@ command -v javac`, output: "java แสดง openjdk 21...; javac แสดง 
     pitfalls: [
       "ใช้ id เป็น index",
       "แก้ ArrayList คู่ขนานไม่ครบทุก list",
-      "ข้อความตอบกลับไม่ตรงข้อกำหนด (ทดสอบด้วย diff ไม่ผ่าน)",
+      "ข้อความตอบกลับไม่ตรงข้อกำหนด (เทียบกับ expected-output ไม่ผ่าน)",
       "parseInt โดยไม่จับ NumberFormatException",
     ],
     checks: [
@@ -1317,7 +1317,7 @@ command -v javac`, output: "java แสดง openjdk 21...; javac แสดง 
     ],
     acceptance: [
       local,
-      "ตรวจเอง: java -cp out library.Main < test-input.txt ได้ผลตรงกับ expected-output.txt ทุกบรรทัด (diff ไม่มีความต่าง)",
+      "ตรวจเอง: รันด้วย test-input.txt (วิธีตาม shell ของคุณ: PowerShell ใช้ Get-Content ... | java ; Bash/WSL ใช้ < test-input.txt) แล้วผลตรงกับ expected-output.txt ทุกบรรทัด (Compare-Object หรือ diff ไม่มีความต่าง)",
       "ตรวจเอง: ทุกข้อความตอบกลับในข้อกำหนดปรากฏอย่างน้อยหนึ่งครั้งใน test-input",
       "ตรวจเอง: compile/run แบบหลายไฟล์ด้วย javac -d out และ java -cp out library.Main",
     ],

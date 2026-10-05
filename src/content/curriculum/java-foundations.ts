@@ -350,7 +350,7 @@ public class Start {
   courseId,
   unit: "ชนิดข้อมูล",
   title: "String: methods, equals และ immutability",
-  objective: "ใช้ methods ที่พบบ่อยของ String (length, strip, toUpperCase, contains, substring, indexOf, split, isBlank) เทียบข้อความด้วย equals/equalsIgnoreCase และอธิบายว่า String เปลี่ยนค่าไม่ได้",
+  objective: "ใช้ methods ที่พบบ่อยของ String (length, strip, toUpperCase, contains, substring, indexOf, isBlank) เทียบข้อความด้วย equals/equalsIgnoreCase และอธิบายว่า String เปลี่ยนค่าไม่ได้",
   why: "input จากผู้ใช้ทุกชิ้นเข้ามาเป็นข้อความ การเทียบ String ด้วย == เป็น bug คลาสสิกที่บางครั้งดูเหมือนทำงานได้ และการลืมว่า method ของ String คืนค่าใหม่ทำให้การแก้ข้อความหายไปเงียบ ๆ",
   explanation: "String เป็น object ไม่ใช่ primitive method อย่าง strip/toUpperCase ไม่แก้ตัวเดิม (immutable) แต่คืนผลออกมา (อาจเป็น object เดิมถ้าไม่มีอะไรเปลี่ยน): name.strip(); เฉย ๆ ไม่มีผล ต้องเขียน name = name.strip(); เทียบเนื้อหาด้วย a.equals(b) หรือ equalsIgnoreCase เพราะ == เทียบว่าเป็น object เดียวกันไหม (literal ที่เหมือนกันอาจถูกใช้ร่วมกันจนทำให้ == ดูเหมือนถูกในบางกรณี แต่ข้อความจาก input หรือการต่อข้อความตอนรันมักเป็นคนละ object) index เริ่มที่ 0, substring(begin, end) ไม่รวม end, indexOf คืน -1 เมื่อไม่พบ, strip() ตัดช่องว่างแบบ Unicode (Java 11+) isBlank() ว่างหรือมีแต่ช่องว่าง",
   language: "java",
@@ -474,7 +474,7 @@ public class Start {
   title: "Scanner: อ่าน input ทีละบรรทัดอย่างปลอดภัย",
   objective: "อ่าน input จาก System.in ด้วย Scanner แบบทีละบรรทัด (nextLine) แล้วแปลงเป็นตัวเลขเอง อธิบายกับดักของ nextInt ตามด้วย nextLine และทดสอบโปรแกรมด้วยการส่ง input ผ่าน pipe",
   why: "โปรแกรม CLI ทุกตัวต้องรับ input จากผู้ใช้ กับดักเรื่องบรรทัดค้างทำให้โปรแกรม “ข้าม” คำถามไปเฉย ๆ และ input ที่ไม่ตรงชนิดทำให้โปรแกรมล่ม การวางแนวทางอ่านทีละบรรทัดตั้งแต่แรกช่วยให้ควบคุมได้ทุกกรณี",
-  explanation: "Scanner scanner = new Scanner(System.in); (import java.util.Scanner;) scanner.nextLine() อ่านจนจบบรรทัดและคืนข้อความโดยไม่รวมตัวขึ้นบรรทัด nextInt() อ่านเฉพาะตัวเลขแล้วทิ้งตัวขึ้นบรรทัดไว้ nextLine() ถัดไปจึงได้ข้อความว่างทันที — วิธีที่คาดเดาได้กว่าคือใช้ nextLine() เสมอแล้วแปลงเอง Integer.parseInt(line.strip()) hasNextLine() บอกว่ายังมีบรรทัดให้อ่านไหม (false เมื่อ input จบ เช่น ปลายไฟล์ที่ pipe เข้ามา) การทดสอบโดยไม่ต้องพิมพ์เอง: printf 'Sea\\n3\\n' | java Main.java หรือ java Main.java < input.txt ใช้ Scanner ตัวเดียวทั้งโปรแกรม (สร้างหลายตัวบน System.in แล้วข้อมูลที่ตัวแรกอ่านล่วงหน้าไว้อาจหาย)",
+  explanation: "Scanner scanner = new Scanner(System.in); (import java.util.Scanner;) scanner.nextLine() อ่านจนจบบรรทัดและคืนข้อความโดยไม่รวมตัวขึ้นบรรทัด nextInt() อ่านเฉพาะตัวเลขแล้วทิ้งตัวขึ้นบรรทัดไว้ nextLine() ถัดไปจึงได้ข้อความว่างทันที — วิธีที่คาดเดาได้กว่าคือใช้ nextLine() เสมอแล้วแปลงเอง Integer.parseInt(line.strip()) hasNextLine() บอกว่ายังมีบรรทัดให้อ่านไหม (false เมื่อ input จบ เช่น ปลายไฟล์ที่ pipe เข้ามา) การทดสอบโดยไม่ต้องพิมพ์เอง: เก็บ input ไว้ในไฟล์ input.txt แล้วป้อนเข้าโปรแกรม โดย PowerShell ใช้ Get-Content input.txt | java Main.java ส่วน Bash/WSL ใช้ java Main.java < input.txt (สองแบบนี้เป็นคนละ shell ห้ามปนกัน) ใช้ Scanner ตัวเดียวทั้งโปรแกรม (สร้างหลายตัวบน System.in แล้วข้อมูลที่ตัวแรกอ่านล่วงหน้าไว้อาจหาย)",
   language: "java",
   standard: "v3",
   prerequisites: ["java-casting"],
@@ -1511,7 +1511,7 @@ public class Main {
   expectedOutput: "(no books)\nadded #1\nadded #2\n#1 Clean Code [borrowed]\n#2 Java 21 [available]",
   tracePrompt: "ใน ArrayList คู่ขนาน ถ้าคำสั่ง remove ในอนาคตเขียน titles.remove(i) และ borrowed.remove(i) แต่ลืม ids.remove(i) แล้วสั่ง list จะเห็นอะไรผิด",
   traceAnswer: "ids จะยาวกว่าอีกสอง list และ index เดียวกันไม่ใช่หนังสือเล่มเดียวกันอีกต่อไป เช่นหลังลบเล่มแรกจาก [1,2]/[A,B] จะได้ ids [1,2] กับ titles [B] list แสดง #1 B ซึ่งผิด และ i = 1 จะได้ IndexOutOfBoundsException จาก titles.get(1) ข้อมูลที่ “เป็นของชิ้นเดียวกัน” ควรอยู่ใน object เดียว (M1)",
-  practicePrompt: "สร้าง Library CLI M0 ตามข้อกำหนดในคำอธิบายให้ครบทุกคำสั่ง แยกเป็นอย่างน้อย 2 ไฟล์ใน package library (เช่น Catalog.java เก็บข้อมูลและกติกา, Main.java อ่าน input/พิมพ์) เขียนไฟล์ test-input.txt ที่ครอบคลุมทุกข้อความตอบกลับ แล้วรัน java -cp out library.Main < test-input.txt เทียบกับ expected-output.txt ที่เขียนเอง (เช่นด้วย diff) เฉลยมี test-input.txt และ expected-output.txt ที่ครอบคลุมทุกข้อความตอบกลับให้เทียบ",
+  practicePrompt: "สร้าง Library CLI M0 ตามข้อกำหนดในคำอธิบายให้ครบทุกคำสั่ง แยกเป็นอย่างน้อย 2 ไฟล์ใน package library (เช่น Catalog.java เก็บข้อมูลและกติกา, Main.java อ่าน input/พิมพ์) เขียนไฟล์ test-input.txt ที่ครอบคลุมทุกข้อความตอบกลับ แล้วรันโปรแกรมโดยป้อน test-input.txt (PowerShell: Get-Content test-input.txt | java -cp out library.Main ; Bash/WSL: java -cp out library.Main < test-input.txt) เทียบกับ expected-output.txt ที่เขียนเอง เฉลยมี test-input.txt และ expected-output.txt ที่ครอบคลุมทุกข้อความตอบกลับให้เทียบ",
   starter: java`// File: library/Catalog.java
 package library;
 

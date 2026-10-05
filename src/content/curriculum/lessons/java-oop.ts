@@ -107,7 +107,7 @@ export const javaOopLessons: Record<string, RichLesson> = {
     recap: ["constructor รับข้อมูลจำเป็นทั้งหมด", "ตรวจแล้ว throw ก่อนกำหนด", "this(...) และ toString"],
     traceHint: "สำหรับแต่ละ new ไล่ว่าเข้า constructor ไหน ผ่าน/ไม่ผ่านการตรวจข้อไหน และพิมพ์อะไร",
     practiceHints: ["constructor หลักตรวจสามเงื่อนไขตามลำดับ id, name, maxLoans", "constructor สั้นเรียก this(id, name, 3)", "toString คืน #id name (max n) และ main จับ IllegalArgumentException ตอนสร้าง Fon"],
-    acceptance: [local, "ตรวจเอง: พิมพ์ #1 Sea (max 3), #2 Ton (max 5) และ rejected: พร้อมค่า 0", "ตรวจเอง: ทั้งสาม field เป็น final ตาม starter และเฉลย; maxLoans ตรวจช่วง 1–10 ใน constructor"],
+    acceptance: [local, "ตรวจเอง: พิมพ์ #1 Sea (max 3), #2 Ton (max 5) และ rejected: พร้อมค่า 0", "ตรวจเอง: ทั้งสาม field เป็น final ตามที่ starter สั่งให้เพิ่ม; maxLoans ตรวจช่วง 1–10 ใน constructor"],
     solutionNotes: ["ข้อความระบุช่วงและค่าที่ผิด ทำให้ debug จาก log ได้โดยไม่ต้องเดา"],
     reflection: ["object ใดใน Library CLI ที่ไม่ควรมีอยู่ถ้าข้อมูลไม่ครบ"],
     extension: "เพิ่ม static factory Member.student(int id, String name) ที่คืน Member maxLoans 5 แล้วเทียบกับการใช้ constructor ตรง ๆ",
@@ -197,7 +197,7 @@ export const javaOopLessons: Record<string, RichLesson> = {
     recap: ["fixture ก่อนโค้ด", "Book/Member/Catalog แบ่งหน้าที่", "Main แปลง exception เป็นข้อความ"],
     traceHint: "ไล่ test-input ทีละบรรทัด เขียนว่าเรียก method ไหนของ Catalog/Book และได้ข้อความหรือ exception อะไร",
     practiceHints: ["เขียน Book ให้ checkOut/giveBack throw ข้อความตรงข้อกำหนด", "Catalog สร้าง object ให้สำเร็จก่อนแล้วจึงเพิ่ม nextId", "Main.handle คืน String และ main พิมพ์เท่านั้น"],
-    acceptance: [local, "ตรวจเอง: java -cp out library.Main < test-input.txt ตรงกับ expected-output.txt ทุกบรรทัด", "ตรวจเอง: ไม่มี static field ที่เปลี่ยนค่าได้"],
+    acceptance: [local, "ตรวจเอง: รัน library.Main ด้วย test-input.txt (PowerShell: Get-Content test-input.txt | java -cp out library.Main ; Bash/WSL: java -cp out library.Main < test-input.txt) ตรงกับ expected-output.txt ทุกบรรทัด", "ตรวจเอง: ไม่มี static field ที่เปลี่ยนค่าได้"],
     solutionNotes: ["joinLines รับ ArrayList<?> เพื่อใช้ร่วมกับ Book และ Member โดยเรียก toString", "ข้อความ title required มาจาก constructor ของ Book จึงตรงกันทุกที่ที่สร้างหนังสือ"],
     reflection: ["เทียบกับ M0 การเพิ่มกติกาใหม่ตอนนี้แก้กี่ที่"],
     extension: "เพิ่มคำสั่ง rename <id> <title> ที่ใช้กติกาเดียวกับ constructor ในการตรวจชื่อ",
@@ -253,6 +253,7 @@ export const javaOopLessons: Record<string, RichLesson> = {
   "oop-project-library-2": {
     hook: "ห้องสมุดชุมชนต้องรู้ว่าใครยืมเล่มไหน ครบกำหนดเมื่อไร และค้างค่าปรับเท่าไร M2 รวม composition กับ collaboration เป็นระบบที่ตอบคำถามเหล่านี้ได้ทุกครั้งอย่างสอดคล้อง",
     explain: [
+      { heading: "0) split ที่ใช้ใน Main ของบทนี้", text: ["split(\"\\\\s+\") แยกด้วยช่องว่างหรือแท็บติดกันกี่ตัวก็ได้ (หนึ่งตัวขึ้นไป) นับเป็นตัวคั่นเดียว ต่างจาก split(\" \") ที่ช่องว่างซ้อนกันจะทำให้ได้ชิ้นว่างปนมา ในโค้ด Java ต้องเขียน backslash สองตัว (\\\\s) เพราะ backslash ในข้อความต้อง escape ตัวคั่นของ split เป็น regular expression ใช้เพียงรูปนี้ในบทนี้ ไม่ต้องเรียน regex เพิ่ม", "ถ้า line ว่างหรือมีแต่ช่องว่าง ผลของ split อาจเป็น array ที่ไม่มีชิ้นให้ใช้หรือมีแต่ชิ้นว่าง จึงต้องตรวจบรรทัดว่างก่อนอ่าน words[0]"] },
       { heading: "1) ข้อกำหนดก่อน", text: ["ลำดับการตรวจของ borrow ถูกกำหนดไว้ จึงเขียน expected-output ได้ก่อนเขียนโค้ด", "วันเป็นตัวเลข (day 20) ทำให้ทดสอบค่าปรับได้แน่นอนโดยไม่พึ่งนาฬิกาจริง"] },
       { heading: "2) Loan เชื่อมสองฝ่าย", text: ["Book รู้ Loan ปัจจุบัน Member รู้รายการ Loan", "list แสดงผู้ยืมจาก loan.member() ไม่ใช่ข้อมูลซ้ำ"] },
       { heading: "3) Main แปลง input", text: ["Integer ที่เป็น null แทนการแปลงไม่ได้ ทำให้ตรวจ usage ได้ที่เดียว", "ข้อความ exception จาก Library ตรงตามข้อกำหนด Main แค่พิมพ์"] },
@@ -266,7 +267,7 @@ export const javaOopLessons: Record<string, RichLesson> = {
     recap: ["ข้อกำหนด + fixture", "Loan เดียวเชื่อม Book กับ Member", "วันเป็นข้อมูล ทดสอบได้"],
     traceHint: "ทำตาราง: today, ผู้ยืมของแต่ละเล่ม, loans ของแต่ละคน แล้วไล่ test-input ทีละบรรทัด",
     practiceHints: ["เริ่มจาก Loan และ lateDays แล้วจึง Book/Member", "Library.borrow ตรวจตามลำดับ book → member → ว่าง → โควตา ก่อนเปลี่ยนอะไร", "Main แยกคำแรกเป็นคำสั่งและใช้ helper number() คืน null เมื่อแปลงไม่ได้"],
-    acceptance: [local, "ตรวจเอง: java -cp out library.cli.Main < test-input.txt ได้ผลตรง expected-output ทุกบรรทัด", "ตรวจเอง: Main อยู่ใน library.cli และเรียก attach/detach ของ Book ไม่ได้ (compile error ถ้าลอง)", "ตรวจเอง: ไม่มี static field ที่เปลี่ยนค่าได้"],
+    acceptance: [local, "ตรวจเอง: รัน library.cli.Main ด้วย test-input.txt (PowerShell: Get-Content test-input.txt | java -cp out library.cli.Main ; Bash/WSL: java -cp out library.cli.Main < test-input.txt) ได้ผลตรง expected-output ทุกบรรทัด", "ตรวจเอง: Main อยู่ใน library.cli และเรียก attach/detach ของ Book ไม่ได้ (compile error ถ้าลอง)", "ตรวจเอง: ไม่มี static field ที่เปลี่ยนค่าได้"],
     solutionNotes: ["findBook/findMember throw ข้อความตามข้อกำหนด ทำให้ทุกคำสั่งที่ต้องหา object ได้ข้อความเดียวกัน", "Member.loans() คืน List.copyOf ผู้อื่นแก้รายการยืมไม่ได้", "private field อย่างเดียวไม่พอเมื่อ Main อยู่ package เดียวกับ Book: Main จะเรียก detach ได้ตรง ๆ การแยก Main ไป library.cli ทำให้ทางเดียวที่เปลี่ยนการยืมคือผ่าน Library", "ค่าปรับคำนวณด้วย (long) ก่อน Math.min เพราะ lateDays × 5 อาจเกินช่วง int เมื่อวันมาก และ setDay จำกัดไม่เกิน 1000000"],
     reflection: ["ถ้าต้องเพิ่มการจองหนังสือ ส่วนไหนของโครงสร้างนี้ช่วย และส่วนไหนต้องปรับ"],
     extension: "เพิ่มคำสั่ง overdue ที่แสดงการยืมที่เลยกำหนดทั้งหมด เรียงตามวันครบกำหนด",
@@ -481,6 +482,7 @@ export const javaOopLessons: Record<string, RichLesson> = {
   "oop-project-library-3": {
     hook: "ห้องสมุดใช้ M2 ได้ทั้งวัน แต่ปิดโปรแกรมแล้วทุกอย่างหาย capstone นี้ทำให้ข้อมูลอยู่รอด โดยไม่ทำให้กติกาที่สร้างมาตลอดคอร์สอ่อนลงเมื่อโหลดไฟล์ที่อาจเสีย",
     explain: [
+      { heading: "0) split แบบเก็บ field ว่าง", text: ["\"\\t\" คืออักขระ tab หนึ่งตัวในข้อความ Java ไฟล์บันทึกใช้ tab คั่น field ได้เพราะชื่อหรือข้อความมีช่องว่างปนได้", "line.split(\"\\t\", -1) ตัวเลขที่สองคือ limit ถ้าเป็นลบจะเก็บ field ว่างท้ายบรรทัดไว้ด้วย ค่าปกติ (ไม่ใส่ limit) ตัด field ว่างท้ายบรรทัดทิ้ง ทำให้นับ field ผิดและตรวจบรรทัดที่ขาดข้อมูลไม่ได้"] },
       { heading: "1) แยกการตีความออกจากไฟล์", text: ["Library.snapshot() / restore(List<String>) ไม่รู้จักไฟล์ test ได้ในหน่วยความจำ", "LibraryStore เป็นที่เดียวที่ใช้ Files"] },
       { heading: "2) โหลดผ่านกติกาเดิม", text: ["restore สร้างด้วย constructor และ attach/addLoan เดิม ไฟล์เสียจึงสร้าง Library ผิดรูปไม่ได้", "บรรทัดผิดได้ LibraryDataException พร้อมเลขบรรทัดและ cause"] },
       { heading: "3) test ด้วย @TempDir", text: ["JUnit สร้างโฟลเดอร์ชั่วคราวให้และลบให้", "ทดสอบ round trip, id ต่อเนื่อง, ไฟล์หาย, ไฟล์เสีย และคำสั่ง CLI"] },
@@ -494,7 +496,7 @@ export const javaOopLessons: Record<string, RichLesson> = {
     recap: ["snapshot/restore ไม่รู้จักไฟล์; LibraryStore รู้จัก", "โหลดผ่านกติกาเดิม + เลขบรรทัด", "@TempDir + golden master เดิม"],
     traceHint: "เขียน snapshot ของ sample() ทีละบรรทัด แล้วไล่ restore ว่าแต่ละบรรทัดเรียก constructor/method ไหน",
     practiceHints: ["เริ่มจาก snapshot ใน Library แล้วเขียน test round trip ก่อนเขียนไฟล์จริง", "restore แยกบรรทัดด้วย split(\"\\t\", -1) ตรวจจำนวน field แล้วใช้ constructor และ attach/addLoan เดิม ห่อ error พร้อมเลขบรรทัด", "LibraryStore ใช้ Files.write/readAllLines และ Main เพิ่ม save/load แล้วรัน golden master ของ M2 ซ้ำ"],
-    acceptance: [localJunit, "ตรวจเอง: JUnit 11 test ผ่าน", "ตรวจเอง: golden master ของ M2 ยังผ่านกับ M3 (java -cp out library.cli.Main < test-input.txt)", "ตรวจเอง: ลบบรรทัดที่ตั้ง nextBookId ใน restore ชั่วคราวแล้ว test idsContinueAfterLoad ล้ม"],
+    acceptance: [localJunit, "ตรวจเอง: JUnit 11 test ผ่าน", "ตรวจเอง: golden master ของ M2 ยังผ่านกับ M3 (รัน library.cli.Main ด้วย test-input.txt (PowerShell: Get-Content test-input.txt | java -cp out library.cli.Main ; Bash/WSL: java -cp out library.cli.Main < test-input.txt))", "ตรวจเอง: ลบบรรทัดที่ตั้ง nextBookId ใน restore ชั่วคราวแล้ว test idsContinueAfterLoad ล้ม"],
     solutionNotes: ["split(\"\\t\", -1) เก็บ field ว่างท้ายบรรทัดไว้ การนับ field จึงจับบรรทัดที่ขาดได้", "ข้อความของ NumberFormatException ถูกต่อหลัง line N: ใน test จึงตรวจข้อความเต็มได้แน่นอน"],
     reflection: ["หลังจบคอร์ส การตัดสินใจออกแบบไหนที่ทำให้ M3 ง่ายที่สุด และไหนที่อยากทำต่างออกไป"],
     extension: "เพิ่มการบันทึกอัตโนมัติหลังทุกคำสั่งที่เปลี่ยนข้อมูล โดยเขียนลงไฟล์ชั่วคราวแล้ว Files.move ทับไฟล์จริง (atomic move) เพื่อไม่ให้ไฟล์เสียเมื่อโปรแกรมล่มกลางการเขียน",

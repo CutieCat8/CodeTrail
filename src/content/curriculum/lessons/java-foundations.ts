@@ -21,10 +21,13 @@ export const javaFoundationLessons: Record<string, RichLesson> = {
       limits: "นักแปลจริงแปลครั้งเดียวจบ แต่ JVM ยังแปล bytecode เป็นคำสั่งเครื่องอีกชั้นระหว่างทำงาน (JIT) และ java File.java (single-file) ทำทั้งสองขั้นต่อกันในคำสั่งเดียวโดยไม่เก็บฉบับแปลไว้",
     },
     explain: [
-      { heading: "อ่านโครงไฟล์แรกก่อนคัดลอก", text: ["public class QuestStart { ... } ตั้งชื่อโปรแกรมต้องตรงQuestStart.java; public static void main(String[] args) { ... } คือจุดเริ่มที่launcherเรียก คอร์สนี้ใช้โครงนี้ก่อนแล้วอ่านทีละคำในjava-main ยังไม่ต้องออกแบบclassเอง", "System.out.println(...) แสดงค่าแล้วขึ้นบรรทัดใหม่ ข้อความคร่อมdoublequote; + ต่อข้อความกับค่าที่อ่านมา Runtime.version().feature() คือการถามlibraryว่ารุ่นหลักของJavaที่กำลังรันคืออะไร ใช้เพื่อยืนยันเครื่องมือ ตัวอย่างนี้ยังไม่มีตัวแปร/functionที่ต้องเขียนเพิ่มเอง"] },
-      { heading: "0) เตรียม editor/workspace ก่อน Java", text: ["เส้นทาง Java เริ่มจากศูนย์ได้โดยไม่เรียนเว็บ: ถ้ายังไม่เคยเปิด editor หรือ terminal ให้ทบทวน dev-files, dev-terminal และ dev-editor ก่อน บันทึกไฟล์ source ให้ชื่อตรง public class ในพื้นที่ java-lab ของตัวเอง ไม่ใช้ scratchpad ของผู้สอน", "โค้ดตรวจรุ่นในบทนี้ให้คัดลอกทั้งไฟล์เป็นเครื่องมือวัดก่อน: System.out.println แสดงข้อความ; Runtime.version().feature() ถามรุ่นหลักของ JVM ที่กำลังรัน โครง main/วงเล็บปีกกาเรียนแยกใน java-main ไม่ต้องออกแบบ class เองก่อนบทนั้น"] },
-      { heading: "ติดตั้ง JDK 21: Windows PowerShell", text: ["เปิด https://adoptium.net/temurin/releases เลือก Version 21, OS Windows, architecture ให้ตรงเครื่อง และ Package Type JDK ไม่ใช่ JRE สำหรับ Windows x64 ดาวน์โหลด .msi เปิด installer เลือกเพิ่ม PATH และ JAVA_HOME แล้ว Finish; ดู https://adoptium.net/installation/windows", "เปิด PowerShell ใหม่ ใช้ java --version และ javac --version ทั้งคู่ต้องเริ่มรุ่น 21 (patch ไม่ต้องตรงตัวเลขตัวอย่าง) ตรวจ Get-Command java และ Get-Command javac ว่ามาจาก JDK ที่ตั้งใจ", "ถ้า is not recognized ให้ดูว่าโฟลเดอร์ JDK มี bin/java.exe และ bin/javac.exe จริง จาก Settings ค้น Environment Variables เพิ่มโฟลเดอร์ bin นั้นใน User Path โดยเก็บค่าอื่นไว้ ตั้ง JAVA_HOME เป็นโฟลเดอร์ JDK ที่อยู่เหนือ bin เปิด terminal ใหม่แล้วตรวจสองคำสั่งซ้ำ", "หาก java กับ javac คนละรุ่น ไม่แก้ source ให้ตรวจ path ของทั้งคู่และจัดลำดับ JDK 21 bin ก่อนรุ่นอื่น JAVA_HOME อย่างเดียวไม่ได้บังคับ shell ให้เลือก java ตัวนั้น"] },
-      { heading: "ติดตั้ง JDK 21: Linux/WSL Bash แบบ archive", text: ["บนหน้า releases เลือก Version 21, Linux, JDK, architecture ตรง uname -m (x86_64 ใช้ x64; aarch64 ใช้ aarch64) ดาวน์โหลด tar.gz บันทึกชื่อ jdk21.tar.gz ในโฟลเดอร์ java-tools ว่าง; Windows installer ไม่ใช่การติดตั้งใน WSL", "ชุดคำสั่งต่อไปนี้ทำใน java-tools ที่มี archive แล้ว แตกไฟล์ลง jdk21 และเลือก JDK นั้นใน shell นี้ ถ้ามี jdk21 อยู่แล้วให้ใช้พื้นที่ใหม่ก่อน ไม่เขียนทับ", "เก็บถาวรได้โดยเพิ่ม export JAVA_HOME เป็น path เต็มที่แตกไฟล์จริง และ export PATH บรรทัดเดิมใน ~/.bashrc ผ่าน editor; เปิด Bash ใหม่แล้วตรวจ หาก command not found ตรวจ command -v java/javac, ไฟล์ bin และ environment ก่อนแก้โค้ด", "macOS: เลือก Version 21/macOS/JDK และ architecture ให้ตรง ดาวน์โหลด .pkg ตาม https://adoptium.net/installation/macOS เปิด terminal ใหม่ ตรวจ java/javac --version; ถ้ามีหลายรุ่นใช้ /usr/libexec/java_home -v 21 หา path แล้วตั้ง JAVA_HOME และ PATH ตาม JDK ที่พบ"], language: "shell", code: `uname -m
+      { heading: "0) เตรียม editor/workspace ก่อน Java", text: ["เส้นทาง Java เริ่มจากศูนย์ได้โดยไม่เรียนเว็บ: ถ้ายังไม่เคยเปิด terminal ให้ทบทวน dev-files และ dev-terminal ก่อน (ถ้าไม่เคยเปิด editor ดู dev-editor ประกอบ) บันทึกไฟล์ source ให้ชื่อตรง public class ในพื้นที่ java-lab ของตัวเอง ไม่ใช้ scratchpad ของผู้สอน", "โค้ดตรวจรุ่นในบทนี้ให้คัดลอกทั้งไฟล์เป็นเครื่องมือวัดก่อน: System.out.println แสดงข้อความ; Runtime.version().feature() ถามรุ่นหลักของ JVM ที่กำลังรัน โครง main/วงเล็บปีกกาเรียนแยกใน java-main ไม่ต้องออกแบบ class เองก่อนบทนั้น"] },
+      { heading: "อ่านโครงไฟล์แรกก่อนคัดลอก", text: ["public class QuestStart { ... } ตั้งชื่อโปรแกรมต้องตรง QuestStart.java; public static void main(String[] args) { ... } คือจุดเริ่มที่ launcher เรียก คอร์สนี้ใช้โครงนี้ก่อนแล้วอ่านทีละคำใน java-main ยังไม่ต้องออกแบบ class เอง", "System.out.println(...) แสดงค่าแล้วขึ้นบรรทัดใหม่ ข้อความคร่อม doublequote; + ต่อข้อความกับค่าที่อ่านมา Runtime.version().feature() คือการถาม library ว่ารุ่นหลักของ Java ที่กำลังรันคืออะไร ใช้เพื่อยืนยันเครื่องมือ ตัวอย่างนี้ยังไม่มีตัวแปร/function ที่ต้องเขียนเพิ่มเอง"] },
+      { heading: "ติดตั้ง JDK 21: Windows PowerShell", text: ["เปิด https://adoptium.net/temurin/releases เลือก Version 21, OS Windows, architecture ให้ตรงเครื่อง และ Package Type JDK ไม่ใช่ JRE สำหรับ Windows x64 ดาวน์โหลด .msi เปิด installer เลือกเพิ่ม PATH และ JAVA_HOME แล้ว Finish; ดู https://adoptium.net/installation/windows", "เปิด PowerShell ใหม่ ใช้ java --version และ javac --version ทั้งคู่ต้องเริ่มรุ่น 21 (patch ไม่ต้องตรงตัวเลขตัวอย่าง) ตรวจ Get-Command java และ Get-Command javac ว่ามาจาก JDK ที่ตั้งใจ", "ถ้า is not recognized ให้ดูว่าโฟลเดอร์ JDK มี bin/java.exe และ bin/javac.exe จริง จาก Settings ค้น Environment Variables เพิ่มโฟลเดอร์ bin นั้นใน User Path โดยเก็บค่าอื่นไว้ (ถ้ามี Java รุ่นเก่าอยู่ใน System Path ให้เลื่อน JDK 21 ขึ้นเหนือรุ่นเก่า หรือเอารุ่นเก่าออก เพราะ System Path ถูกอ่านก่อน User Path) ตั้ง JAVA_HOME เป็นโฟลเดอร์ JDK ที่อยู่เหนือ bin เปิด terminal ใหม่แล้วตรวจสองคำสั่งซ้ำ", "หาก java กับ javac คนละรุ่น ไม่แก้ source ให้ตรวจ path ของทั้งคู่และจัดลำดับ JDK 21 bin ก่อนรุ่นอื่น JAVA_HOME อย่างเดียวไม่ได้บังคับ shell ให้เลือก java ตัวนั้น"], language: "shell", code: `java --version
+javac --version
+Get-Command java
+Get-Command javac`, output: "java และ javac แสดงรุ่น 21 และ path ชี้ใต้โฟลเดอร์ JDK 21" },
+      { heading: "ติดตั้ง JDK 21: Linux/WSL Bash แบบ archive", text: ["บนหน้า releases เลือก Version 21, Linux, JDK, architecture ตรง uname -m (x86_64 ใช้ x64; aarch64 ใช้ aarch64) ดาวน์โหลด tar.gz บันทึกชื่อ jdk21.tar.gz ในโฟลเดอร์ java-tools ว่าง (ถ้าดาวน์โหลดด้วยเบราว์เซอร์ Windows ให้คัดลอกเข้า WSL เช่น cp /mnt/c/Users/ชื่อคุณ/Downloads/jdk21.tar.gz . หรือบน Ubuntu ติดตั้งด้วย sudo apt install openjdk-21-jdk แทนก็ได้); Windows installer ไม่ใช่การติดตั้งใน WSL", "ชุดคำสั่งต่อไปนี้ทำใน java-tools ที่มี archive แล้ว แตกไฟล์ลง jdk21 และเลือก JDK นั้นใน shell นี้ ถ้ามี jdk21 อยู่แล้วให้ใช้พื้นที่ใหม่ก่อน ไม่เขียนทับ", "เก็บถาวรได้โดยเพิ่ม export JAVA_HOME เป็น path เต็มที่แตกไฟล์จริง และ export PATH บรรทัดเดิมใน ~/.bashrc ผ่าน editor; เปิด Bash ใหม่แล้วตรวจ หาก command not found ตรวจ command -v java/javac, ไฟล์ bin และ environment ก่อนแก้โค้ด", "macOS: เลือก Version 21/macOS/JDK และ architecture ให้ตรง ดาวน์โหลด .pkg ตาม https://adoptium.net/installation/macOS เปิด terminal ใหม่ ตรวจ java/javac --version; ถ้ามีหลายรุ่นใช้ /usr/libexec/java_home -v 21 หา path แล้วตั้ง JAVA_HOME และ PATH ตาม JDK ที่พบ"], language: "shell", code: `uname -m
 mkdir jdk21
 tar -xf jdk21.tar.gz -C jdk21 --strip-components=1
 export JAVA_HOME="$PWD/jdk21"
@@ -402,13 +405,13 @@ command -v javac`, output: "java แสดง openjdk 21...; javac แสดง 
         heading: "3) overflow ที่ต้นทาง",
         text: [
           "การคำนวณใช้ชนิดของตัวถูกดำเนินการ ไม่ใช่ชนิดของตัวแปรที่รับผล long x = a * b; ยัง overflow ถ้า a และ b เป็น int",
-          "แก้ที่ต้นทาง: (long) a * b หรือใส่ L ที่ literal ตัวแรก",
+          "แก้ที่ต้นทาง: ใส่ L ที่ตัวแรกของการคำนวณ เช่น 1L * a * b (การแปลงชนิดด้วย (long) จะเรียนในบท java-casting)",
         ],
         code: java`public class Main {
     public static void main(String[] args) {
         int a = 100_000;
         long wrong = a * a;
-        long right = (long) a * a;
+        long right = 1L * a * a;
         System.out.println(wrong + " " + right);
     }
 }`,
@@ -483,7 +486,7 @@ command -v javac`, output: "java แสดง openjdk 21...; javac แสดง 
         heading: "2) ตำแหน่งและการตัด",
         text: [
           "charAt(i), substring(begin, end) (ไม่รวม end), indexOf(x) (-1 ถ้าไม่พบ), length()",
-          "สำหรับคำสั่งสองส่วน ให้หาindexช่องว่างด้วยindexOfแล้วsubstringก่อน/หลังตำแหน่งนั้น stripส่วนรหัสซ้ำเพื่อรับช่องว่างซ้อน กิจกรรมนี้ยังไม่ใช้split/array/regex",
+          "สำหรับคำสั่งสองส่วน ให้หา index ช่องว่างด้วย indexOf แล้ว substring ก่อน/หลังตำแหน่งนั้น strip ส่วนรหัสซ้ำเพื่อรับช่องว่างซ้อน กิจกรรมนี้ยังไม่ใช้ split/array/regex",
         ],
       },
       {
@@ -507,28 +510,28 @@ command -v javac`, output: "java แสดง openjdk 21...; javac แสดง 
       "title = raw.strip() ได้ข้อความยาว 10 ตัว",
       "substring(0, 5) ได้ Clean, indexOf(\"Code\") ได้ 6, indexOf(\"Java\") ได้ -1",
       "new String(...) สร้าง object ใหม่ == จึงเป็น false แต่ equals เป็น true",
-      "indexOf(\",\") ใน a,b,c ได้1 เพราะcommaแรกอยู่ตำแหน่ง1",
+      "indexOf(\",\") ใน a,b,c ได้ 1 เพราะ comma แรกอยู่ตำแหน่ง 1",
     ],
     pitfalls: [
       "เทียบ String ด้วย ==",
       "เรียก method แล้วไม่เก็บผล",
       "เรียก method บนตัวแปรที่เป็น null: NullPointerException",
-      "indexOfไม่พบได้-1 ต้องกำหนดสัญญาของข้อมูลก่อนใช้เป็นขอบsubstring กิจกรรมนี้รับคำสั่งและรหัสที่มีช่องว่างคั่นแน่นอน",
+      "indexOf ไม่พบได้ -1 ต้องกำหนดสัญญาของข้อมูลก่อนใช้เป็นขอบ substring กิจกรรมนี้รับคำสั่งและรหัสที่มีช่องว่างคั่นแน่นอน",
     ],
     checks: [
-      { question: "\"a,b,c\".indexOf(\",\") ได้เท่าไร?", answer: "1 เพราะindexเริ่ม0 และcommaแรกอยู่หลังa" },
+      { question: "\"a,b,c\".indexOf(\",\") ได้เท่าไร?", answer: "1 เพราะ index เริ่ม 0 และ comma แรกอยู่หลังa" },
       { question: "ทำไม \"help\".equals(command) ปลอดภัยกว่า command.equals(\"help\")", answer: "ถ้า command เป็น null แบบแรกได้ false ส่วนแบบหลังได้ NullPointerException" },
     ],
     recap: [
       "String immutable: รับผลของ method ไว้เสมอ",
       "equals/equalsIgnoreCase ไม่ใช่ ==",
-      "indexเริ่ม0 substringไม่รวมend; indexOfหาไม่พบได้-1",
+      "index เริ่ม 0 substring ไม่รวม end; indexOf หาไม่พบได้ -1",
     ],
     traceHint: "เขียนค่าของแต่ละตัวแปรหลังทุกบรรทัด สังเกตบรรทัดที่เรียก method แต่ไม่มี = รับผล — บรรทัดนั้นไม่เปลี่ยนอะไร",
     practiceHints: [
-      "stripก่อนแล้วหาspace=cleaned.indexOf(\" \")",
-      "command=cleaned.substring(0,space).toLowerCase(); id=cleaned.substring(space+1).strip().toUpperCase();",
-      "พิมพ์ valid= ต่อด้วย command.equals(\"borrow\")",
+      "ตัดช่องว่างรอบนอกก่อน แล้วหาตำแหน่งของช่องว่างแรกในข้อความที่ตัดแล้ว คำสั่งคือส่วนก่อนตำแหน่งนั้น",
+      "รหัสคือส่วนหลังตำแหน่งนั้น ตัดช่องว่างซ้อนอีกครั้ง แล้วแปลงตัวพิมพ์ตามโจทย์ ส่วน valid ใช้ equals เทียบกับ borrow",
+      "ลำดับโค้ด: cleaned = line.strip(); space = cleaned.indexOf(\" \"); command = cleaned.substring(0, space).toLowerCase(); id = cleaned.substring(space + 1).strip().toUpperCase(); แล้วพิมพ์ valid= ตามด้วย command.equals(\"borrow\")",
     ],
     acceptance: [
       local,
@@ -536,12 +539,12 @@ command -v javac`, output: "java แสดง openjdk 21...; javac แสดง 
       "ตรวจเอง: ลองเปลี่ยน line เป็น \"return   b002\" แล้วได้ valid=false โดยไม่ล่ม",
     ],
     solutionNotes: [
-      "กิจกรรมนี้กำหนดว่ามีคำสั่งและรหัสคั่นด้วยช่องว่าง ถ้าไม่มีช่องว่าง indexOfได้-1 แล้วsubstringใช้ขอบนั้นไม่ได้ ต้องตรวจและกำหนดพฤติกรรมผิดข้อมูลในjava-branch/java-exceptions-basicก่อนรองรับกรณีนี้",
+      "กิจกรรมนี้กำหนดว่ามีคำสั่งและรหัสคั่นด้วยช่องว่าง ถ้าไม่มีช่องว่าง indexOf ได้ -1 แล้ว substring ใช้ขอบนั้นไม่ได้ ต้องตรวจและกำหนดพฤติกรรมผิดข้อมูลใน java-branch/java-exceptions-basic ก่อนรองรับกรณีนี้",
     ],
     reflection: [
       "input แบบไหนจากผู้ใช้จริงที่โปรแกรมนี้ยังรับมือไม่ได้",
     ],
-    extension: "หลังเรียนjava-branchกลับมาตรวจกรณีไม่มีช่องว่างคั่น ให้แสดงข้อความระบุว่าขาดรหัสแทนพยายามsubstringด้วยindex-1 เปรียบexpected/actualและอธิบายว่ากฎข้อมูลเปลี่ยนอย่างไร",
+    extension: "หลังเรียน java-branch กลับมาตรวจกรณีไม่มีช่องว่างคั่น ให้แสดงข้อความระบุว่าขาดรหัสแทนพยายาม substring ด้วย index-1 เปรียบ expected/actual และอธิบายว่ากฎข้อมูลเปลี่ยนอย่างไร",
   },
   "java-casting": {
     hook: "ค่าเฉลี่ยรีวิว 4.5 ดาวกลายเป็น 22.0 ในหน้าจอ เพราะสองบรรทัดเล็ก ๆ: ต่อข้อความก่อนแปลงเป็นตัวเลข และหารจำนวนเต็มก่อนเก็บเป็นทศนิยม การแปลงชนิดต้องตั้งใจทุกครั้ง",
@@ -578,7 +581,7 @@ command -v javac`, output: "java แสดง openjdk 21...; javac แสดง 
       "หารก่อนแปลงเป็น double",
       "คิดว่า (int) ปัดเศษ",
       "ต่อข้อความก่อน parse",
-      "parseInt ข้อความที่มีช่องว่างหรือหน่วย เช่น \"12 \" หรือ \"12บาท\"",
+      "parseInt ข้อความที่มีช่องว่างหรือหน่วย เช่น \"12 \" หรือ \"12 บาท\"",
     ],
     checks: [
       { question: "(int) 7.9 + (int) 0.5 ได้เท่าไร", answer: "7 เพราะ (int) 7.9 = 7 และ (int) 0.5 = 0" },
@@ -642,7 +645,7 @@ command -v javac`, output: "java แสดง openjdk 21...; javac แสดง 
       {
         heading: "3) ทดสอบโดยไม่ต้องพิมพ์",
         text: [
-          "บันทึก input ลงไฟล์แล้วรัน java Main.java < input.txt หรือ printf 'Sea\\n3\\n' | java Main.java ได้ผลเหมือนเดิมทุกครั้ง",
+          "บันทึก input ลงไฟล์ input.txt แล้วรัน (PowerShell: Get-Content input.txt | java Main.java ; Bash/WSL: java Main.java < input.txt) ได้ผลเหมือนเดิมทุกครั้ง",
           "เมื่อ input มาจากไฟล์ ข้อความคำถาม (print) จะอยู่ติดกันเพราะไม่มีการกด Enter ของผู้ใช้แทรก — expected output ของบทนี้จึงมี ชื่อ: จำนวนเล่ม: อยู่บรรทัดเดียว",
         ],
       },
@@ -661,7 +664,7 @@ command -v javac`, output: "java แสดง openjdk 21...; javac แสดง 
     ],
     checks: [
       { question: "input คือ 5 ⏎ (บรรทัดเดียว) แล้วโปรแกรมเรียก nextLine สองครั้ง ครั้งที่สองเกิดอะไร", answer: "NoSuchElementException: No line found เพราะไม่มีบรรทัดเหลือ ควรตรวจ hasNextLine ก่อน" },
-      { question: "ทำไมการทดสอบด้วย < input.txt ดีกว่าพิมพ์เอง", answer: "รันซ้ำได้ผลเดิมทุกครั้ง เก็บกรณีทดสอบไว้ และเทียบ output กับไฟล์ที่คาดไว้ได้" },
+      { question: "ทำไมการทดสอบด้วยไฟล์ input.txt ดีกว่าพิมพ์เอง", answer: "รันซ้ำได้ผลเดิมทุกครั้ง เก็บกรณีทดสอบไว้ และเทียบ output กับไฟล์ที่คาดไว้ได้" },
     ],
     recap: [
       "nextLine ทุกครั้ง + parse เอง",
@@ -672,7 +675,7 @@ command -v javac`, output: "java แสดง openjdk 21...; javac แสดง 
     practiceHints: [
       "อ่านสามครั้งด้วย nextLine().strip()",
       "บรรทัดที่สองใช้ Integer.parseInt บรรทัดที่สามใช้ Double.parseDouble",
-      "พิมพ์ด้วย printf(\"%s: %d วัน ค่าปรับ %.2f บาท%n\", ...) และทดสอบ printf 'Clean Code\\n3\\n2.5\\n' | java Main.java",
+      "พิมพ์ด้วย printf(\"%s: %d วัน ค่าปรับ %.2f บาท%n\", ...) และทดสอบด้วยไฟล์ input.txt สามบรรทัด (Clean Code, 3, 2.5) โดย PowerShell ใช้ Get-Content input.txt | java Main.java ส่วน Bash/WSL ใช้ java Main.java < input.txt",
     ],
     acceptance: [
       local,
@@ -1246,7 +1249,7 @@ command -v javac`, output: "java แสดง openjdk 21...; javac แสดง 
     practiceHints: [
       "ย้ายการตรวจ add/done และการสร้างบรรทัดของ list ไปที่ Wishlist ให้ทุก method รับ list เป็น parameter",
       "Commands.run แยกคำสั่งด้วย split(\" \", 2) แล้วใช้ switch expression ที่คืนข้อความ (\"\" เมื่อไม่ต้องพิมพ์)",
-      "Main แค่วน nextLine เรียก Commands.run และพิมพ์ถ้าไม่ว่าง จากนั้น javac -d out src/wishlist/*.java และ java -cp out wishlist.Main < input.txt",
+      "Main แค่วน nextLine เรียก Commands.run และพิมพ์ถ้าไม่ว่าง จากนั้น javac -d out src/wishlist/*.java และ java -cp out wishlist.Main โดยป้อน input.txt (PowerShell: Get-Content input.txt | java -cp out wishlist.Main ; Bash/WSL: java -cp out wishlist.Main < input.txt)",
     ],
     acceptance: [
       local,
@@ -1270,7 +1273,7 @@ command -v javac`, output: "java แสดง openjdk 21...; javac แสดง 
         heading: "1) ทำให้ผลทดสอบได้ก่อนเขียนโค้ด",
         text: [
           "ข้อความตอบกลับทุกแบบถูกกำหนดไว้ตายตัวในคำอธิบายบท จึงเขียน test-input.txt และ expected-output.txt ได้ตั้งแต่ก่อนเขียนโค้ด",
-          "รันซ้ำ: java -cp out library.Main < test-input.txt > actual.txt แล้ว diff expected-output.txt actual.txt (Windows ใช้ fc)",
+          "รันซ้ำแล้วเทียบ — PowerShell: Get-Content test-input.txt | java -cp out library.Main | Set-Content -Encoding utf8 actual.txt แล้ว Compare-Object (Get-Content expected-output.txt) (Get-Content actual.txt) (ไม่มีผลลัพธ์ = ตรงกัน); Bash/WSL: java -cp out library.Main < test-input.txt > actual.txt แล้ว diff expected-output.txt actual.txt (ไม่มีผลลัพธ์ = ตรงกัน)",
         ],
       },
       {
@@ -1297,7 +1300,7 @@ command -v javac`, output: "java แสดง openjdk 21...; javac แสดง 
     pitfalls: [
       "ใช้ id เป็น index",
       "แก้ ArrayList คู่ขนานไม่ครบทุก list",
-      "ข้อความตอบกลับไม่ตรงข้อกำหนด (ทดสอบด้วย diff ไม่ผ่าน)",
+      "ข้อความตอบกลับไม่ตรงข้อกำหนด (เทียบกับ expected-output ไม่ผ่าน)",
       "parseInt โดยไม่จับ NumberFormatException",
     ],
     checks: [
@@ -1317,7 +1320,7 @@ command -v javac`, output: "java แสดง openjdk 21...; javac แสดง 
     ],
     acceptance: [
       local,
-      "ตรวจเอง: java -cp out library.Main < test-input.txt ได้ผลตรงกับ expected-output.txt ทุกบรรทัด (diff ไม่มีความต่าง)",
+      "ตรวจเอง: รันด้วย test-input.txt (วิธีตาม shell ของคุณ: PowerShell ใช้ Get-Content ... | java ; Bash/WSL ใช้ < test-input.txt) แล้วผลตรงกับ expected-output.txt ทุกบรรทัด (Compare-Object หรือ diff ไม่มีความต่าง)",
       "ตรวจเอง: ทุกข้อความตอบกลับในข้อกำหนดปรากฏอย่างน้อยหนึ่งครั้งใน test-input",
       "ตรวจเอง: compile/run แบบหลายไฟล์ด้วย javac -d out และ java -cp out library.Main",
     ],

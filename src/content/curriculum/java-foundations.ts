@@ -342,7 +342,7 @@ public class Start {
     }
 }`,
   bugCheck: {kind: "logic", output: "ยอดไม่ตรง: 0.30000000000000004"},
-  bugExplanation: "คาดยอด0.3 แต่ actual ยอดไม่ตรง: 0.30000000000000004 เพราะ double แทน0.1และ0.2ในฐานสองไม่พอดี แก้สำหรับเงินโดยเก็บจำนวนเต็มหน่วยสตางค์ เช่น long totalSatang = 10 + 20; แล้วพิมพ์ totalSatang / 100.0 ได้0.3; อย่าแค่ปัดข้อความแล้วอ้างว่าค่าภายในแม่นยำ",
+  bugExplanation: "คาดยอด 0.3 แต่ actual ยอดไม่ตรง: 0.30000000000000004 เพราะ double แทน 0.1 และ 0.2 ในฐานสองไม่พอดี แก้สำหรับเงินโดยเก็บจำนวนเต็มหน่วยสตางค์ เช่น long totalSatang = 10 + 20; แล้วพิมพ์ totalSatang / 100.0 ได้ 0.3; อย่าแค่ปัดข้อความแล้วอ้างว่าค่าภายในแม่นยำ",
   vocabulary: [v("primitive type", "ชนิดพื้นฐาน 8 ชนิดที่เก็บค่าโดยตรง"), v("int / long", "จำนวนเต็ม 32 / 64 bit"), v("double", "ทศนิยมฐานสอง 64 bit มีความคลาดเคลื่อน"), v("overflow", "ค่าเกินช่วงแล้ววนไปอีกฝั่งโดยไม่มี error"), v("char", "ตัวอักษรหนึ่งหน่วยใน ' '"), v("BigDecimal", "ชนิดทศนิยมฐานสิบที่แม่นยำ เหมาะกับเงิน")],
 },
 {
@@ -350,7 +350,7 @@ public class Start {
   courseId,
   unit: "ชนิดข้อมูล",
   title: "String: methods, equals และ immutability",
-  objective: "ใช้ methods ที่พบบ่อยของ String (length, strip, toUpperCase, contains, substring, indexOf, split, isBlank) เทียบข้อความด้วย equals/equalsIgnoreCase และอธิบายว่า String เปลี่ยนค่าไม่ได้",
+  objective: "ใช้ methods ที่พบบ่อยของ String (length, strip, toUpperCase, contains, substring, indexOf, isBlank) เทียบข้อความด้วย equals/equalsIgnoreCase และอธิบายว่า String เปลี่ยนค่าไม่ได้",
   why: "input จากผู้ใช้ทุกชิ้นเข้ามาเป็นข้อความ การเทียบ String ด้วย == เป็น bug คลาสสิกที่บางครั้งดูเหมือนทำงานได้ และการลืมว่า method ของ String คืนค่าใหม่ทำให้การแก้ข้อความหายไปเงียบ ๆ",
   explanation: "String เป็น object ไม่ใช่ primitive method อย่าง strip/toUpperCase ไม่แก้ตัวเดิม (immutable) แต่คืนผลออกมา (อาจเป็น object เดิมถ้าไม่มีอะไรเปลี่ยน): name.strip(); เฉย ๆ ไม่มีผล ต้องเขียน name = name.strip(); เทียบเนื้อหาด้วย a.equals(b) หรือ equalsIgnoreCase เพราะ == เทียบว่าเป็น object เดียวกันไหม (literal ที่เหมือนกันอาจถูกใช้ร่วมกันจนทำให้ == ดูเหมือนถูกในบางกรณี แต่ข้อความจาก input หรือการต่อข้อความตอนรันมักเป็นคนละ object) index เริ่มที่ 0, substring(begin, end) ไม่รวม end, indexOf คืน -1 เมื่อไม่พบ, strip() ตัดช่องว่างแบบ Unicode (Java 11+) isBlank() ว่างหรือมีแต่ช่องว่าง",
   language: "java",
@@ -375,7 +375,7 @@ public class Start {
   solutionCheck: { output: "command=borrow id=B001\nvalid=true" },
   tracePrompt: "String s = \"Library\"; s.toLowerCase(); String t = s.substring(3); พิมพ์ s + \" \" + t + \" \" + t.charAt(0) ได้อะไร",
   traceAnswer: "s.toLowerCase(); คืนค่าใหม่ที่ไม่มีใครเก็บ s จึงยังเป็น Library substring(3) ตัดตั้งแต่ index 3 ได้ rary และ charAt(0) ของ t คือ r ผลคือ Library rary r",
-  practicePrompt: "มีบรรทัดคำสั่ง String line = \"  BORROW  b001 \" ให้ตัดช่องว่างรอบนอก ใช้indexOfหาช่องว่างแรกหลังstrip แล้วsubstringแยกคำสั่งและรหัส ตัดช่องว่างรอบรหัสด้วยstrip (โจทย์รับสองส่วนนี้แน่นอน) แปลงคำสั่งเป็นตัวพิมพ์เล็กและรหัสเป็นตัวพิมพ์ใหญ่ แล้วพิมพ์ command=borrow id=B001 และพิมพ์ valid=true ถ้าคำสั่งเท่ากับ borrow (ใช้ equals)",
+  practicePrompt: "มีบรรทัดคำสั่ง String line = \"  BORROW  b001 \" ให้ตัดช่องว่างรอบนอก แล้วแยกคำสั่งกับรหัสที่คั่นกันด้วยช่องว่าง (โจทย์รับสองส่วนนี้แน่นอน และรหัสอาจมีช่องว่างนำหน้า) แปลงคำสั่งเป็นตัวพิมพ์เล็กและรหัสเป็นตัวพิมพ์ใหญ่ แล้วพิมพ์ command=borrow id=B001 และพิมพ์ valid=true ถ้าคำสั่งเท่ากับ borrow (ใช้ equals)",
   starter: java`public class Main {
     public static void main(String[] args) {
         String line = "  BORROW  b001 ";
@@ -401,7 +401,7 @@ public class Start {
     }
 }`,
   bugCheck: {kind: "logic", output: "false"},
-  bugExplanation: "คาด true แต่ actual false เพราะ command.toUpperCase() คืนข้อความใหม่แต่ไม่ได้เก็บ จึงยังเป็น help แก้ด้วย String upper = command.toUpperCase(); แล้ว upper.equals(\"HELP\") ได้true หรือใช้ equalsIgnoreCase หากต้องการเทียบโดยไม่สนตัวพิมพ์",
+  bugExplanation: "คาด true แต่ actual false เพราะ command.toUpperCase() คืนข้อความใหม่แต่ไม่ได้เก็บ จึงยังเป็น help แก้ด้วย String upper = command.toUpperCase(); แล้ว upper.equals(\"HELP\") ได้ true หรือใช้ equalsIgnoreCase หากต้องการเทียบโดยไม่สนตัวพิมพ์",
   vocabulary: [v("immutable", "สร้างแล้วเปลี่ยนค่าไม่ได้ method คืนค่าใหม่"), v("equals", "เทียบเนื้อหาของ object"), v("==", "กับ object คือเทียบว่าเป็นตัวเดียวกัน"), v("index", "ตำแหน่งเริ่มที่ 0"), v("substring", "ตัดข้อความจาก begin ถึงก่อน end"), v("indexOf", "หาตำแหน่งข้อความแรก หรือ -1 เมื่อไม่พบ")],
 },
 {
@@ -474,7 +474,7 @@ public class Start {
   title: "Scanner: อ่าน input ทีละบรรทัดอย่างปลอดภัย",
   objective: "อ่าน input จาก System.in ด้วย Scanner แบบทีละบรรทัด (nextLine) แล้วแปลงเป็นตัวเลขเอง อธิบายกับดักของ nextInt ตามด้วย nextLine และทดสอบโปรแกรมด้วยการส่ง input ผ่าน pipe",
   why: "โปรแกรม CLI ทุกตัวต้องรับ input จากผู้ใช้ กับดักเรื่องบรรทัดค้างทำให้โปรแกรม “ข้าม” คำถามไปเฉย ๆ และ input ที่ไม่ตรงชนิดทำให้โปรแกรมล่ม การวางแนวทางอ่านทีละบรรทัดตั้งแต่แรกช่วยให้ควบคุมได้ทุกกรณี",
-  explanation: "Scanner scanner = new Scanner(System.in); (import java.util.Scanner;) scanner.nextLine() อ่านจนจบบรรทัดและคืนข้อความโดยไม่รวมตัวขึ้นบรรทัด nextInt() อ่านเฉพาะตัวเลขแล้วทิ้งตัวขึ้นบรรทัดไว้ nextLine() ถัดไปจึงได้ข้อความว่างทันที — วิธีที่คาดเดาได้กว่าคือใช้ nextLine() เสมอแล้วแปลงเอง Integer.parseInt(line.strip()) hasNextLine() บอกว่ายังมีบรรทัดให้อ่านไหม (false เมื่อ input จบ เช่น ปลายไฟล์ที่ pipe เข้ามา) การทดสอบโดยไม่ต้องพิมพ์เอง: printf 'Sea\\n3\\n' | java Main.java หรือ java Main.java < input.txt ใช้ Scanner ตัวเดียวทั้งโปรแกรม (สร้างหลายตัวบน System.in แล้วข้อมูลที่ตัวแรกอ่านล่วงหน้าไว้อาจหาย)",
+  explanation: "Scanner scanner = new Scanner(System.in); (import java.util.Scanner;) scanner.nextLine() อ่านจนจบบรรทัดและคืนข้อความโดยไม่รวมตัวขึ้นบรรทัด nextInt() อ่านเฉพาะตัวเลขแล้วทิ้งตัวขึ้นบรรทัดไว้ nextLine() ถัดไปจึงได้ข้อความว่างทันที — วิธีที่คาดเดาได้กว่าคือใช้ nextLine() เสมอแล้วแปลงเอง Integer.parseInt(line.strip()) hasNextLine() บอกว่ายังมีบรรทัดให้อ่านไหม (false เมื่อ input จบ เช่น ปลายไฟล์ที่ pipe เข้ามา) การทดสอบโดยไม่ต้องพิมพ์เอง: เก็บ input ไว้ในไฟล์ input.txt แล้วป้อนเข้าโปรแกรม โดย PowerShell ใช้ Get-Content input.txt | java Main.java ส่วน Bash/WSL ใช้ java Main.java < input.txt (สองแบบนี้เป็นคนละ shell ห้ามปนกัน) ใช้ Scanner ตัวเดียวทั้งโปรแกรม (สร้างหลายตัวบน System.in แล้วข้อมูลที่ตัวแรกอ่านล่วงหน้าไว้อาจหาย)",
   language: "java",
   standard: "v3",
   prerequisites: ["java-casting"],
@@ -688,16 +688,15 @@ public class Main {
   solutionCheck: { stdin: "30\n", output: "ค่าปรับ 150 บาท (คำนวณ 20 วัน)" },
   buggy: java`public class Main {
     public static void main(String[] args) {
-        int[] fines = {10, 20, 30};
         int total = 0;
-        for (int i = 0; i <= fines.length; i++) {
-            total += fines[i];
+        for (int day = 1; day < 3; day++) {
+            total += day * 10;
         }
-        System.out.println(total);
+        System.out.println("fine for 3 days: " + total);
     }
 }`,
-  bugCheck: {kind: "runtime", message: "ArrayIndexOutOfBoundsException: Index 3 out of bounds for length 3"},
-  bugExplanation: "compile ผ่าน แต่ตอนรันได้ ArrayIndexOutOfBoundsException: Index 3 out of bounds for length 3 เพราะ i <= fines.length ทำรอบที่ i = 3 ซึ่งไม่มีอยู่ (index สุดท้ายคือ length - 1) เป็น off-by-one แก้เป็น i < fines.length หรือใช้ for (int fine : fines)",
+  bugCheck: {kind: "logic", output: "fine for 3 days: 30"},
+  bugExplanation: "คาดค่าปรับ 3 วัน = 10 + 20 + 30 = 60 แต่ได้ 30 เพราะเงื่อนไข day < 3 หยุดก่อนวันที่ 3 จึงนับแค่วันที่ 1 และ 2 เป็น off-by-one (ทำขาดไปหนึ่งรอบ) แก้เป็น day <= 3 และตรวจด้วยการไล่ค่า day ทีละรอบ",
   vocabulary: [v("for loop", "loop ที่มีตัวนับ: เริ่มต้น; เงื่อนไข; ปรับค่า"), v("while loop", "ทำซ้ำตราบที่เงื่อนไขจริง"), v("accumulator", "ตัวแปรสะสมผลระหว่าง loop"), v("break / continue", "ออกจาก loop / ข้ามไปรอบถัดไป"), v("off-by-one", "ทำเกินหรือขาดไปหนึ่งรอบ"), v("infinite loop", "loop ที่เงื่อนไขไม่เคยเป็นเท็จ")],
 },
 {
@@ -798,7 +797,7 @@ public class Main {
     }
 }`,
   bugCheck: {kind: "compile", message: "the switch expression does not cover all possible input values"},
-  bugExplanation: "compile error: “the switch expression does not cover all possible input values” switch expression ต้องคืนค่าได้ทุกกรณี แต่ int มีค่าอื่นนอกจาก 1–7 (เช่น 0 หรือ 99) เพิ่ม default -> \"วันไม่ถูกต้อง\" หรือ default -> throw new IllegalArgumentException(\"day: \" + day); ถ้าค่าที่ไม่ถูกต้องควรถือว่าเป็นความผิดพลาด",
+  bugExplanation: "compile error: “the switch expression does not cover all possible input values” switch expression ต้องคืนค่าได้ทุกกรณี แต่ int มีค่าอื่นนอกจาก 1–7 (เช่น 0 หรือ 99) เพิ่ม default -> \"วันไม่ถูกต้อง\" ที่แสดงข้อความหรือค่าที่บอกว่าวันไม่ถูกต้อง (การโยน exception ด้วย throw จะเรียนในบท java-exceptions-basic)",
   vocabulary: [v("switch expression", "switch ที่คืนค่าได้"), v("arrow case (->)", "เคสที่ทำแค่ฝั่งขวาแล้วจบ ไม่ไหลต่อ"), v("fall-through", "การไหลไปทำเคสถัดไปเมื่อไม่มี break ใน switch แบบเก่า"), v("yield", "คืนค่าจากเคสแบบ block ใน switch expression"), v("default", "เคสสำหรับค่าที่ไม่ตรงเคสใด"), v("exhaustive", "ครอบคลุมทุกค่าที่เป็นไปได้")],
 },
 {
@@ -1511,7 +1510,7 @@ public class Main {
   expectedOutput: "(no books)\nadded #1\nadded #2\n#1 Clean Code [borrowed]\n#2 Java 21 [available]",
   tracePrompt: "ใน ArrayList คู่ขนาน ถ้าคำสั่ง remove ในอนาคตเขียน titles.remove(i) และ borrowed.remove(i) แต่ลืม ids.remove(i) แล้วสั่ง list จะเห็นอะไรผิด",
   traceAnswer: "ids จะยาวกว่าอีกสอง list และ index เดียวกันไม่ใช่หนังสือเล่มเดียวกันอีกต่อไป เช่นหลังลบเล่มแรกจาก [1,2]/[A,B] จะได้ ids [1,2] กับ titles [B] list แสดง #1 B ซึ่งผิด และ i = 1 จะได้ IndexOutOfBoundsException จาก titles.get(1) ข้อมูลที่ “เป็นของชิ้นเดียวกัน” ควรอยู่ใน object เดียว (M1)",
-  practicePrompt: "สร้าง Library CLI M0 ตามข้อกำหนดในคำอธิบายให้ครบทุกคำสั่ง แยกเป็นอย่างน้อย 2 ไฟล์ใน package library (เช่น Catalog.java เก็บข้อมูลและกติกา, Main.java อ่าน input/พิมพ์) เขียนไฟล์ test-input.txt ที่ครอบคลุมทุกข้อความตอบกลับ แล้วรัน java -cp out library.Main < test-input.txt เทียบกับ expected-output.txt ที่เขียนเอง (เช่นด้วย diff) เฉลยมี test-input.txt และ expected-output.txt ที่ครอบคลุมทุกข้อความตอบกลับให้เทียบ",
+  practicePrompt: "สร้าง Library CLI M0 ตามข้อกำหนดในคำอธิบายให้ครบทุกคำสั่ง แยกเป็นอย่างน้อย 2 ไฟล์ใน package library (เช่น Catalog.java เก็บข้อมูลและกติกา, Main.java อ่าน input/พิมพ์) เขียนไฟล์ test-input.txt ที่ครอบคลุมทุกข้อความตอบกลับ แล้วรันโปรแกรมโดยป้อน test-input.txt (PowerShell: Get-Content test-input.txt | java -cp out library.Main ; Bash/WSL: java -cp out library.Main < test-input.txt) เทียบกับ expected-output.txt ที่เขียนเอง เฉลยมี test-input.txt และ expected-output.txt ที่ครอบคลุมทุกข้อความตอบกลับให้เทียบ",
   starter: java`// File: library/Catalog.java
 package library;
 

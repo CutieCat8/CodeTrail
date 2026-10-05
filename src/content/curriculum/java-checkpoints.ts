@@ -202,40 +202,123 @@ equalsIgnoreCase เทียบเนื้อหาโดยไม่สนต
 Integer.parseInt("12x") ไม่คืน 12 แต่เกิด NumberFormatException เพราะทั้งข้อความต้องเป็นตัวเลข`,
   },
   "java-scanner": {
-    "prompt": "ประเมินบริบทใหม่ — เปิด documentation ได้ ไม่เปิดrubric/เฉลยก่อนส่ง: อ่านชื่อสินค้า จำนวน และราคาต่อชิ้นคนละบรรทัด เช่น \"Lamp\",3,2.5 แล้วแสดง Lamp: 7.50 ทดลองชื่อมีช่องว่างหัวท้ายและinputไม่ครบ เก็บerror อธิบายว่าทำไมไม่ใช้nextIntแล้วnextLineโดยไม่จัดการnewline\nแนบโค้ด/คำสั่ง/ค่าทำนายและoutputหรือerrorจริง การส่งเป็นบันทึกความพยายาม ยังต้องเทียบเกณฑ์ด้วยตนเอง",
-    "rubric": [
-      "ผลตรงและstripชื่อ",
-      "อ่านทุกบรรทัดด้วยวิธีที่อธิบายได้",
-      "inputไม่ครบระบุNoSuchElementExceptionหรือfeedbackที่ออกแบบไว้ ไม่อ้างรองรับถ้าไม่รองรับ"
+    prompt: prompt(
+      "อ่านชื่อห้อง เวลาเริ่ม และเวลาจบ (เป็นนาทีนับจากเที่ยงคืน) คนละบรรทัด เช่น Room A / 540 / 675 แล้วแสดง Room A: 2 h 15 min",
+      "ทดลองชื่อห้องที่มีช่องว่างหัวท้าย และ input ที่ไม่ครบ เก็บ error ที่เห็น อธิบายว่าทำไมจึงไม่ใช้ nextInt แล้วตามด้วย nextLine โดยไม่จัดการตัวขึ้นบรรทัด",
+    ),
+    rubric: [
+      "ผลตรงตามรูปแบบ และตัดช่องว่างหัวท้ายของชื่อห้อง",
+      "อ่านทุกบรรทัดด้วยวิธีที่อธิบายได้ (เช่น nextLine แล้ว parse เอง)",
+      "input ไม่ครบระบุ NoSuchElementException หรือ feedback ที่ออกแบบไว้ ไม่อ้างว่ารองรับถ้าไม่ได้รองรับ",
     ],
-    "modelAnswer": "import java.util.Scanner; public class Main {public static void main(String[] args){Scanner input=new Scanner(System.in);String name=input.nextLine().strip();int count=Integer.parseInt(input.nextLine().strip());double price=Double.parseDouble(input.nextLine().strip());System.out.printf(\"%s: %.2f%n\",name,count*price);}} บันทึกสามบรรทัดinput.txt; PowerShellใช้Get-Content input.txt | java Main ส่วนBashใช้java Main < input.txt; inputไม่ครบnextLineหาไม่ได้"
+    modelAnswer: `import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+        String room = input.nextLine().strip();
+        int start = Integer.parseInt(input.nextLine().strip());
+        int end = Integer.parseInt(input.nextLine().strip());
+        int minutes = end - start;
+        System.out.println(room + ": " + minutes / 60 + " h " + minutes % 60 + " min");
+    }
+}
+
+บันทึก input สามบรรทัดไว้ในไฟล์ input.txt แล้วรัน
+PowerShell: Get-Content input.txt | java Main
+Bash: java Main < input.txt
+ผลที่ได้คือ Room A: 2 h 15 min และชื่อที่มีช่องว่างหัวท้ายก็ได้ผลเดิมเพราะใช้ strip
+ถ้า input ไม่ครบ nextLine จะหาบรรทัดไม่ได้และเกิด NoSuchElementException
+ไม่ใช้ nextInt แล้วตามด้วย nextLine เพราะ nextInt ทิ้งตัวขึ้นบรรทัดไว้ nextLine ถัดไปจึงอ่านได้บรรทัดว่าง`,
   },
   "java-branch": {
-    "prompt": "ประเมินบริบทใหม่ — เปิด documentation ได้ ไม่เปิดrubric/เฉลยก่อนส่ง: ค่าผ่านทาง:อายุติดลบแสดงinvalid ต่ำกว่า12ฟรี อายุ12ถึง59ราคา40 ตั้งแต่60ราคา20 ทดลอง-1,0,11,12,59,60 เลือกวิธีเองและอธิบายกิ่งที่เลือก\nแนบโค้ด/คำสั่ง/ค่าทำนายและoutputหรือerrorจริง การส่งเป็นบันทึกความพยายาม ยังต้องเทียบเกณฑ์ด้วยตนเอง",
-    "rubric": [
-      "ผลinvalid,0,0,40,40,20",
-      "ขอบ12และ60ถูกต้อง",
-      "กิ่งผิดข้อมูลไม่ถูกคิดค่าบริการ"
+    prompt: prompt(
+      "คิดค่าจอดรถจากจำนวนชั่วโมง hours: ติดลบแสดง invalid, น้อยกว่า 1 ชั่วโมงฟรี (0), 1 ถึง 2 ชั่วโมง 20 บาท, 3 ถึง 5 ชั่วโมง 50 บาท, 6 ชั่วโมงขึ้นไป 100 บาท (เพดานรายวัน)",
+      "ทดลอง hours เป็น -1, 0, 2, 3, 5 และ 6 เลือกวิธีเขียนเอง และอธิบายกิ่งที่เลือก",
+    ),
+    rubric: [
+      "ผล invalid, 0, 20, 50, 50, 100 ตามลำดับ",
+      "ค่าขอบ 2 กับ 3 และ 5 กับ 6 ถูกต้อง",
+      "ข้อมูลที่ผิด (ติดลบ) ไม่ถูกคิดค่าจอด",
     ],
-    "modelAnswer": "int age=60;if(age<0){System.out.println(\"invalid\");}else if(age<12){System.out.println(0);}else if(age<60){System.out.println(40);}else{System.out.println(20);} ตรวจตามลำดับและเลือกกิ่งแรกที่จริง"
+    modelAnswer: `public class Main {
+    public static void main(String[] args) {
+        int hours = 6;
+        if (hours < 0) {
+            System.out.println("invalid");
+        } else if (hours < 1) {
+            System.out.println(0);
+        } else if (hours < 3) {
+            System.out.println(20);
+        } else if (hours < 6) {
+            System.out.println(50);
+        } else {
+            System.out.println(100);
+        }
+    }
+}
+
+เปลี่ยน hours ทีละค่า ผลที่ได้: -1 → invalid, 0 → 0, 2 → 20, 3 → 50, 5 → 50, 6 → 100
+if / else if ตรวจจากบนลงล่างและเลือกกิ่งแรกที่เป็นจริง จึงตรวจค่าติดลบก่อน แล้วไล่ขอบเขตจากน้อยไปมาก`,
   },
   "java-loops": {
-    "prompt": "ประเมินบริบทใหม่ — เปิด documentation ได้ ไม่เปิดrubric/เฉลยก่อนส่ง: อ่านจำนวนงานผ่านตัวแปร: งานชิ้น1ใช้2นาที ชิ้น2ใช้4 ชิ้น3ใช้6 เพิ่มทีละ2นาที แต่รวมเวลาได้ไม่เกิน10 หยุดก่อนชิ้นที่ทำให้งบเกิน แสดงจำนวนชิ้นกับเวลารวม ทดลอง0ชิ้น,1ชิ้น,4ชิ้น เลือกวิธีเอง\nแนบโค้ด/คำสั่ง/ค่าทำนายและoutputหรือerrorจริง การส่งเป็นบันทึกความพยายาม ยังต้องเทียบเกณฑ์ด้วยตนเอง",
-    "rubric": [
-      "ผล0/0,1/2,2/6ตามกรณี",
-      "ไม่เพิ่มชิ้นที่ทำให้เกินก่อนหยุด",
-      "อธิบายตัวสะสม ตัวนับ และเงื่อนไขหยุด"
+    prompt: prompt(
+      "งานชิ้นที่ 1 ใช้เวลา 2 นาที ชิ้นที่ 2 ใช้ 4 ชิ้นที่ 3 ใช้ 6 เพิ่มชิ้นละ 2 นาที แต่รวมเวลาได้ไม่เกิน 10 นาที ให้หยุดก่อนชิ้นที่ทำให้เวลาเกิน",
+      "อ่านจำนวนงานผ่านตัวแปร jobs แสดงจำนวนชิ้นที่ทำได้กับเวลารวมในรูป ชิ้น:เวลา เช่น 2:6 ทดลอง 0 ชิ้น 1 ชิ้น และ 4 ชิ้น เลือกวิธีเอง",
+    ),
+    rubric: [
+      "ผล 0:0, 1:2 และ 2:6 ตามลำดับสำหรับ jobs 0, 1, 4",
+      "ไม่นับชิ้นที่ทำให้เวลาเกิน ก่อนหยุด",
+      "อธิบายตัวสะสม ตัวนับ และเงื่อนไขหยุด",
     ],
-    "modelAnswer": "int jobs=4;int done=0;int total=0;for(int job=1;job<=jobs;job++){int cost=job*2;if(total+cost>10)break;total+=cost;done++;}System.out.println(done+\":\"+total); ถ้ารวมก่อนตรวจจะนับงานที่เกินด้วย"
+    modelAnswer: `public class Main {
+    public static void main(String[] args) {
+        int jobs = 4;
+        int done = 0;
+        int total = 0;
+        for (int job = 1; job <= jobs; job++) {
+            int cost = job * 2;
+            if (total + cost > 10) {
+                break;
+            }
+            total += cost;
+            done++;
+        }
+        System.out.println(done + ":" + total);
+    }
+}
+
+jobs = 4 ได้ 2:6 (ชิ้นที่ 3 ใช้ 6 รวมเป็น 12 เกิน 10 จึงหยุดก่อนนับ) jobs = 1 ได้ 1:2 และ jobs = 0 ได้ 0:0
+total เป็นตัวสะสมเวลา done เป็นตัวนับชิ้น และ break หยุดเมื่อชิ้นถัดไปทำให้เกินงบ
+ถ้าบวก total ก่อนตรวจ จะนับชิ้นที่เกินเข้าไปด้วย`,
   },
   "java-switch": {
-    "prompt": "ประเมินบริบทใหม่ — เปิด documentation ได้ ไม่เปิดrubric/เฉลยก่อนส่ง: รับชื่อโหมดผ่านตัวแปร ไม่สนตัวพิมพ์และช่องว่างหัวท้าย: quietแสดงQ, normalแสดงN, loudแสดงL,อื่นแสดงunknown:พร้อมค่าหลังstrip ทดลอง \" QUIET \",\"normal\",\"Loud\",\"Fast\" ใช้switchเพื่อฝึกและอธิบายdefault\nแนบโค้ด/คำสั่ง/ค่าทำนายและoutputหรือerrorจริง การส่งเป็นบันทึกความพยายาม ยังต้องเทียบเกณฑ์ด้วยตนเอง",
-    "rubric": [
-      "Q,N,L,unknown:Fast",
-      "ไม่เกิดfallthroughและไม่ทำชื่อunknownหาย",
-      "อธิบายswitchเลือกตามค่ากับdefault"
+    prompt: prompt(
+      "รับชื่อโหมดผ่านตัวแปร ไม่สนตัวพิมพ์เล็กใหญ่และช่องว่างหัวท้าย: quiet แสดง Q, normal แสดง N, loud แสดง L, อื่น ๆ แสดง unknown: ตามด้วยค่าที่ตัดช่องว่างแล้ว",
+      "ทดลอง \" QUIET \", \"normal\", \"Loud\" และ \"Fast\" ใช้ switch และอธิบายหน้าที่ของ default",
+    ),
+    rubric: [
+      "ได้ Q, N, L และ unknown:Fast ตามลำดับ",
+      "ไม่เกิด fallthrough และไม่ทำชื่อใน unknown หาย",
+      "อธิบายว่า switch เลือกตามค่า และ default ทำงานเมื่อไม่ตรงทุก case",
     ],
-    "modelAnswer": "String raw=\"Fast\".strip();String result=switch(raw.toLowerCase()){case \"quiet\"->\"Q\";case \"normal\"->\"N\";case \"loud\"->\"L\";default->\"unknown:\"+raw;};System.out.println(result); ->คืนค่าของexpressionโดยไม่ไหลไปcaseถัดไป"
+    modelAnswer: `public class Main {
+    public static void main(String[] args) {
+        String raw = "Fast";
+        String mode = raw.strip();
+        String result = switch (mode.toLowerCase()) {
+            case "quiet" -> "Q";
+            case "normal" -> "N";
+            case "loud" -> "L";
+            default -> "unknown:" + mode;
+        };
+        System.out.println(result);
+    }
+}
+
+" QUIET " ได้ Q, "normal" ได้ N, "Loud" ได้ L และ "Fast" ได้ unknown:Fast
+switch แบบ -> คืนค่าของ expression และไม่ไหลต่อไปยัง case ถัดไป
+default ทำงานเมื่อไม่ตรงทุก case เก็บค่า mode ที่ตัดช่องว่างแล้วไว้ใช้ในข้อความ unknown`,
   },
   "java-methods": {
     "prompt": "ประเมินบริบทใหม่ — เปิด documentation ได้ ไม่เปิดrubric/เฉลยก่อนส่ง: ค่าตั๋วเริ่ม80 ส่วนลดเป็นบาทผ่านparameter แต่ยอดสุดท้ายต้องไม่ติดลบ สร้างmethodเลือกชื่อเองรับราคาและส่วนลด คืนยอด แล้วmethodอีกตัวจัดข้อความ Ticket: ยอด ทดสอบส่วนลด0,20,100กับราคา80 อธิบายreturnและpass-by-value\nแนบโค้ด/คำสั่ง/ค่าทำนายและoutputหรือerrorจริง การส่งเป็นบันทึกความพยายาม ยังต้องเทียบเกณฑ์ด้วยตนเอง",

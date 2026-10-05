@@ -107,7 +107,7 @@ export const javaOopLessons: Record<string, RichLesson> = {
     recap: ["constructor รับข้อมูลจำเป็นทั้งหมด", "ตรวจแล้ว throw ก่อนกำหนด", "this(...) และ toString"],
     traceHint: "สำหรับแต่ละ new ไล่ว่าเข้า constructor ไหน ผ่าน/ไม่ผ่านการตรวจข้อไหน และพิมพ์อะไร",
     practiceHints: ["constructor หลักตรวจสามเงื่อนไขตามลำดับ id, name, maxLoans", "constructor สั้นเรียก this(id, name, 3)", "toString คืน #id name (max n) และ main จับ IllegalArgumentException ตอนสร้าง Fon"],
-    acceptance: [local, "ตรวจเอง: พิมพ์ #1 Sea (max 3), #2 Ton (max 5) และ rejected: พร้อมค่า 0", "ตรวจเอง: ทั้งสาม field เป็น final ตาม starter และเฉลย; maxLoans ตรวจช่วง 1–10 ใน constructor"],
+    acceptance: [local, "ตรวจเอง: พิมพ์ #1 Sea (max 3), #2 Ton (max 5) และ rejected: พร้อมค่า 0", "ตรวจเอง: ทั้งสาม field เป็น final ตามที่ starter สั่งให้เพิ่ม; maxLoans ตรวจช่วง 1–10 ใน constructor"],
     solutionNotes: ["ข้อความระบุช่วงและค่าที่ผิด ทำให้ debug จาก log ได้โดยไม่ต้องเดา"],
     reflection: ["object ใดใน Library CLI ที่ไม่ควรมีอยู่ถ้าข้อมูลไม่ครบ"],
     extension: "เพิ่ม static factory Member.student(int id, String name) ที่คืน Member maxLoans 5 แล้วเทียบกับการใช้ constructor ตรง ๆ",
@@ -253,6 +253,7 @@ export const javaOopLessons: Record<string, RichLesson> = {
   "oop-project-library-2": {
     hook: "ห้องสมุดชุมชนต้องรู้ว่าใครยืมเล่มไหน ครบกำหนดเมื่อไร และค้างค่าปรับเท่าไร M2 รวม composition กับ collaboration เป็นระบบที่ตอบคำถามเหล่านี้ได้ทุกครั้งอย่างสอดคล้อง",
     explain: [
+      { heading: "0) split ที่ใช้ใน Main ของบทนี้", text: ["split(\"\\\\s+\") แยกด้วยช่องว่างหรือแท็บติดกันกี่ตัวก็ได้ (หนึ่งตัวขึ้นไป) นับเป็นตัวคั่นเดียว ต่างจาก split(\" \") ที่ช่องว่างซ้อนกันจะทำให้ได้ชิ้นว่างปนมา ในโค้ด Java ต้องเขียน backslash สองตัว (\\\\s) เพราะ backslash ในข้อความต้อง escape ตัวคั่นของ split เป็น regular expression ใช้เพียงรูปนี้ในบทนี้ ไม่ต้องเรียน regex เพิ่ม", "ถ้า line ว่างหรือมีแต่ช่องว่าง ผลของ split อาจเป็น array ที่ไม่มีชิ้นให้ใช้หรือมีแต่ชิ้นว่าง จึงต้องตรวจบรรทัดว่างก่อนอ่าน words[0]"] },
       { heading: "1) ข้อกำหนดก่อน", text: ["ลำดับการตรวจของ borrow ถูกกำหนดไว้ จึงเขียน expected-output ได้ก่อนเขียนโค้ด", "วันเป็นตัวเลข (day 20) ทำให้ทดสอบค่าปรับได้แน่นอนโดยไม่พึ่งนาฬิกาจริง"] },
       { heading: "2) Loan เชื่อมสองฝ่าย", text: ["Book รู้ Loan ปัจจุบัน Member รู้รายการ Loan", "list แสดงผู้ยืมจาก loan.member() ไม่ใช่ข้อมูลซ้ำ"] },
       { heading: "3) Main แปลง input", text: ["Integer ที่เป็น null แทนการแปลงไม่ได้ ทำให้ตรวจ usage ได้ที่เดียว", "ข้อความ exception จาก Library ตรงตามข้อกำหนด Main แค่พิมพ์"] },
@@ -481,6 +482,7 @@ export const javaOopLessons: Record<string, RichLesson> = {
   "oop-project-library-3": {
     hook: "ห้องสมุดใช้ M2 ได้ทั้งวัน แต่ปิดโปรแกรมแล้วทุกอย่างหาย capstone นี้ทำให้ข้อมูลอยู่รอด โดยไม่ทำให้กติกาที่สร้างมาตลอดคอร์สอ่อนลงเมื่อโหลดไฟล์ที่อาจเสีย",
     explain: [
+      { heading: "0) split แบบเก็บ field ว่าง", text: ["\"\\t\" คืออักขระ tab หนึ่งตัวในข้อความ Java ไฟล์บันทึกใช้ tab คั่น field ได้เพราะชื่อหรือข้อความมีช่องว่างปนได้", "line.split(\"\\t\", -1) ตัวเลขที่สองคือ limit ถ้าเป็นลบจะเก็บ field ว่างท้ายบรรทัดไว้ด้วย ค่าปกติ (ไม่ใส่ limit) ตัด field ว่างท้ายบรรทัดทิ้ง ทำให้นับ field ผิดและตรวจบรรทัดที่ขาดข้อมูลไม่ได้"] },
       { heading: "1) แยกการตีความออกจากไฟล์", text: ["Library.snapshot() / restore(List<String>) ไม่รู้จักไฟล์ test ได้ในหน่วยความจำ", "LibraryStore เป็นที่เดียวที่ใช้ Files"] },
       { heading: "2) โหลดผ่านกติกาเดิม", text: ["restore สร้างด้วย constructor และ attach/addLoan เดิม ไฟล์เสียจึงสร้าง Library ผิดรูปไม่ได้", "บรรทัดผิดได้ LibraryDataException พร้อมเลขบรรทัดและ cause"] },
       { heading: "3) test ด้วย @TempDir", text: ["JUnit สร้างโฟลเดอร์ชั่วคราวให้และลบให้", "ทดสอบ round trip, id ต่อเนื่อง, ไฟล์หาย, ไฟล์เสีย และคำสั่ง CLI"] },

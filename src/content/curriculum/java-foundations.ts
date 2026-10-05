@@ -797,7 +797,7 @@ public class Main {
     }
 }`,
   bugCheck: {kind: "compile", message: "the switch expression does not cover all possible input values"},
-  bugExplanation: "compile error: “the switch expression does not cover all possible input values” switch expression ต้องคืนค่าได้ทุกกรณี แต่ int มีค่าอื่นนอกจาก 1–7 (เช่น 0 หรือ 99) เพิ่ม default -> \"วันไม่ถูกต้อง\" หรือ default -> throw new IllegalArgumentException(\"day: \" + day); ถ้าค่าที่ไม่ถูกต้องควรถือว่าเป็นความผิดพลาด",
+  bugExplanation: "compile error: “the switch expression does not cover all possible input values” switch expression ต้องคืนค่าได้ทุกกรณี แต่ int มีค่าอื่นนอกจาก 1–7 (เช่น 0 หรือ 99) เพิ่ม default -> \"วันไม่ถูกต้อง\" ที่แสดงข้อความหรือค่าที่บอกว่าวันไม่ถูกต้อง (การโยน exception ด้วย throw จะเรียนในบท java-exceptions-basic)",
   vocabulary: [v("switch expression", "switch ที่คืนค่าได้"), v("arrow case (->)", "เคสที่ทำแค่ฝั่งขวาแล้วจบ ไม่ไหลต่อ"), v("fall-through", "การไหลไปทำเคสถัดไปเมื่อไม่มี break ใน switch แบบเก่า"), v("yield", "คืนค่าจากเคสแบบ block ใน switch expression"), v("default", "เคสสำหรับค่าที่ไม่ตรงเคสใด"), v("exhaustive", "ครอบคลุมทุกค่าที่เป็นไปได้")],
 },
 {

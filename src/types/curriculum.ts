@@ -45,6 +45,13 @@ export type OutputCheck = {
   wrongAnswers?: string[];
 };
 
+// compile: javac fails and its output contains `message` · runtime: compiles, then the run fails with `message`
+// in its output · logic: compiles and runs normally but prints `output` (the wrong result the lesson explains).
+export type BugCheck =
+  | { kind: "compile"; message: string }
+  | { kind: "runtime"; message: string; stdin?: string }
+  | { kind: "logic"; output: string; stdin?: string };
+
 export type TopicSource = {
   id: string;
   courseId: string;
@@ -69,8 +76,11 @@ export type TopicSource = {
   requires?: string[];
   // Standard input fed to `example` when it is verified (Java Scanner lessons); shown to the learner in the lesson text.
   stdin?: string;
-  // Expected output of `solution` (with optional input), checked by scripts/verify-java-lessons.ts.
-  solutionCheck?: { stdin?: string; output: string };
+  // What `solution` must do, checked by scripts/verify-java-lessons.ts: print `output` for `stdin`,
+  // and/or pass exactly `junitTests` JUnit tests with no failures.
+  solutionCheck?: { stdin?: string; output?: string; junitTests?: number };
+  // What `buggy` really does, checked by scripts/verify-java-lessons.ts so bugExplanation cannot drift from it.
+  bugCheck?: BugCheck;
   // Marks a topic rewritten to the lesson standard in docs/COURSE-PLAN.md; tests then require every part.
   standard?: "v3";
   // Topic IDs to review first; must exist and come earlier in the learning order.

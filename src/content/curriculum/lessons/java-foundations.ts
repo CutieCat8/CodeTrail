@@ -406,7 +406,7 @@ export const javaFoundationLessons: Record<string, RichLesson> = {
       "Integer.MAX_VALUE + 1 วนไปเป็น -2147483648",
       "3_000_000_000L เกิน int จึงต้องเป็น long",
       "0.1 + 0.2 ได้ 0.30000000000000004 ส่วนสตางค์ 10 + 20 ได้ 30 พอดี",
-      "Math.addExact โยน ArithmeticException แทนการวนเงียบ ๆ",
+      "ถ้าต้องการให้ overflow ไม่เงียบ ใช้ Math.addExact ซึ่งโยน ArithmeticException (บท java-exceptions-basic สอนการจับ)",
     ],
     pitfalls: [
       "ใช้ int กับยอดสะสมที่โตได้ไม่จำกัด",
@@ -460,9 +460,9 @@ export const javaFoundationLessons: Record<string, RichLesson> = {
     },
     explain: [
       {
-        heading: "1) method คืนค่าใหม่เสมอ",
+        heading: "1) method ไม่แก้ตัวเดิม",
         text: [
-          "String เปลี่ยนไม่ได้ (immutable) trim/strip/toUpperCase/replace คืน String ใหม่ ต้องรับผลไว้",
+          "String เปลี่ยนไม่ได้ (immutable) strip/toUpperCase/replace ไม่แก้ตัวเดิมแต่คืนผลออกมา (ถ้าไม่มีอะไรต้องเปลี่ยนอาจคืน object เดิม) ต้องรับผลไว้เสมอ",
           "ข้อดี: ส่ง String ไปที่ไหนก็ไม่มีใครแก้ของเราได้",
         ],
       },
@@ -534,9 +534,9 @@ export const javaFoundationLessons: Record<string, RichLesson> = {
     hook: "ค่าเฉลี่ยรีวิว 4.5 ดาวกลายเป็น 22.0 ในหน้าจอ เพราะสองบรรทัดเล็ก ๆ: ต่อข้อความก่อนแปลงเป็นตัวเลข และหารจำนวนเต็มก่อนเก็บเป็นทศนิยม การแปลงชนิดต้องตั้งใจทุกครั้ง",
     explain: [
       {
-        heading: "1) แปลงอัตโนมัติเมื่อไม่เสียข้อมูล",
+        heading: "1) แปลงอัตโนมัติจากแคบไปกว้าง",
         text: [
-          "int → long → double ทำให้อัตโนมัติ (widening) และใน expression ผสมชนิดค่าจะถูกยกเป็นชนิดที่กว้างกว่า",
+          "int → long → double ทำให้อัตโนมัติ (widening) และใน expression ผสมชนิดค่าจะถูกยกเป็นชนิดที่กว้างกว่า ส่วนใหญ่ค่าไม่เปลี่ยน แต่ long ที่ใหญ่เกิน 2^53 เมื่อกลายเป็น double จะถูกปัด (double เก็บตัวเลขนัยสำคัญได้ประมาณ 15–16 หลัก)",
           "ถ้าอาจเสียข้อมูล (double → int, long → int) ต้อง cast เอง compiler บังคับให้ตั้งใจ",
         ],
       },
@@ -550,7 +550,7 @@ export const javaFoundationLessons: Record<string, RichLesson> = {
       {
         heading: "3) ข้อความ ↔ ตัวเลข",
         text: [
-          "Integer.parseInt(\"42\"), Double.parseDouble(\"4.5\") ข้อความต้องเป็นตัวเลขล้วน (ช่องว่างรอบนอกก็ไม่ได้ ใช้ strip ก่อน)",
+          "Integer.parseInt(\"42\") ต้องเป็นตัวเลขล้วน ช่องว่างรอบนอกก็ไม่ได้ ส่วน Double.parseDouble(\" 4.5 \") ยอมรับช่องว่างรอบนอก — strip() ก่อน parse ทุกครั้งเพื่อไม่ต้องจำความต่างนี้",
           "ข้อความผิดรูปแบบได้ NumberFormatException ตอนรัน บท java-exceptions-basic จะจับและขอ input ใหม่",
         ],
       },
@@ -765,14 +765,14 @@ export const javaFoundationLessons: Record<string, RichLesson> = {
       },
     ],
     walkthrough: [
-      "แต่ละคำสั่งแปลงเป็นตัวพิมพ์เล็กก่อน LS จึงตรงเคส list/ls",
+      "input มาจาก stdin ทีละบรรทัด switch ใช้ตัวพิมพ์เล็ก LS จึงตรงเคส list/ls แต่ข้อความตอบกลับยังแสดง raw ตามที่พิมพ์",
       "help ใช้ block และ yield",
-      "dance ไม่ตรงเคสใดจึงเข้า default",
+      "Dance ไม่ตรงเคสใดจึงเข้า default และแสดงตามตัวพิมพ์เดิม",
       "switch แบบเก่าของ day = 6 ไหลไปเคส 7 เพราะไม่มี break",
     ],
     pitfalls: [
       "switch expression ที่ไม่มี default",
-      "switch บนค่าที่เป็น null: NullPointerException",
+      "switch บนค่าที่เป็น null โดยไม่มี case null: NullPointerException",
       "ลืม break ใน switch แบบเก่า",
       "ใส่ logic ยาวในเคสแทนการเรียก method",
     ],
@@ -787,16 +787,17 @@ export const javaFoundationLessons: Record<string, RichLesson> = {
     ],
     traceHint: "สำหรับแต่ละค่า หาเคสแรกที่ตรง (หรือ default) แล้วเขียนผล สำหรับแบบเก่า ไล่ต่อไปจนเจอ break",
     practiceHints: [
-      "ตรวจบรรทัดว่างด้วย isEmpty() แล้ว continue ก่อนถึง switch",
+      "เก็บ raw = บรรทัดหลัง strip() ไว้แสดงผล และ command = raw.toLowerCase() ไว้เลือกเคส ตรวจบรรทัดว่างแล้ว continue ก่อนถึง switch",
       "switch expression มีสี่เคส: add, list/ls, quit, default",
       "หลังพิมพ์ผล ถ้าเป็น quit ให้ break ออกจาก while",
     ],
     acceptance: [
       local,
-      "ตรวจเอง: input add / LS / (ว่าง) / jump / quit / add ได้สี่บรรทัดตามโจทย์ และ add ตัวสุดท้ายไม่ถูกประมวลผล",
+      "ตรวจเอง: input add / LS / (ว่าง) / Jump / quit / add ได้สี่บรรทัดตามโจทย์ (unknown: Jump คงตัวพิมพ์เดิม) และ add ตัวสุดท้ายไม่ถูกประมวลผล",
     ],
     solutionNotes: [
-      "break ใน switch แบบลูกศรใช้ไม่ได้ break ในเฉลยจึงอยู่นอก switch และออกจาก while",
+      "break ภายใน switch expression ใช้ไม่ได้ (ต้องคืนค่าด้วย yield) ส่วนใน switch statement แบบลูกศรใช้ break ได้และออกแค่จาก switch — break ในเฉลยจึงวางไว้หลัง switch expression เพื่อออกจาก while",
+      "reply ของคำสั่งที่ไม่รู้จักใช้ raw (ข้อความที่พิมพ์ หลังตัดช่องว่าง) ส่วนการเลือกเคสใช้ตัวพิมพ์เล็ก ผู้ใช้จึงเห็นสิ่งที่ตัวเองพิมพ์จริง",
     ],
     reflection: [
       "ถ้าคำสั่งมีเพิ่มเป็น 20 คำสั่ง switch นี้ยังอ่านง่ายไหม และอะไรจะช่วยได้",
@@ -1040,7 +1041,7 @@ export const javaFoundationLessons: Record<string, RichLesson> = {
         heading: "2) wrapper และ autoboxing",
         text: [
           "ArrayList<int> ใช้ไม่ได้ ต้องเป็น ArrayList<Integer> Java แปลง int ↔ Integer ให้เอง",
-          "Integer เป็น object: เทียบด้วย equals ไม่ใช่ == (== ใช้ได้เฉพาะค่าที่ถูก cache −128 ถึง 127 ซึ่งเป็นกับดักอีกแบบ)",
+          "Integer เป็น object: เทียบค่าสองตัวด้วย equals เสมอ == เทียบว่าเป็น object เดียวกัน ซึ่งบางครั้งดูเหมือนถูกเพราะ Java เก็บ Integer ของค่าเล็ก ๆ (อย่างน้อย −128 ถึง 127) ไว้ใช้ซ้ำ — อย่าพึ่งพฤติกรรมนี้",
         ],
         code: java`public class Main {
     public static void main(String[] args) {
@@ -1303,13 +1304,13 @@ export const javaFoundationLessons: Record<string, RichLesson> = {
     ],
     acceptance: [
       local,
-      "ตรวจเอง: input ตัวอย่างในโจทย์ได้ผลตรงกับ expected-output ที่เขียนไว้ทุกบรรทัด (diff ไม่มีความต่าง)",
+      "ตรวจเอง: java -cp out library.Main < test-input.txt ได้ผลตรงกับ expected-output.txt ทุกบรรทัด (diff ไม่มีความต่าง)",
       "ตรวจเอง: ทุกข้อความตอบกลับในข้อกำหนดปรากฏอย่างน้อยหนึ่งครั้งใน test-input",
       "ตรวจเอง: compile/run แบบหลายไฟล์ด้วย javac -d out และ java -cp out library.Main",
     ],
     solutionNotes: [
       "Integer.valueOf ไม่จำเป็นใน ids.indexOf(id) เพราะ id เป็น int ที่ถูก autobox เป็น Integer และ indexOf ใช้ equals เทียบค่า",
-      "บรรทัดหลัง quit (add ignored) ไม่ถูกประมวลผล ยืนยันว่า break ออกจาก loop ทันที",
+      "test-input.txt ในเฉลยมีทุกข้อความตอบกลับของข้อกำหนดอย่างน้อยหนึ่งครั้ง และบรรทัดหลัง quit (add ignored) ไม่ถูกประมวลผล ยืนยันว่า break ออกจาก loop ทันที",
       "ตัวแปร static ใน Catalog ทำให้มี catalog ได้แค่ชุดเดียวทั้งโปรแกรม — M1 จะแก้ด้วยการสร้าง object",
     ],
     reflection: [

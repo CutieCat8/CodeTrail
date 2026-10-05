@@ -19,7 +19,8 @@ export const javaFoundationTopics: TopicSource[] = [
   language: "java",
   standard: "v3",
   prerequisites: ["dev-terminal", "dev-errors"],
-  example: java`public class QuestStart {
+  example: java`// File: QuestStart.java
+public class QuestStart {
     public static void main(String[] args) {
         System.out.println("Ready");
         System.out.println("Java " + Runtime.version().feature());
@@ -30,13 +31,15 @@ export const javaFoundationTopics: TopicSource[] = [
   tracePrompt: "สั่ง javac QuestStart.java แล้ว java QuestStart ไฟล์ไหนถูกสร้างขึ้น คำสั่งไหนเริ่ม JVM และถ้าลบ QuestStart.class ทิ้งก่อนสั่ง java QuestStart จะเกิดอะไร",
   traceAnswer: "javac สร้าง QuestStart.class (ไม่เริ่มโปรแกรม) java QuestStart เริ่ม JVM แล้วโหลด class ชื่อ QuestStart จาก classpath (โฟลเดอร์ปัจจุบัน) ถ้าลบ .class ทิ้ง JVM หา class ไม่เจอ ได้ “Error: Could not find or load main class QuestStart” ซึ่งเป็นปัญหาตอนรัน ไม่ใช่ปัญหาของ source",
   practicePrompt: "ในเครื่อง: ติดตั้ง JDK 21 (เช่น Eclipse Temurin 21) แล้วสร้าง QuestStart.java ที่พิมพ์สองบรรทัด: Ready และ Java ตามด้วย feature version (Runtime.version().feature()) ทำสองวิธี: (1) javac QuestStart.java แล้ว java QuestStart (2) java QuestStart.java แล้วเขียนว่าวิธีไหนสร้างไฟล์ .class",
-  starter: java`public class QuestStart {
+  starter: java`// File: QuestStart.java
+public class QuestStart {
     public static void main(String[] args) {
         // บรรทัดที่ 1: Ready
         // บรรทัดที่ 2: Java ตามด้วยเลข version จาก Runtime.version().feature()
     }
 }`,
-  solution: java`public class QuestStart {
+  solution: java`// File: QuestStart.java
+public class QuestStart {
     public static void main(String[] args) {
         System.out.println("Ready");
         System.out.println("Java " + Runtime.version().feature());
@@ -48,6 +51,7 @@ public class Start {
         System.out.println("Ready");
     }
 }`,
+  bugCheck: {kind: "compile", message: "class Start is public, should be declared in a file named Start.java"},
   bugExplanation: "javac แจ้ง “class Start is public, should be declared in a file named Start.java” public class ต้องชื่อตรงกับชื่อไฟล์ (ตัวพิมพ์เล็ก/ใหญ่ต้องตรง) แก้โดยเปลี่ยนเป็น public class QuestStart หรือเปลี่ยนชื่อไฟล์เป็น Start.java นี่คือ compile error: โปรแกรมยังไม่ได้เริ่มเลย",
   vocabulary: [v("JDK", "ชุดเครื่องมือพัฒนา Java มี javac, java และ library มาตรฐาน"), v("javac", "compiler แปลง .java เป็น .class"), v("bytecode", "คำสั่งกลางในไฟล์ .class ที่ JVM เข้าใจ"), v("JVM", "โปรแกรมที่โหลดและทำงานตาม bytecode"), v("compile error", "ข้อผิดพลาดที่ javac พบก่อนโปรแกรมเริ่ม"), v("runtime error", "ข้อผิดพลาดที่เกิดระหว่างโปรแกรมทำงาน")],
 },
@@ -96,6 +100,7 @@ public class Start {
         system.out.println("เปิด 09:00-18:00");
     }
 }`,
+  bugCheck: {kind: "compile", message: "';' expected"},
   bugExplanation: "มีสอง compile error: บรรทัดแรกขาด ; (javac แจ้ง “';' expected”) และ system ต้องเป็น System (Java แยกตัวพิมพ์ ชื่อ system ไม่มีอยู่ javac แจ้ง “package system does not exist”) javac อาจรายงานทีละจุด แก้จุดแรกแล้ว compile ใหม่",
   vocabulary: [v("class", "หน่วยที่ใช้จัดกลุ่มโค้ด ทุกโค้ด Java อยู่ใน class"), v("main", "method ที่ JVM เรียกเป็นจุดเริ่ม"), v("statement", "คำสั่งหนึ่งหน่วย จบด้วย ;"), v("block", "กลุ่ม statement ใน { }"), v("args", "array ของข้อความจาก command line"), v("case-sensitive", "ตัวพิมพ์เล็ก/ใหญ่ต่างกันเป็นคนละชื่อ")],
 },
@@ -149,6 +154,7 @@ public class Start {
         System.out.printf("Fine: %d%n", fine);
     }
 }`,
+  bugCheck: {kind: "runtime", message: "IllegalFormatConversionException: d != java.lang.Double"},
   bugExplanation: "compile ผ่าน แต่ตอนรันได้ IllegalFormatConversionException: d != java.lang.Double เพราะ %d ใช้กับจำนวนเต็มเท่านั้น javac ไม่ได้ตรวจ format string ให้ แก้เป็น %.2f (หรือ %s ถ้าไม่สนรูปแบบ)",
   vocabulary: [v("println", "พิมพ์แล้วขึ้นบรรทัดใหม่"), v("print", "พิมพ์โดยไม่ขึ้นบรรทัดใหม่"), v("printf", "พิมพ์ตาม format string"), v("format specifier", "ตำแหน่งแทนค่าใน format เช่น %d %s %.2f"), v("%n", "ขึ้นบรรทัดใหม่ใน printf"), v("String.format", "สร้างข้อความตาม format โดยไม่พิมพ์")],
 },
@@ -207,6 +213,7 @@ public class Start {
         System.out.println("อ่านไปแล้ว " + percent + "%");
     }
 }`,
+  bugCheck: {kind: "logic", output: "อ่านไปแล้ว 0.0%"},
   bugExplanation: "พิมพ์ อ่านไปแล้ว 0.0% เพราะ pagesRead / pages เป็นการหารจำนวนเต็มได้ 0 ก่อนจะคูณ 100 และแปลงเป็น double ตอนเก็บ การประกาศ percent เป็น double ไม่ได้เปลี่ยนการคำนวณฝั่งขวา แก้โดยให้ฝั่งใดฝั่งหนึ่งเป็น double ก่อนหาร เช่น pagesRead * 100.0 / pages ได้ 40.0",
   vocabulary: [v("literal", "ค่าที่เขียนตรง ๆ ในโค้ด"), v("expression", "ส่วนของโค้ดที่คำนวณได้เป็นค่า"), v("operator precedence", "ลำดับว่า operator ใดทำก่อน"), v("integer division", "การหารจำนวนเต็มที่ตัดเศษทิ้ง"), v("%", "เศษจากการหาร"), v("string concatenation", "การต่อข้อความด้วย +")],
 },
@@ -217,7 +224,7 @@ public class Start {
   title: "ตัวแปร: ประกาศ กำหนดค่า เปลี่ยนค่า และ final",
   objective: "ประกาศตัวแปรพร้อมชนิด กำหนดและเปลี่ยนค่า ใช้ += ++ ได้ถูกต้อง ใช้ final กับค่าที่ไม่ควรเปลี่ยน และรู้ว่า var อนุมานชนิดได้แต่ชนิดยังคงที่",
   why: "ตัวแปรคือสิ่งที่โปรแกรมจำไว้ระหว่างทำงาน Java บังคับชนิดตั้งแต่ประกาศ ทำให้ compiler จับ bug ได้ก่อนรัน แต่ต้องเข้าใจกติกา เช่นใช้ตัวแปรก่อนกำหนดค่าไม่ได้",
-  explanation: "ประกาศด้วย ชนิด ชื่อ = ค่า; เช่น int copies = 3; หลังประกาศเปลี่ยนค่าได้ด้วย = แต่เปลี่ยนชนิดไม่ได้ ตัวแปรภายใน method ต้องกำหนดค่าก่อนอ่าน (ไม่งั้น compile error “might not have been initialized”) shorthand: x += 2 คือ x = x + 2, x++ เพิ่ม 1 final ทำให้กำหนดค่าได้ครั้งเดียว (ใช้กับค่าคงที่ ตั้งชื่อแบบ UPPER_SNAKE_CASE) var (Java 10+) ให้ compiler อนุมานชนิดจากค่าเริ่มต้น var count = 3; คือ int ตลอดไป ไม่ใช่ตัวแปรไร้ชนิด ชื่อตัวแปรใช้ camelCase และสื่อความหมาย",
+  explanation: "ประกาศด้วย ชนิด ชื่อ = ค่า; เช่น int copies = 3; หลังประกาศเปลี่ยนค่าได้ด้วย = แต่เปลี่ยนชนิดไม่ได้ ตัวแปรภายใน method ต้องกำหนดค่าก่อนอ่าน (ไม่งั้น compile error “might not have been initialized”) shorthand: กับตัวแปร int ในบทนี้ x += 2 ให้ผลเหมือน x = x + 2 และ x++ เพิ่ม 1 (ในภาษาจริง += ยังแปลงชนิดกลับให้อัตโนมัติด้วย เช่นกับ short จึงไม่ใช่การเขียนแทนกันแบบตรงตัวทุกกรณี) final ทำให้กำหนดค่าได้ครั้งเดียว (ใช้กับค่าคงที่ ตั้งชื่อแบบ UPPER_SNAKE_CASE) var (Java 10+) ให้ compiler อนุมานชนิดจากค่าเริ่มต้น var count = 3; คือ int ตลอดไป ไม่ใช่ตัวแปรไร้ชนิด ชื่อตัวแปรใช้ camelCase และสื่อความหมาย",
   language: "java",
   standard: "v3",
   prerequisites: ["java-expressions"],
@@ -269,6 +276,7 @@ public class Start {
         System.out.println(fine + MAX_LOANS);
     }
 }`,
+  bugCheck: {kind: "compile", message: "cannot assign a value to final variable MAX_LOANS"},
   bugExplanation: "compile error สองจุด: กำหนดค่าใหม่ให้ final (“cannot assign a value to final variable MAX_LOANS”) และอ่าน fine ก่อนกำหนดค่า (“variable fine might not have been initialized”) แก้โดยไม่เปลี่ยนค่าคงที่ (ถ้าต้องเปลี่ยนจริงให้เลิกใช้ final) และกำหนด int fine = 0; ก่อนใช้",
   vocabulary: [v("variable", "ชื่อที่ผูกกับที่เก็บค่า"), v("declaration", "การประกาศชนิดและชื่อ"), v("assignment", "การกำหนดค่าด้วย ="), v("final", "กำหนดค่าได้ครั้งเดียว"), v("var", "ให้ compiler อนุมานชนิดจากค่าเริ่มต้น"), v("camelCase", "รูปแบบชื่อ เช่น maxLoans")],
 },
@@ -279,7 +287,7 @@ public class Start {
   title: "primitive types: int, long, double, boolean, char และช่วงค่า",
   objective: "เลือก primitive type ให้เหมาะกับข้อมูล อธิบาย overflow ของ int และความคลาดเคลื่อนของ double ได้ และรู้ว่าเมื่อไรควรใช้ long หรือ BigDecimal",
   why: "ค่าที่เกินช่วงของ int ไม่ error แต่กลายเป็นเลขติดลบเงียบ ๆ และ 0.1 + 0.2 ไม่เท่ากับ 0.3 พอดี bug แบบนี้หายากเพราะโปรแกรมไม่ล่ม",
-  explanation: "Java มี primitive 8 ชนิด ที่ใช้บ่อย: int (จำนวนเต็ม 32 bit ประมาณ ±2.1 พันล้าน), long (64 bit ใส่ L ท้าย literal เช่น 3_000_000_000L), double (ทศนิยม 64 bit), boolean (true/false), char (ตัวอักษรหนึ่งหน่วย UTF-16 ใน ' ') เกินช่วงของ int จะ overflow วนไปฝั่งลบโดยไม่มี error Math.addExact โยน ArithmeticException แทนถ้าต้องการให้รู้ตัว double เก็บทศนิยมฐานสองจึงแทน 0.1 ได้ไม่พอดี เงินที่ต้องแม่นยำใช้หน่วยเล็กสุดเป็น long (สตางค์) หรือ BigDecimal ใช้ _ คั่นตัวเลขยาวให้อ่านง่ายได้ (1_000_000) ค่าสูงสุดดูได้จาก Integer.MAX_VALUE",
+  explanation: "Java มี primitive 8 ชนิด ที่ใช้บ่อย: int (จำนวนเต็ม 32 bit ประมาณ ±2.1 พันล้าน), long (64 bit ใส่ L ท้าย literal เช่น 3_000_000_000L), double (ทศนิยม 64 bit), boolean (true/false), char (ตัวอักษรหนึ่งหน่วย UTF-16 ใน ' ') เกินช่วงของ int จะ overflow วนไปฝั่งลบโดยไม่มี error Math.addExact(a, b) โยน ArithmeticException แทนการวนเงียบ ๆ ถ้าต้องการให้รู้ตัว (การจับ exception อยู่ในบท java-exceptions-basic) double เก็บทศนิยมฐานสองจึงแทน 0.1 ได้ไม่พอดี เงินที่ต้องแม่นยำใช้หน่วยเล็กสุดเป็น long (สตางค์) หรือ BigDecimal ใช้ _ คั่นตัวเลขยาวให้อ่านง่ายได้ (1_000_000) ค่าสูงสุดดูได้จาก Integer.MAX_VALUE",
   language: "java",
   standard: "v3",
   prerequisites: ["java-variables"],
@@ -297,14 +305,9 @@ public class Start {
         char grade = 'A';
         boolean member = true;
         System.out.println(grade + " " + member);
-        try {
-            Math.addExact(Integer.MAX_VALUE, 1);
-        } catch (ArithmeticException e) {
-            System.out.println("addExact: " + e.getMessage());
-        }
     }
 }`,
-  expectedOutput: "2147483647\n-2147483648\n3000000000\n0.30000000000000004\n0.3 บาท\nA true\naddExact: integer overflow",
+  expectedOutput: "2147483647\n-2147483648\n3000000000\n0.30000000000000004\n0.3 บาท\nA true",
   solutionCheck: { output: "2500000001\n60.60 บาท" },
   tracePrompt: "int ms = 30 * 24 * 60 * 60 * 1000; คำนวณมิลลิวินาทีใน 30 วัน ผลถูกไหม และแก้ด้วยการเปลี่ยนเป็น long ms = 30 * 24 * 60 * 60 * 1000; ได้ไหม",
   traceAnswer: "ค่าจริงคือ 2,592,000,000 ซึ่งเกิน int จึง overflow ได้ค่าติดลบ (-1702967296) การเปลี่ยนชนิดตัวแปรฝั่งซ้ายเป็น long ไม่พอ เพราะฝั่งขวายังคูณแบบ int และ overflow ก่อนเก็บ ต้องให้ตัวแรกเป็น long: 30L * 24 * 60 * 60 * 1000",
@@ -339,6 +342,7 @@ public class Start {
         }
     }
 }`,
+  bugCheck: {kind: "logic", output: "ยอดไม่ตรง: 0.30000000000000004"},
   bugExplanation: "พิมพ์ ยอดไม่ตรง: 0.30000000000000004 เพราะ double แทน 0.1 และ 0.2 ได้ไม่พอดี การเทียบ == กับทศนิยมจึงเชื่อไม่ได้ สำหรับเงินให้เก็บเป็นจำนวนเต็มของหน่วยเล็กสุด (10 + 20 สตางค์ == 30) หรือใช้ BigDecimal ส่วนค่าทางวิทยาศาสตร์ให้เทียบว่าห่างกันน้อยกว่าค่าที่ยอมรับได้ Math.abs(a - b) < 1e-9",
   vocabulary: [v("primitive type", "ชนิดพื้นฐาน 8 ชนิดที่เก็บค่าโดยตรง"), v("int / long", "จำนวนเต็ม 32 / 64 bit"), v("double", "ทศนิยมฐานสอง 64 bit มีความคลาดเคลื่อน"), v("overflow", "ค่าเกินช่วงแล้ววนไปอีกฝั่งโดยไม่มี error"), v("char", "ตัวอักษรหนึ่งหน่วยใน ' '"), v("BigDecimal", "ชนิดทศนิยมฐานสิบที่แม่นยำ เหมาะกับเงิน")],
 },
@@ -349,7 +353,7 @@ public class Start {
   title: "String: methods, equals และ immutability",
   objective: "ใช้ methods ที่พบบ่อยของ String (length, strip, toUpperCase, contains, substring, indexOf, split, isBlank) เทียบข้อความด้วย equals/equalsIgnoreCase และอธิบายว่า String เปลี่ยนค่าไม่ได้",
   why: "input จากผู้ใช้ทุกชิ้นเข้ามาเป็นข้อความ การเทียบ String ด้วย == เป็น bug คลาสสิกที่บางครั้งดูเหมือนทำงานได้ และการลืมว่า method ของ String คืนค่าใหม่ทำให้การแก้ข้อความหายไปเงียบ ๆ",
-  explanation: "String เป็น object ไม่ใช่ primitive method ทุกตัวคืนค่าใหม่และไม่แก้ตัวเดิม (immutable): name.strip(); เฉย ๆ ไม่มีผล ต้องเขียน name = name.strip(); เทียบเนื้อหาด้วย a.equals(b) หรือ equalsIgnoreCase เพราะ == เทียบว่าเป็น object เดียวกันไหม (literal ที่เหมือนกันอาจถูกใช้ร่วมกันจนทำให้ == ดูเหมือนถูกในบางกรณี แต่ข้อความจาก input หรือการต่อข้อความตอนรันมักเป็นคนละ object) index เริ่มที่ 0, substring(begin, end) ไม่รวม end, indexOf คืน -1 เมื่อไม่พบ, split(\",\") คืน String[] strip() ตัดช่องว่างแบบ Unicode (Java 11+) isBlank() ว่างหรือมีแต่ช่องว่าง",
+  explanation: "String เป็น object ไม่ใช่ primitive method อย่าง strip/toUpperCase ไม่แก้ตัวเดิม (immutable) แต่คืนผลออกมา (อาจเป็น object เดิมถ้าไม่มีอะไรเปลี่ยน): name.strip(); เฉย ๆ ไม่มีผล ต้องเขียน name = name.strip(); เทียบเนื้อหาด้วย a.equals(b) หรือ equalsIgnoreCase เพราะ == เทียบว่าเป็น object เดียวกันไหม (literal ที่เหมือนกันอาจถูกใช้ร่วมกันจนทำให้ == ดูเหมือนถูกในบางกรณี แต่ข้อความจาก input หรือการต่อข้อความตอนรันมักเป็นคนละ object) index เริ่มที่ 0, substring(begin, end) ไม่รวม end, indexOf คืน -1 เมื่อไม่พบ, split(\",\") คืน String[] ซึ่งเป็น array ของข้อความ อ่านช่องแรกด้วย parts[0] ช่องถัดไป parts[1] และจำนวนช่องด้วย parts.length (รายละเอียดของ array อยู่ในบท java-arrays) strip() ตัดช่องว่างแบบ Unicode (Java 11+) isBlank() ว่างหรือมีแต่ช่องว่าง",
   language: "java",
   standard: "v3",
   prerequisites: ["java-primitives"],
@@ -402,6 +406,7 @@ public class Start {
         }
     }
 }`,
+  bugCheck: {kind: "logic", output: "ไม่รู้จักคำสั่ง help"},
   bugExplanation: "พิมพ์ ไม่รู้จักคำสั่ง help มีสองปัญหา: command.toUpperCase(); ไม่ได้เก็บผลจึงยังเป็นตัวเล็ก และ == เทียบว่าเป็น object เดียวกัน ไม่ใช่เนื้อหา แก้เป็น if (command.equalsIgnoreCase(\"help\")) หรือ command = command.toUpperCase(); แล้ว command.equals(\"HELP\")",
   vocabulary: [v("immutable", "สร้างแล้วเปลี่ยนค่าไม่ได้ method คืนค่าใหม่"), v("equals", "เทียบเนื้อหาของ object"), v("==", "กับ object คือเทียบว่าเป็นตัวเดียวกัน"), v("index", "ตำแหน่งเริ่มที่ 0"), v("substring", "ตัดข้อความจาก begin ถึงก่อน end"), v("split", "แยกข้อความเป็น array ตาม pattern")],
 },
@@ -412,7 +417,7 @@ public class Start {
   title: "type conversion: widening, casting และ parse ข้อความเป็นตัวเลข",
   objective: "อธิบายว่าเมื่อไร Java แปลงชนิดให้อัตโนมัติ (widening/promotion) เมื่อไรต้อง cast เอง และผลของการ cast (ตัดเศษ, overflow) รวมถึงแปลง String เป็นตัวเลขด้วย Integer.parseInt/Double.parseDouble และ Math.round",
   why: "การแปลง double เป็น int แบบไม่คิดทำให้ 2.99 กลายเป็น 2 และข้อความ \"12a\" ทำให้โปรแกรมล่มด้วย NumberFormatException การรู้กติกาช่วยเลือกระหว่างตัดเศษ ปัดเศษ หรือแจ้งผู้ใช้",
-  explanation: "widening: แปลงจากชนิดแคบไปกว้างอัตโนมัติ (int → long → double) และใน expression ที่ผสมชนิด ค่าจะถูก promote เป็นชนิดที่กว้างกว่า (int + double = double; byte/short/char ถูก promote เป็น int) narrowing: กว้างไปแคบต้อง cast เอง (int) 2.99 ได้ 2 (ตัดเศษไปทาง 0 ไม่ใช่ปัด) cast ค่าที่เกินช่วง (int) 3_000_000_000L ได้เลขผิด ถ้าต้องการปัดใช้ Math.round (คืน long สำหรับ double) แปลงข้อความ: Integer.parseInt(\"42\"), Double.parseDouble(\"2.5\") ข้อความที่ไม่ใช่ตัวเลขทำให้เกิด NumberFormatException ตอนรัน (จะจัดการในบท java-exceptions-basic) แปลงตัวเลขเป็นข้อความด้วย String.valueOf(x) char กับ int แปลงกันได้: (char) ('A' + 1) คือ 'B'",
+  explanation: "widening: แปลงจากชนิดแคบไปกว้างอัตโนมัติ (int → long → double) ส่วนใหญ่ไม่เสียค่า แต่ long → double อาจปัดเศษเมื่อเลขเกิน 2^53 (เช่น 9007199254740993L กลายเป็น 9007199254740992.0) และใน expression ที่ผสมชนิด ค่าจะถูก promote เป็นชนิดที่กว้างกว่า (int + double = double; byte/short/char ถูก promote เป็น int) narrowing: กว้างไปแคบต้อง cast เอง (int) 2.99 ได้ 2 (ตัดเศษไปทาง 0 ไม่ใช่ปัด) cast ค่าที่เกินช่วง (int) 3_000_000_000L ได้เลขผิด ถ้าต้องการปัดใช้ Math.round (คืน long สำหรับ double) แปลงข้อความ: Integer.parseInt(\"42\") (ห้ามมีช่องว่างแม้รอบนอก), Double.parseDouble(\"2.5\") (ยอมรับช่องว่างรอบนอก) — คอร์สนี้ strip() ก่อน parse เสมอเพื่อให้กติกาเดียวกัน ข้อความที่ไม่ใช่ตัวเลขทำให้เกิด NumberFormatException ตอนรัน (จะจัดการในบท java-exceptions-basic) แปลงตัวเลขเป็นข้อความด้วย String.valueOf(x) char กับ int แปลงกันได้: (char) ('A' + 1) คือ 'B'",
   language: "java",
   standard: "v3",
   prerequisites: ["java-string"],
@@ -464,6 +469,7 @@ public class Start {
         System.out.println(average);
     }
 }`,
+  bugCheck: {kind: "logic", output: "22.0"},
   bugExplanation: "พิมพ์ 22.0 แทน 4.5 มีสองจุด: a + b ต่อข้อความเป็น \"45\" ก่อนแปลง (ต้อง parse ทีละตัวแล้วค่อยบวก) และ sum / 2 เป็นการหารจำนวนเต็มก่อนเก็บเป็น double แก้เป็น int sum = Integer.parseInt(a) + Integer.parseInt(b); double average = sum / 2.0;",
   vocabulary: [v("widening", "แปลงจากชนิดแคบไปกว้างโดยอัตโนมัติ"), v("cast", "บังคับแปลงชนิด เช่น (int) x"), v("narrowing", "แปลงจากกว้างไปแคบ อาจเสียข้อมูล"), v("promotion", "ค่าใน expression ถูกแปลงเป็นชนิดที่กว้างกว่า"), v("parseInt", "แปลงข้อความเป็น int"), v("Math.round", "ปัดเป็นจำนวนเต็มที่ใกล้ที่สุด")],
 },
@@ -528,6 +534,7 @@ public class Main {
         System.out.println("[" + title + "] " + days + " วัน");
     }
 }`,
+  bugCheck: {kind: "logic", stdin: "3\nClean Code\n", output: "[] 3 วัน"},
   bugExplanation: "เมื่อ input เป็น 3 ⏎ Clean Code ⏎ โปรแกรมพิมพ์ [] 3 วัน เพราะ nextInt ทิ้งตัวขึ้นบรรทัดไว้ nextLine จึงได้ข้อความว่าง compile ผ่านและไม่ล่ม เป็น logic bug แก้โดยอ่านด้วย nextLine ทั้งคู่: int days = Integer.parseInt(scanner.nextLine().strip()); String title = scanner.nextLine().strip();",
   vocabulary: [v("Scanner", "class สำหรับอ่าน input แบบแยกคำ/บรรทัด"), v("System.in", "standard input ของโปรแกรม"), v("nextLine", "อ่านจนจบบรรทัด ไม่รวมตัวขึ้นบรรทัด"), v("nextInt", "อ่านตัวเลขหนึ่งตัว ทิ้งตัวขึ้นบรรทัดไว้"), v("hasNextLine", "ยังมีบรรทัดให้อ่านไหม"), v("pipe", "ส่ง output ของคำสั่งหนึ่งเป็น input ของอีกคำสั่ง (|)")],
 },
@@ -604,115 +611,21 @@ public class Main {
         System.out.println(status);
     }
 }`,
+  bugCheck: {kind: "logic", output: "blocked"},
   bugExplanation: "พิมพ์ blocked ทั้งที่ไม่ได้คืนช้า เพราะไม่มี { } if ครอบแค่ statement ถัดไปบรรทัดเดียว (println) ส่วน status = \"blocked\" ทำงานเสมอ การย่อหน้าไม่ได้มีความหมายใน Java compile ผ่านเป็น logic bug แก้โดยใส่ { } ครอบทั้งสองบรรทัด",
   vocabulary: [v("boolean", "ค่า true/false"), v("comparison operator", "== != < > <= >= ให้ผลเป็น boolean"), v("&& / || / !", "และ / หรือ / ไม่"), v("short-circuit", "ไม่ประเมินฝั่งขวาเมื่อรู้ผลจากฝั่งซ้ายแล้ว"), v("else if", "กิ่งถัดไปที่ตรวจเมื่อกิ่งก่อนเป็นเท็จ"), v("ternary", "condition ? a : b เลือกค่า")],
 },
 {
-  id: "java-switch",
-  courseId,
-  unit: "Input และเงื่อนไข",
-  title: "switch expression: เลือกตามค่าแบบไม่หลุดเคส",
-  objective: "ใช้ switch แบบลูกศร (->) ทั้งแบบ statement และแบบ expression ที่คืนค่า รวมหลาย label ในเคสเดียว ใช้ default และ yield และอธิบายปัญหา fall-through ของ switch แบบเก่า",
-  why: "เมนูคำสั่งของโปรแกรม CLI คือการเลือกตามค่าข้อความ if/else if ยาว ๆ อ่านยากและเขียน equals ผิดได้ง่าย switch แบบใหม่ (Java 14+) อ่านง่าย ไม่หลุดเคส และ compiler ช่วยเตือนเมื่อ switch expression ไม่ครบทุกกรณี",
-  explanation: "switch (command) { case \"add\" -> ...; case \"list\", \"ls\" -> ...; default -> ...; } แต่ละเคสแบบ -> ทำแค่ฝั่งขวาของตัวเองแล้วจบ (ไม่ fall-through) switch ใช้กับ int, char, String และ enum ได้ ส่วน String ถูกเทียบด้วย equals ให้อัตโนมัติ switch expression คืนค่า: String label = switch (day) { case 6, 7 -> \"วันหยุด\"; default -> \"วันทำงาน\"; }; ต้องครอบคลุมทุกค่า (มักต้องมี default) ถ้าเคสต้องทำหลายบรรทัดใช้ { ... yield ค่า; } switch แบบเก่า (case \"add\": ... break;) จะไหลต่อไปเคสถัดไปถ้าลืม break ถ้าค่าที่ switch เป็น null จะเกิด NullPointerException",
-  language: "java",
-  standard: "v3",
-  prerequisites: ["java-branch"],
-  example: java`public class Main {
-    public static void main(String[] args) {
-        String[] commands = {"add", "LS", "help", "quit", "dance"};
-        for (String raw : commands) {
-            String command = raw.toLowerCase();
-            String reply = switch (command) {
-                case "add" -> "เพิ่มหนังสือ";
-                case "list", "ls" -> "แสดงรายการ";
-                case "help" -> {
-                    String commandsText = "add, list, quit";
-                    yield "คำสั่ง: " + commandsText;
-                }
-                case "quit" -> "ลาก่อน";
-                default -> "ไม่รู้จัก '" + raw + "'";
-            };
-            System.out.println(raw + " → " + reply);
-        }
-
-        int day = 6;
-        switch (day) {
-            case 6:
-                System.out.println("old: เสาร์");
-            case 7:
-                System.out.println("old: อาทิตย์");
-                break;
-            default:
-                System.out.println("old: วันทำงาน");
-        }
-    }
-}`,
-  expectedOutput: "add → เพิ่มหนังสือ\nLS → แสดงรายการ\nhelp → คำสั่ง: add, list, quit\nquit → ลาก่อน\ndance → ไม่รู้จัก 'dance'\nold: เสาร์\nold: อาทิตย์",
-  tracePrompt: "ใน switch แบบเก่าท้ายตัวอย่าง ถ้าเปลี่ยน day เป็น 7 จะพิมพ์อะไร และถ้าเป็น 3 จะพิมพ์อะไร ทำไม day = 6 จึงพิมพ์สองบรรทัด",
-  traceAnswer: "day = 7 พิมพ์ old: อาทิตย์ แล้ว break ออก · day = 3 พิมพ์ old: วันทำงาน · day = 6 เข้า case 6 แต่ไม่มี break จึงไหล (fall-through) ไปทำ case 7 ต่อจนเจอ break — switch แบบ -> ไม่มีพฤติกรรมนี้",
-  practicePrompt: "เขียนโปรแกรมอ่านคำสั่งทีละบรรทัดจนหมด input (while (scanner.hasNextLine())) แต่ละบรรทัดตัดช่องว่างและแปลงเป็นตัวพิมพ์เล็ก แล้วใช้ switch expression เลือกข้อความ: add → ok: add, list หรือ ls → ok: list, quit → bye (แล้วหยุดอ่านทันที), บรรทัดว่าง → ข้ามโดยไม่พิมพ์อะไร, อื่น ๆ → unknown: <คำสั่งเดิม> ตัวอย่าง input: add / LS / (ว่าง) / jump / quit / add → พิมพ์ ok: add / ok: list / unknown: jump / bye",
-  starter: java`import java.util.Scanner;
-
-public class Main {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        while (scanner.hasNextLine()) {
-            String command = scanner.nextLine().strip().toLowerCase();
-            // ข้ามบรรทัดว่าง
-            // เลือกข้อความด้วย switch expression แล้วพิมพ์
-            // หยุดเมื่อเป็น quit
-        }
-    }
-}`,
-  solution: java`import java.util.Scanner;
-
-public class Main {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        while (scanner.hasNextLine()) {
-            String command = scanner.nextLine().strip().toLowerCase();
-            if (command.isEmpty()) {
-                continue;
-            }
-            String reply = switch (command) {
-                case "add" -> "ok: add";
-                case "list", "ls" -> "ok: list";
-                case "quit" -> "bye";
-                default -> "unknown: " + command;
-            };
-            System.out.println(reply);
-            if (command.equals("quit")) {
-                break;
-            }
-        }
-    }
-}`,
-  solutionCheck: { stdin: "add\n LS \n\njump\nquit\nadd\n", output: "ok: add\nok: list\nunknown: jump\nbye" },
-  buggy: java`public class Main {
-    public static void main(String[] args) {
-        int day = 3;
-        String kind = switch (day) {
-            case 6, 7 -> "วันหยุด";
-            case 1, 2, 3, 4, 5 -> "วันทำงาน";
-        };
-        System.out.println(kind);
-    }
-}`,
-  bugExplanation: "compile error: “the switch expression does not cover all possible input values” switch expression ต้องคืนค่าได้ทุกกรณี แต่ int มีค่าอื่นนอกจาก 1–7 (เช่น 0 หรือ 99) เพิ่ม default -> \"วันไม่ถูกต้อง\" หรือ default -> throw new IllegalArgumentException(\"day: \" + day); ถ้าค่าที่ไม่ถูกต้องควรถือว่าเป็นความผิดพลาด",
-  vocabulary: [v("switch expression", "switch ที่คืนค่าได้"), v("arrow case (->)", "เคสที่ทำแค่ฝั่งขวาแล้วจบ ไม่ไหลต่อ"), v("fall-through", "การไหลไปทำเคสถัดไปเมื่อไม่มี break ใน switch แบบเก่า"), v("yield", "คืนค่าจากเคสแบบ block ใน switch expression"), v("default", "เคสสำหรับค่าที่ไม่ตรงเคสใด"), v("exhaustive", "ครอบคลุมทุกค่าที่เป็นไปได้")],
-},
-{
   id: "java-loops",
   courseId,
-  unit: "การทำซ้ำ",
+  unit: "การทำซ้ำและเมนูคำสั่ง",
   title: "for, while, break/continue และเงื่อนไขหยุด",
   objective: "เลือกใช้ for (รู้จำนวนรอบ) หรือ while (หยุดตามเงื่อนไข) เขียนตัวสะสม (accumulator) ใช้ break/continue อย่างมีเหตุผล และตรวจ loop ด้วยการไล่ค่าตัวแปรทีละรอบเพื่อป้องกัน off-by-one และ loop ไม่รู้จบ",
   why: "งานจริงส่วนใหญ่คือทำสิ่งเดียวกันกับข้อมูลหลายชิ้น loop ที่หยุดผิดรอบหนึ่งรอบ (off-by-one) หรือไม่หยุดเลยเป็น bug ที่พบบ่อยมาก การไล่ค่าทีละรอบคือวิธีพิสูจน์ว่า loop ถูกก่อนรัน",
   explanation: "for (int day = 1; day <= 7; day++) { ... } มีสามส่วน: เริ่มต้น; เงื่อนไขที่ตรวจก่อนทุกรอบ; สิ่งที่ทำหลังทุกรอบ ตัวแปร day มีอยู่เฉพาะใน loop while (เงื่อนไข) { ... } ใช้เมื่อไม่รู้ล่วงหน้าว่ากี่รอบ ต้องมีบางอย่างใน loop ที่ทำให้เงื่อนไขเป็นเท็จในที่สุด do { ... } while (...); ทำอย่างน้อยหนึ่งรอบ break ออกจาก loop ทันที continue ข้ามไปรอบถัดไป ตัวสะสม: ประกาศนอก loop (int total = 0;) แล้วเพิ่มใน loop ขอบเขต: < n ทำ n รอบเมื่อเริ่มที่ 0 ส่วน <= n ทำ n รอบเมื่อเริ่มที่ 1",
   language: "java",
   standard: "v3",
-  prerequisites: ["java-switch"],
+  prerequisites: ["java-branch"],
   example: java`public class Main {
     public static void main(String[] args) {
         int total = 0;
@@ -789,8 +702,110 @@ public class Main {
         System.out.println(total);
     }
 }`,
+  bugCheck: {kind: "runtime", message: "ArrayIndexOutOfBoundsException: Index 3 out of bounds for length 3"},
   bugExplanation: "compile ผ่าน แต่ตอนรันได้ ArrayIndexOutOfBoundsException: Index 3 out of bounds for length 3 เพราะ i <= fines.length ทำรอบที่ i = 3 ซึ่งไม่มีอยู่ (index สุดท้ายคือ length - 1) เป็น off-by-one แก้เป็น i < fines.length หรือใช้ for (int fine : fines)",
   vocabulary: [v("for loop", "loop ที่มีตัวนับ: เริ่มต้น; เงื่อนไข; ปรับค่า"), v("while loop", "ทำซ้ำตราบที่เงื่อนไขจริง"), v("accumulator", "ตัวแปรสะสมผลระหว่าง loop"), v("break / continue", "ออกจาก loop / ข้ามไปรอบถัดไป"), v("off-by-one", "ทำเกินหรือขาดไปหนึ่งรอบ"), v("infinite loop", "loop ที่เงื่อนไขไม่เคยเป็นเท็จ")],
+},
+{
+  id: "java-switch",
+  courseId,
+  unit: "การทำซ้ำและเมนูคำสั่ง",
+  title: "switch expression: เลือกตามค่าแบบไม่หลุดเคส",
+  objective: "ใช้ switch แบบลูกศร (->) ทั้งแบบ statement และแบบ expression ที่คืนค่า รวมหลาย label ในเคสเดียว ใช้ default และ yield และอธิบายปัญหา fall-through ของ switch แบบเก่า",
+  why: "เมนูคำสั่งของโปรแกรม CLI คือการเลือกตามค่าข้อความ if/else if ยาว ๆ อ่านยากและเขียน equals ผิดได้ง่าย switch แบบใหม่ (Java 14+) อ่านง่าย ไม่หลุดเคส และ compiler ช่วยเตือนเมื่อ switch expression ไม่ครบทุกกรณี",
+  explanation: "switch (command) { case \"add\" -> ...; case \"list\", \"ls\" -> ...; default -> ...; } แต่ละเคสแบบ -> ทำแค่ฝั่งขวาของตัวเองแล้วจบ (ไม่ fall-through) switch ใช้กับ int, char, String และ enum ได้ ส่วน String ถูกเทียบด้วย equals ให้อัตโนมัติ switch expression คืนค่า: String label = switch (day) { case 6, 7 -> \"วันหยุด\"; default -> \"วันทำงาน\"; }; ต้องครอบคลุมทุกค่า (มักต้องมี default) ถ้าเคสต้องทำหลายบรรทัดใช้ { ... yield ค่า; } switch แบบเก่า (case \"add\": ... break;) จะไหลต่อไปเคสถัดไปถ้าลืม break ถ้าค่าที่ switch เป็น null และไม่มี case null (Java 21 เขียน case null -> ... ได้) จะเกิด NullPointerException",
+  language: "java",
+  standard: "v3",
+  prerequisites: ["java-loops"],
+  example: java`import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        while (scanner.hasNextLine()) {
+            String raw = scanner.nextLine().strip();
+            String reply = switch (raw.toLowerCase()) {
+                case "add" -> "เพิ่มหนังสือ";
+                case "list", "ls" -> "แสดงรายการ";
+                case "help" -> {
+                    String commandsText = "add, list, quit";
+                    yield "คำสั่ง: " + commandsText;
+                }
+                case "quit" -> "ลาก่อน";
+                default -> "ไม่รู้จัก '" + raw + "'";
+            };
+            System.out.println(raw + " → " + reply);
+        }
+
+        int day = 6;
+        switch (day) {
+            case 6:
+                System.out.println("old: เสาร์");
+            case 7:
+                System.out.println("old: อาทิตย์");
+                break;
+            default:
+                System.out.println("old: วันทำงาน");
+        }
+    }
+}`,
+  stdin: "add\nLS\nhelp\nquit\nDance\n",
+  expectedOutput: "add → เพิ่มหนังสือ\nLS → แสดงรายการ\nhelp → คำสั่ง: add, list, quit\nquit → ลาก่อน\nDance → ไม่รู้จัก 'Dance'\nold: เสาร์\nold: อาทิตย์",
+  tracePrompt: "ใน switch แบบเก่าท้ายตัวอย่าง ถ้าเปลี่ยน day เป็น 7 จะพิมพ์อะไร และถ้าเป็น 3 จะพิมพ์อะไร ทำไม day = 6 จึงพิมพ์สองบรรทัด",
+  traceAnswer: "day = 7 พิมพ์ old: อาทิตย์ แล้ว break ออก · day = 3 พิมพ์ old: วันทำงาน · day = 6 เข้า case 6 แต่ไม่มี break จึงไหล (fall-through) ไปทำ case 7 ต่อจนเจอ break — switch แบบ -> ไม่มีพฤติกรรมนี้",
+  practicePrompt: "เขียนโปรแกรมอ่านคำสั่งทีละบรรทัดจนหมด input (while (scanner.hasNextLine())) แต่ละบรรทัดตัดช่องว่าง แล้วใช้ switch expression กับตัวพิมพ์เล็กของบรรทัดนั้นเพื่อเลือกข้อความ: add → ok: add, list หรือ ls → ok: list, quit → bye (แล้วหยุดอ่านทันที), บรรทัดว่าง → ข้ามโดยไม่พิมพ์อะไร, อื่น ๆ → unknown: <คำสั่งตามที่พิมพ์ (ตัดช่องว่างแล้ว ไม่แปลงตัวพิมพ์)> ตัวอย่าง input: add / LS / (ว่าง) / Jump / quit / add → พิมพ์ ok: add / ok: list / unknown: Jump / bye",
+  starter: java`import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        while (scanner.hasNextLine()) {
+            String raw = scanner.nextLine().strip();
+            String command = raw.toLowerCase();
+            // ข้ามบรรทัดว่าง
+            // เลือกข้อความด้วย switch expression แล้วพิมพ์
+            // หยุดเมื่อเป็น quit
+        }
+    }
+}`,
+  solution: java`import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        while (scanner.hasNextLine()) {
+            String raw = scanner.nextLine().strip();
+            String command = raw.toLowerCase();
+            if (command.isEmpty()) {
+                continue;
+            }
+            String reply = switch (command) {
+                case "add" -> "ok: add";
+                case "list", "ls" -> "ok: list";
+                case "quit" -> "bye";
+                default -> "unknown: " + raw;
+            };
+            System.out.println(reply);
+            if (command.equals("quit")) {
+                break;
+            }
+        }
+    }
+}`,
+  solutionCheck: { stdin: "add\n LS \n\nJump\nquit\nadd\n", output: "ok: add\nok: list\nunknown: Jump\nbye" },
+  buggy: java`public class Main {
+    public static void main(String[] args) {
+        int day = 3;
+        String kind = switch (day) {
+            case 6, 7 -> "วันหยุด";
+            case 1, 2, 3, 4, 5 -> "วันทำงาน";
+        };
+        System.out.println(kind);
+    }
+}`,
+  bugCheck: {kind: "compile", message: "the switch expression does not cover all possible input values"},
+  bugExplanation: "compile error: “the switch expression does not cover all possible input values” switch expression ต้องคืนค่าได้ทุกกรณี แต่ int มีค่าอื่นนอกจาก 1–7 (เช่น 0 หรือ 99) เพิ่ม default -> \"วันไม่ถูกต้อง\" หรือ default -> throw new IllegalArgumentException(\"day: \" + day); ถ้าค่าที่ไม่ถูกต้องควรถือว่าเป็นความผิดพลาด",
+  vocabulary: [v("switch expression", "switch ที่คืนค่าได้"), v("arrow case (->)", "เคสที่ทำแค่ฝั่งขวาแล้วจบ ไม่ไหลต่อ"), v("fall-through", "การไหลไปทำเคสถัดไปเมื่อไม่มี break ใน switch แบบเก่า"), v("yield", "คืนค่าจากเคสแบบ block ใน switch expression"), v("default", "เคสสำหรับค่าที่ไม่ตรงเคสใด"), v("exhaustive", "ครอบคลุมทุกค่าที่เป็นไปได้")],
 },
 {
   id: "java-methods",
@@ -802,7 +817,7 @@ public class Main {
   explanation: "static int fineFor(int lateDays) { return lateDays * 5; } ประกอบด้วย ชนิดที่คืน (int หรือ void ถ้าไม่คืน), ชื่อ (camelCase เป็นคำกริยา/คำนามที่สื่อผล), parameter พร้อมชนิด ทุกเส้นทางของ method ที่ไม่ใช่ void ต้อง return ค่า (ไม่งั้น compile error “missing return statement”) ตัวแปรที่ประกาศใน method มีอยู่เฉพาะใน method นั้น (scope) method อื่นมองไม่เห็น Java ส่งค่าแบบ pass-by-value: method ได้สำเนาของค่า การกำหนดค่าใหม่ให้ parameter ไม่กระทบตัวแปรของผู้เรียก overloading: method ชื่อเดียวกันได้ถ้าชนิด/จำนวน parameter ต่างกัน ในบทนี้ทุก method เป็น static เพราะยังไม่ได้สร้าง object",
   language: "java",
   standard: "v3",
-  prerequisites: ["java-loops"],
+  prerequisites: ["java-switch"],
   example: java`public class Main {
     static int fineFor(int lateDays) {
         if (lateDays <= 0) {
@@ -896,6 +911,7 @@ public class Main {
         System.out.println(fineFor(3));
     }
 }`,
+  bugCheck: {kind: "compile", message: "missing return statement"},
   bugExplanation: "compile error: “missing return statement” เมื่อ lateDays <= 0 method ไม่มีค่าให้ return javac ตรวจว่าทุกเส้นทางของ method ที่คืน int ต้องจบด้วย return แก้โดยเพิ่ม return 0; ท้าย method",
   vocabulary: [v("method", "ชุดคำสั่งที่มีชื่อ เรียกใช้ซ้ำได้"), v("parameter", "ตัวแปรที่รับค่าตอนเรียก method"), v("return type", "ชนิดของค่าที่ method คืน (void = ไม่คืน)"), v("scope", "ขอบเขตที่ตัวแปรถูกมองเห็น"), v("pass-by-value", "method ได้สำเนาของค่าที่ส่งเข้าไป"), v("overloading", "method ชื่อเดียวกันแต่ parameter ต่างกัน")],
 },
@@ -1034,6 +1050,7 @@ public class Main {
         System.out.println(Arrays.toString(sorted) + " " + Arrays.toString(arrivalOrder));
     }
 }`,
+  bugCheck: {kind: "logic", output: "[1, 2, 3] [1, 2, 3]"},
   bugExplanation: "พิมพ์ [1, 2, 3] [1, 2, 3] ลำดับการมาถึงเดิมหายไป เพราะ int[] copy = values; ไม่ได้คัดลอก แค่ให้อีกชื่อชี้ array เดิม Arrays.sort จึงเรียง array ของผู้เรียก compile ผ่านเป็น logic bug แก้เป็น int[] copy = Arrays.copyOf(values, values.length);",
   vocabulary: [v("array", "ชุดข้อมูลชนิดเดียวกันขนาดคงที่"), v("index", "ตำแหน่ง 0 ถึง length - 1"), v("length", "จำนวนช่องของ array (ไม่มีวงเล็บ)"), v("enhanced for", "for (T x : array) อ่านทุกช่อง"), v("reference", "ค่าที่ชี้ไปยัง object/array ในหน่วยความจำ"), v("Arrays.copyOf", "สร้าง array ใหม่ที่คัดลอกข้อมูล")],
 },
@@ -1044,7 +1061,7 @@ public class Main {
   title: "ArrayList<T>: รายการที่ขยายได้ และ wrapper types",
   objective: "ใช้ ArrayList<String> และ ArrayList<Integer> (add, get, set, remove, size, contains, indexOf) อธิบายว่าทำไม generic ต้องใช้ Integer แทน int รู้กับดัก remove(int) กับ remove(Object) และการแก้ list ระหว่าง for-each",
   why: "ข้อมูลจริงมักไม่รู้จำนวนล่วงหน้า (หนังสือที่ผู้ใช้เพิ่มเรื่อย ๆ) ArrayList ขยายได้เองและมี method พร้อมใช้ แต่มีกับดักที่ทำให้ลบผิดตัวหรือโปรแกรมล่มได้ถ้าไม่รู้",
-  explanation: "import java.util.ArrayList; ArrayList<String> titles = new ArrayList<>(); (<> ให้ compiler อนุมานชนิดจากฝั่งซ้าย) add(x) เพิ่มท้าย, add(i, x) แทรก, get(i) อ่าน, set(i, x) แทนที่, remove(i) ลบตาม index, remove(obj) ลบตัวแรกที่ equals, size() จำนวน, contains/indexOf ค้นหาด้วย equals generic ใช้ได้กับ object เท่านั้น จึงใช้ wrapper: Integer แทน int, Double แทน double, Boolean แทน boolean Java แปลงให้อัตโนมัติ (autoboxing) กับดัก: ใน ArrayList<Integer> list.remove(1) คือลบ index 1 ไม่ใช่ลบเลข 1 (ต้องใช้ list.remove(Integer.valueOf(1))) การ add/remove ระหว่าง for (String t : titles) ทำให้เกิด ConcurrentModificationException ใช้ removeIf หรือ loop ด้วย index ย้อนหลังแทน List.of(...) สร้าง list ที่แก้ไม่ได้",
+  explanation: "import java.util.ArrayList; ArrayList<String> titles = new ArrayList<>(); (<> ให้ compiler อนุมานชนิดจากฝั่งซ้าย) add(x) เพิ่มท้าย, add(i, x) แทรก, get(i) อ่าน, set(i, x) แทนที่, remove(i) ลบตาม index, remove(obj) ลบตัวแรกที่ equals, size() จำนวน, contains/indexOf ค้นหาด้วย equals generic ใช้ได้กับ object เท่านั้น จึงใช้ wrapper: Integer แทน int, Double แทน double, Boolean แทน boolean Java แปลงให้อัตโนมัติ (autoboxing) กับดัก: ใน ArrayList<Integer> list.remove(1) คือลบ index 1 ไม่ใช่ลบเลข 1 (ต้องใช้ list.remove(Integer.valueOf(1))) การ add/remove ระหว่าง for (String t : titles) ทำให้เกิด ConcurrentModificationException ใช้ removeIf หรือ loop ด้วย index ย้อนหลังแทน removeIf รับเงื่อนไขเป็น lambda: t -> t.endsWith(\"-old\") คือ function สั้น ๆ ที่รับสมาชิก t แล้วคืน true ถ้าต้องการลบ (ซ้ายของ -> คือ parameter ขวาคือค่าที่คืน) List.of(...) สร้าง list ที่แก้ไม่ได้",
   language: "java",
   standard: "v3",
   prerequisites: ["java-arrays"],
@@ -1150,6 +1167,7 @@ public class Main {
         System.out.println(titles);
     }
 }`,
+  bugCheck: {kind: "runtime", message: "ConcurrentModificationException"},
   bugExplanation: "compile ผ่าน แต่ตอนรันได้ ConcurrentModificationException เพราะลบออกจาก list ระหว่างที่ for-each กำลังวนอยู่ (iterator ตรวจพบว่า list ถูกแก้นอกตัวมัน) แก้ด้วย titles.removeIf(title -> title.endsWith(\"-old\")); หรือวน index จากท้ายไปหน้าแล้ว remove(i)",
   vocabulary: [v("ArrayList", "list ที่ขยายขนาดได้"), v("generic", "การระบุชนิดของสมาชิก เช่น ArrayList<String>"), v("wrapper type", "class ที่ห่อ primitive เช่น Integer, Double"), v("autoboxing", "การแปลง int ↔ Integer อัตโนมัติ"), v("removeIf", "ลบสมาชิกที่ตรงเงื่อนไขอย่างปลอดภัย"), v("ConcurrentModificationException", "error เมื่อแก้ list ระหว่าง for-each")],
 },
@@ -1264,6 +1282,7 @@ public class Main {
         System.out.println("รวม " + total + " วัน");
     }
 }`,
+  bugCheck: {kind: "logic", output: "รวม 3 วัน"},
   bugExplanation: "พิมพ์ รวม 3 วัน โดยไม่มีสัญญาณว่า \"สาม\" และ null ผิด catch (Exception e) กว้างเกินไปและคืน 0 แทนการแจ้งปัญหา ข้อมูลผิดจึงกลายเป็นข้อมูล “ถูก” ที่ผิดความจริง compile ผ่านเป็น logic bug แก้โดยจับเฉพาะ NumberFormatException ในจุดที่ขอ input ใหม่ได้ และให้ผู้เรียกตัดสินใจ (เช่นแจ้งผู้ใช้) แทนการแทนค่า 0 เงียบ ๆ",
   vocabulary: [v("exception", "object ที่แทนปัญหาตอนรัน"), v("stack trace", "รายการ method ที่เรียกต่อกันจนถึงจุดเกิด exception"), v("try / catch", "ลองทำและจับ exception ที่คาดไว้"), v("throw", "โยน exception เมื่อพบค่าที่ผิดกติกา"), v("NumberFormatException", "แปลงข้อความเป็นตัวเลขไม่ได้"), v("IllegalArgumentException", "argument ผิดกติกาของ method")],
 },
@@ -1445,6 +1464,7 @@ public class Main {
         System.out.println(Fines.fineFor(3));
     }
 }`,
+  bugCheck: {kind: "compile", message: "cannot find symbol"},
   bugExplanation: "compile error: “cannot find symbol: variable Fines” เพราะ Main อยู่ใน package app ส่วน Fines อยู่ใน package library class ต่าง package มองไม่เห็นกันจนกว่าจะ import แก้โดยเพิ่ม import library.Fines; ใต้บรรทัด package app; (Fines และ fineFor เป็น public อยู่แล้วจึงเรียกข้าม package ได้)",
   vocabulary: [v("package", "กลุ่มของ class ที่เกี่ยวข้องกัน ตรงกับโครงโฟลเดอร์"), v("import", "อ้างถึง class จาก package อื่น"), v("classpath (-cp)", "ที่ที่ JVM ค้นหาไฟล์ .class"), v("javac -d", "กำหนดโฟลเดอร์ output ของ .class"), v("fully qualified name", "ชื่อเต็ม package.Class เช่น library.Main"), v("package-private", "ไม่ใส่ access modifier: เห็นได้เฉพาะใน package เดียวกัน")],
 },
@@ -1455,7 +1475,7 @@ public class Main {
   title: "★ Library CLI M0: เมนูคำสั่ง หนังสือ และสถานะการยืม",
   objective: "รวมทุกบทของ Java Foundations สร้าง Library Management CLI ระยะแรก: อ่านคำสั่งจาก input, เก็บหนังสือและสถานะยืมด้วย ArrayList, ตรวจ input ที่ผิดโดยไม่ล่ม และแยกงานเป็น method/ไฟล์ พร้อมสคริปต์ input สำหรับทดสอบซ้ำ",
   why: "นี่คือฐานของโปรเจกต์ที่จะต่อยอดในคอร์ส Java OOP (M1 แยก Book/Member, M2 Library กับกติกาการยืม, M3 บันทึกไฟล์และ JUnit) M0 ตั้งใจใช้แค่สิ่งที่เรียนมา เพื่อให้เห็นภายหลังว่า object ช่วยแก้ปัญหาอะไรของโค้ดแบบนี้",
-  explanation: "ข้อกำหนด M0 (ผลต้องตรงทุกตัวอักษร เพื่อทดสอบด้วยไฟล์ input ได้): คำสั่ง add <title> เพิ่มหนังสือ ตอบ added #<id> (id เริ่มที่ 1 เพิ่มทีละ 1 และไม่ใช้ซ้ำแม้ลบ); list แสดงแต่ละเล่มเป็น #<id> <title> [available] หรือ [borrowed] หรือ (no books); borrow <id> ตอบ borrowed #<id>, already borrowed หรือ no such book; return <id> ตอบ returned #<id>, not borrowed หรือ no such book; quit ตอบ bye แล้วจบ; บรรทัดว่างข้าม; id ที่ไม่ใช่ตัวเลขตอบ id must be a number; คำสั่งอื่นตอบ unknown command: <คำสั่ง> เก็บข้อมูลด้วย ArrayList คู่ขนาน (ids, titles, borrowed) ที่ index เดียวกันคือหนังสือเล่มเดียวกัน — โครงสร้างนี้เปราะ (ต้องแก้สาม list พร้อมกันทุกครั้ง) และเป็นเหตุผลที่ M1 จะแทนด้วย class Book",
+  explanation: "ข้อกำหนด M0 (ผลต้องตรงทุกตัวอักษร เพื่อทดสอบด้วยไฟล์ input ได้): คำสั่ง add <title> เพิ่มหนังสือ ตอบ added #<id> (id เริ่มที่ 1 เพิ่มทีละ 1 และไม่ใช้ซ้ำแม้ลบ) ถ้าไม่มีชื่อตอบ title required; list แสดงแต่ละเล่มเป็น #<id> <title> [available] หรือ [borrowed] หรือ (no books); borrow <id> ตอบ borrowed #<id>, already borrowed หรือ no such book; return <id> ตอบ returned #<id>, not borrowed หรือ no such book; quit ตอบ bye แล้วจบ; บรรทัดว่างข้าม; id ที่ไม่ใช่ตัวเลขตอบ id must be a number; คำสั่งอื่นตอบ unknown command: <คำสั่ง> เก็บข้อมูลด้วย ArrayList คู่ขนาน (ids, titles, borrowed) ที่ index เดียวกันคือหนังสือเล่มเดียวกัน — โครงสร้างนี้เปราะ (ต้องแก้สาม list พร้อมกันทุกครั้ง) และเป็นเหตุผลที่ M1 จะแทนด้วย class Book",
   language: "java",
   standard: "v3",
   prerequisites: ["java-multi-file", "java-switch"],
@@ -1479,15 +1499,11 @@ public class Main {
         if (ids.isEmpty()) {
             return "(no books)";
         }
-        StringBuilder out = new StringBuilder();
+        ArrayList<String> lines = new ArrayList<>();
         for (int i = 0; i < ids.size(); i++) {
-            if (i > 0) {
-                out.append("\n");
-            }
-            out.append("#").append(ids.get(i)).append(" ").append(titles.get(i));
-            out.append(borrowed.get(i) ? " [borrowed]" : " [available]");
+            lines.add("#" + ids.get(i) + " " + titles.get(i) + (borrowed.get(i) ? " [borrowed]" : " [available]"));
         }
-        return out.toString();
+        return String.join("\n", lines);
     }
 
     public static void main(String[] args) {
@@ -1501,7 +1517,7 @@ public class Main {
   expectedOutput: "(no books)\nadded #1\nadded #2\n#1 Clean Code [borrowed]\n#2 Java 21 [available]",
   tracePrompt: "ใน ArrayList คู่ขนาน ถ้าคำสั่ง remove ในอนาคตเขียน titles.remove(i) และ borrowed.remove(i) แต่ลืม ids.remove(i) แล้วสั่ง list จะเห็นอะไรผิด",
   traceAnswer: "ids จะยาวกว่าอีกสอง list และ index เดียวกันไม่ใช่หนังสือเล่มเดียวกันอีกต่อไป เช่นหลังลบเล่มแรกจาก [1,2]/[A,B] จะได้ ids [1,2] กับ titles [B] list แสดง #1 B ซึ่งผิด และ i = 1 จะได้ IndexOutOfBoundsException จาก titles.get(1) ข้อมูลที่ “เป็นของชิ้นเดียวกัน” ควรอยู่ใน object เดียว (M1)",
-  practicePrompt: "สร้าง Library CLI M0 ตามข้อกำหนดในคำอธิบายให้ครบทุกคำสั่ง แยกเป็นอย่างน้อย 2 ไฟล์ใน package library (เช่น Catalog.java เก็บข้อมูลและกติกา, Main.java อ่าน input/พิมพ์) เขียนไฟล์ test-input.txt ที่ครอบคลุมทุกข้อความตอบกลับ แล้วรัน java -cp out library.Main < test-input.txt เทียบกับ expected-output.txt ที่เขียนเอง (เช่นด้วย diff) ตัวอย่าง input: add Clean Code / add Java 21 / borrow 1 / borrow 1 / borrow x / return 2 / return 9 / list / fly / quit / add ignored",
+  practicePrompt: "สร้าง Library CLI M0 ตามข้อกำหนดในคำอธิบายให้ครบทุกคำสั่ง แยกเป็นอย่างน้อย 2 ไฟล์ใน package library (เช่น Catalog.java เก็บข้อมูลและกติกา, Main.java อ่าน input/พิมพ์) เขียนไฟล์ test-input.txt ที่ครอบคลุมทุกข้อความตอบกลับ แล้วรัน java -cp out library.Main < test-input.txt เทียบกับ expected-output.txt ที่เขียนเอง (เช่นด้วย diff) เฉลยมี test-input.txt และ expected-output.txt ที่ครอบคลุมทุกข้อความตอบกลับให้เทียบ",
   starter: java`// File: library/Catalog.java
 package library;
 
@@ -1621,8 +1637,41 @@ public class Main {
             System.out.println(handle(command, arg));
         }
     }
-}`,
-  solutionCheck: { stdin: "add Clean Code\nadd Java 21\n\nborrow 1\nborrow 1\nborrow x\nreturn 2\nreturn 9\nlist\nfly\nquit\nadd ignored\n", output: "added #1\nadded #2\nborrowed #1\nalready borrowed\nid must be a number\nnot borrowed\nno such book\n#1 Clean Code [borrowed]\n#2 Java 21 [available]\nunknown command: fly\nbye" },
+}
+// File: test-input.txt
+list
+add
+add Clean Code
+add Java 21
+
+borrow 1
+borrow 1
+borrow x
+return 2
+return 1
+return 9
+borrow 1
+list
+fly
+quit
+add ignored
+// File: expected-output.txt
+(no books)
+title required
+added #1
+added #2
+borrowed #1
+already borrowed
+id must be a number
+not borrowed
+returned #1
+no such book
+borrowed #1
+#1 Clean Code [borrowed]
+#2 Java 21 [available]
+unknown command: fly
+bye
+`,
   buggy: java`import java.util.ArrayList;
 
 public class Main {
@@ -1635,6 +1684,7 @@ public class Main {
         System.out.println(index + " " + borrowed);
     }
 }`,
+  bugCheck: {kind: "runtime", message: "IndexOutOfBoundsException: Index 3 out of bounds for length 3"},
   bugExplanation: "compile ผ่าน แต่ตอนรันได้ IndexOutOfBoundsException: Index 3 out of bounds for length 3 เพราะใช้ id (3) เป็น index ทั้งที่ index ของหนังสือ id 3 คือ 2 (หาได้จาก ids.indexOf(id)) id กับ index เป็นคนละเรื่อง: id คงที่ตลอดชีวิตของหนังสือ ส่วน index เปลี่ยนได้เมื่อมีการลบ แก้เป็น borrowed.set(index, true) และตรวจ index == -1 ก่อนใช้",
   vocabulary: [v("CLI", "โปรแกรมที่ใช้งานผ่านข้อความใน terminal"), v("parallel lists", "หลาย list ที่ index เดียวกันหมายถึงสิ่งเดียวกัน"), v("id", "ตัวระบุถาวรของข้อมูล ไม่ใช่ตำแหน่งใน list"), v("input redirection", "java ... < input.txt ส่งไฟล์เป็น input"), v("expected output", "ผลลัพธ์ที่ต้องได้ ใช้เทียบด้วย diff"), v("milestone", "ระยะของโปรเจกต์ที่ส่งมอบได้")],
 },

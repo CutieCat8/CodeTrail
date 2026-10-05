@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
 import ts from "typescript";
+import { execFileSync } from "node:child_process";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import { curriculumCourses, learningSteps, topicSources } from "@/content/curriculum";
 import { buildSnippetWorkerSource, buildTestWorkerSource } from "@/lib/runner";
 import type { TestResult, TestSpec } from "@/types/domain";
@@ -63,7 +67,7 @@ describe("v3 lesson standard", () => {
   it.each(v3Topics.map((topic) => [topic.id, topic] as const))("%s has every teaching part", (_id, topic) => {
     expect(topic.lesson, "standard topics need a rich lesson").toBeDefined();
     const lesson = topic.lesson!;
-    if (topic.language === "javascript") expect(topic.expectedOutput, "JavaScript examples need an expected output").toBeDefined();
+    if (topic.language === "javascript" || topic.language === "node") expect(topic.expectedOutput, "runnable examples need an expected output").toBeDefined();
     expect(topic.objective.trim()).not.toBe("");
     expect(lesson.hook.trim()).not.toBe("");
     expect(lesson.explain.length).toBeGreaterThan(0);
@@ -245,5 +249,32 @@ describe("TypeScript lessons", () => {
     const result = await runSnippet(toJs(block.code!));
     expect(result.error).toBeUndefined();
     expect(result.output.join("\n")).toBe(block.output);
+  });
+});
+
+// Node lessons use APIs the browser runner lacks, so examples run in a real Node process in a scratch directory.
+describe("Node lessons", () => {
+  const nodeTopics = topicSources.filter((topic) => topic.language === "node");
+  const runNode = (source: string) => {
+    const dir = mkdtempSync(path.join(tmpdir(), "node-lesson-"));
+    try {
+      const file = path.join(dir, "example.mjs");
+      writeFileSync(file, source);
+      return execFileSync(process.execPath, [file], { cwd: dir, encoding: "utf8", timeout: 15000 }).replace(/\n$/, "");
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  };
+
+  it("ships the Node course", () => {
+    expect(nodeTopics.length).toBeGreaterThanOrEqual(10);
+  });
+
+  it.each(nodeTopics.filter((topic) => topic.expectedOutput !== undefined).map((topic) => [topic.id, topic] as const))("%s example prints its expected output in Node", (_id, topic) => {
+    expect(runNode(topic.example)).toBe(topic.expectedOutput);
+  });
+
+  it.each(nodeTopics.flatMap((topic) => (topic.lesson?.explain ?? []).filter((block) => block.code && block.output !== undefined).map((block) => [`${topic.id}: ${block.heading}`, block] as const)))("%s prints its expected output in Node", (_label, block) => {
+    expect(runNode(block.code!)).toBe(block.output);
   });
 });

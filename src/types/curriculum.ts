@@ -2,7 +2,7 @@ import type { TestSpec } from "@/types/domain";
 
 export type StepKind = "concept" | "trace" | "practice" | "debug" | "checkpoint";
 
-export type CodeLanguage = "javascript" | "typescript" | "java" | "shell" | "sql";
+export type CodeLanguage = "javascript" | "typescript" | "node" | "java" | "shell" | "sql";
 
 export type RichLesson = {
   hook: string;

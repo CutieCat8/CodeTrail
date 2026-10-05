@@ -38,12 +38,16 @@
 | ตรวจเชื่อม UI | ภาพโลกใหม่ `public/art/typescript-observatory.svg` (pixel art 32×32 วาดด้วย script) ผูกกับคอร์สในหน้า Curriculum; build ผ่าน; ยังไม่ได้ตรวจใน browser |
 | ข้อจำกัด | เว็บรัน TypeScript ไม่ได้ (runner เป็น JavaScript) practice ทุกบทตรวจในเครื่องด้วย `npx tsc --noEmit` ตาม checklist; เนื้อหาหลีกเลี่ยง enum/parameter properties เพราะ Node type stripping ไม่รองรับ |
 
-## Node.js Fundamentals (`node-foundations`)
+## Node.js Fundamentals (`node-foundations`) — ชุด B4 เขียนแล้ว (10 หัวข้อ)
 
-| Topic | Inventory |
+ลำดับ: node-runtime → node-process-cli → node-modules → node-npm → node-fs → node-event-loop → node-events-streams → node-http → node-test → node-project-planner-cli (Planner M4) · ตามด้วย 4 หัวข้อ Express เดิม (บาง) ที่จะย้ายไป `backend` ใน B5
+
+| สถานะ | รายละเอียด |
 |---|---|
-| node-runtime, node-modules, node-npm, node-http | บาง |
-| node-process-cli, node-fs, node-event-loop, node-events-streams, node-test, node-project-planner-cli | ใหม่ |
+| เขียน | 10 หัวข้อ `standard: "v3"` (4 เดิม ID เดิม + 6 ใหม่) ภาษาใหม่ `node` ในเว็บกด Run แล้วบอกให้รันในเครื่อง |
+| ตรวจเทคนิค | tests รัน example และ code ใน explain ทุกหัวข้อด้วย Node 24.21 จริงในโฟลเดอร์ชั่วคราว ได้ output ตรง (รูปแบบ console.log ของ Node) · ลำดับ event loop ตรวจซ้ำ 30 รอบให้ผลเดียวกัน · `import.meta.main` (24.2+/22.18+) ตรวจกับเอกสาร Node · Codex review: ดูบันทึกชุดงาน |
+| ตรวจเชื่อม UI | build ผ่าน; ยังไม่ได้ตรวจใน browser |
+| ข้อจำกัด | practice ทุกบทรันในเครื่อง (checklist) เพราะต้องใช้ fs/process/http |
 
 ## Back-end Development (`backend`, คอร์สใหม่)
 

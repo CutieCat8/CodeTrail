@@ -278,3 +278,13 @@ describe("Node lessons", () => {
     expect(runNode(block.code!)).toBe(block.output);
   });
 });
+
+describe("labs link to the curriculum", () => {
+  it("every lab links to existing curriculum topics", async () => {
+    const { lessons } = await import("@/content/lessons");
+    const topicIds = new Set(topicSources.map((topic) => topic.id));
+    const problems = lessons.flatMap((lesson) =>
+      !lesson.relatedTopics?.length ? [`${lesson.id} has no relatedTopics`] : lesson.relatedTopics.filter((id) => !topicIds.has(id)).map((id) => `${lesson.id} → missing ${id}`));
+    expect(problems).toEqual([]);
+  });
+});

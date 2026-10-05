@@ -21,6 +21,8 @@ export type Lesson = {
   objective: string;
   realWorld: string;
   prerequisites: string[];
+  // Curriculum topic IDs that teach what this lab needs; shown as review links (tests check they exist).
+  relatedTopics?: string[];
   concepts: string[];
   explanation: string[];
   example: string;

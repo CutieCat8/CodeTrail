@@ -82,18 +82,22 @@
 | ตรวจเชื่อม UI | build ผ่าน; ยังไม่ได้ตรวจใน browser |
 | ข้อจำกัด | เว็บไม่รัน Java/JUnit — acceptance ทุกบทระบุ "ตรวจเองในเครื่อง" · ไม่ใช้ Maven/Gradle (สอนผ่าน console launcher) |
 
-## Labs (`src/content/lessons.ts`, 22 บท)
+## Labs (`src/content/lessons.ts`, 22 บท) — ชุด B8
 
-| กลุ่ม | Inventory |
+| สถานะ | รายละเอียด |
 |---|---|
-| web-ts-narrowing, web-react-filter, web-react-form (auto 3 บท) | เนื้อหาครบแต่สั้น; runner ตรวจได้จริง |
-| web-next-boundary, web-next-states, web-express-get, web-express-post, web-errors, web-postgres-schema, web-postgres-join, web-integration, web-testing (self) | เนื้อหาครบแต่สั้น ต้องปรับคำอธิบาย/acceptance และผูก prerequisite |
-| java-run … java-composition (local-java 10 บท) | ต้องผูกกับ Library CLI milestones |
-| plannedJava (inheritance, polymorphism/interfaces, exceptions, collections/generics, JUnit, RPG) | planned → จะมีหัวข้อจริงใน Java OOP |
+| ผูกกับคอร์ส | ทุก lab มี `relatedTopics` ชี้ไปยังหัวข้อ v3 ที่สอนพื้นฐาน แสดงในหน้า lab เป็นปุ่ม “ทบทวนก่อนทำ” (test ตรวจว่ามีครบและทุก ID มีอยู่จริง) |
+| แก้เนื้อหา | web-express-post เลิกใช้ zod ที่ไม่ได้สอน (ใช้ validateActivity จาก node-input), web-errors/web-testing ใช้ error code และ node:test + fetch แบบเดียวกับคอร์ส Back-end, java-scanner ใช้ nextLine + parseInt ตามคอร์ส Java, java-constructors เลิกใช้ static counter (ขัดกับบท oop-static), java-composition ชี้ไป Library CLI M1–M2 · เฉลย Java ที่เขียนใหม่สองบท compile และรันจริงกับ JDK 21 |
+| plannedJava | ว่างแล้ว เพราะทุกหัวข้อที่เคยวางแผน (inheritance, polymorphism, interfaces, exceptions, collections, JUnit, RPG) อยู่ในคอร์ส Java OOP · ส่วน “Java next horizon” ซ่อนเมื่อไม่มีรายการ |
+| ข้อจำกัด | lab ยังเป็นรูปแบบ Lesson เดิม (ไม่ใช่ v3 เต็ม) ตั้งใจเก็บไว้เป็นแบบฝึกเสริมหลังเรียนคอร์ส · ยังไม่ได้ตรวจใน browser |
+
+## Developer Foundations — ชุด B8
+
+8 หัวข้อเป็น `standard: "v3"` แล้ว: เพิ่ม mapping/limits ของ analogy, checks, acceptance (ตรวจเอง — หัวข้อเหล่านี้ไม่มีการตรวจอัตโนมัติ จึงไม่อ้างว่าระบบตรวจ), solution notes, reflection และ extension
 
 ## คอร์ส planned
 
-react, nextjs, postgres — คง planned; ปรับคำอธิบายใน B8
+react, nextjs, postgres ยัง planned · คำอธิบายบอกว่าต่อจากคอร์สไหน และ postgres เปลี่ยนเป็น “PostgreSQL Deep Dive” เพราะ SQL พื้นฐาน, JOIN และ transaction อยู่ใน Back-end Development แล้ว
 
 ## บันทึกชุดงาน
 
@@ -103,6 +107,7 @@ react, nextjs, postgres — คง planned; ปรับคำอธิบาย
 | B1 มาตรฐาน + js-functions | Claude เขียน; Codex review 2 รอบ (รอบ 1: 7 ข้อ เช่น Submit ข้าม tests, editor แก้ระหว่างรัน; รอบ 2: 4 ข้อใน snippet runner ใหม่) | เสร็จ แก้ครบ | commit `01f6048` |
 | B4 Node.js | Claude เขียน; Codex audit 1 รอบ (commit `1a90cfd`): 14 ข้อ เช่น M4 CLI พังเมื่อรายการไม่ใช่ object, Node 24 ตรวจ ESM จาก syntax เมื่อไม่ตั้ง type, assert.equal ใช้ Object.is, เฉลยไม่ครบไฟล์, ข้ออ้างหน่วยความจำของ stream | แก้ครบ; เฉลย M4 รันจริงพร้อม test 6/6 ผ่านในโฟลเดอร์ชั่วคราว | commit `1a90cfd` + commit แก้ |
 | B3 TypeScript | Claude เขียน; Codex audit 1 รอบ (commit `80d905e`): 14 ข้อ เช่นคำสั่ง tsc ไม่ใช้ tsconfig/strict, npx tsc อาจดึง package ผิด, Planner M3 ลืมตรวจวัน, groupBy กับ key \"constructor\", Partial ยอม undefined, ความหมายของ NodeNext | แก้ครบ — ตั้ง ts-lab (tsconfig strict) ในบท ts-why แล้วทุกบทใช้ `npx tsc -p .` | commit `80d905e` + commit แก้ |
+| B8 Labs + Developer Foundations | Claude แก้และตรวจ (test, JDK 21 สำหรับเฉลย Java ที่เขียนใหม่); ยังไม่ได้ส่ง Codex review | เสร็จ | commit ชุด B8 |
 | B7 Java OOP | Claude เขียนและตรวจด้วย JDK 21 + JUnit 6.1.3; Codex audit — ผลบันทึกหลัง review | รอ review | commit ชุด B7 |
 | B6 Java Foundations | Claude เขียนและตรวจด้วย JDK 21; Codex audit 1 รอบ (commit `0bf59f8`, codex exec read-only, ไม่ใช้ web search แต่รัน JDK 21 ใน sandbox เองเพื่อพิสูจน์): 14 ข้อ (Medium 9, Low 5) เช่น java-switch ใช้ loop/array ก่อนสอน, unknown แสดงตัวพิมพ์ที่แปลงแล้ว, break ใน switch แบบลูกศรใช้ได้ใน statement, case null มีใน Java 21, widening long→double ปัดได้, parseDouble ยอมรับช่องว่าง, Integer cache อธิบายเป็นขอบเขตตายตัว, M0 ไม่มีไฟล์ test-input/expected-output, ตัวตรวจทิ้งข้อความก่อน marker แรก, เดาชื่อไฟล์จาก class และจัดประเภท buggy ด้วยข้อความ | แก้ครบ — ย้าย java-switch ไปหลัง java-loops (ตัวอย่างอ่าน stdin แทน array), เพิ่มคำอธิบาย array/lambda ตรงจุดที่ใช้, ตัด try/catch และ StringBuilder ที่ยังไม่สอน, เฉลย M0 มี test-input.txt/expected-output.txt ครบทุกข้อความ (รวม title required) · ตัวตรวจใหม่: โค้ดไม่มี marker บันทึกเป็น Main.java ตามที่ UI แสดง, ปฏิเสธข้อความก่อน marker, แยกความล้มเหลวของ JDK ออกจาก compile error, และทุกหัวข้อมี `bugCheck` (compile + ข้อความ error / runtime + ข้อความ / logic + output ผิดที่อธิบาย) ที่รันจริง | commit `0bf59f8` + commit แก้ |
 | B5 Back-end | Claude เขียน; Codex audit 1 รอบ (commit `20001ba`, codex exec read-only, ไม่ได้ใช้ web search — ลิงก์ที่ Codex อ้างมาจากความรู้ของโมเดล ไม่ได้ fetch จริง): 16 ข้อ (High 1, Medium 11, Low 4) เช่น repository ของ M6 เรียก db.transaction ซึ่ง pg.Pool ไม่มี, เฉลย M5/auth/testing ไม่ครบตามโจทย์, scrypt ใช้ cost เริ่มต้นต่ำกว่า OWASP, อีเมลที่ไม่มีข้าม scrypt (timing enumeration), 401 ไม่มี WWW-Authenticate, error ของ express.json กลายเป็น 500, Vary: Origin ไม่ครบทุก response, service ใน be-architecture นำ race condition กลับมา, ชื่อหมวด OWASP ไม่ระบุฉบับ, CHECK กับ NULL | แก้ครบ 16 ข้อ — สร้างโปรเจกต์อ้างอิง planner-api สามระยะนอก repo (M5 in-memory 9 test, M6 PGlite 11 test, final auth/authz/security/service 16 test) แล้วนำไฟล์จริงไปเป็นเฉลย; adapter ของ pg ทดสอบกับ node-postgres จริงผ่าน PGlite socket server (join/update/rollback/remove); mutation 3 แบบ (ลบการตรวจสิทธิ์, Vary เฉพาะ origin ที่อนุญาต, ตอบอีเมลที่ไม่มีต่างออกไป) ทำให้ test ล้มทุกแบบ; transferSeat 4 กรณีรันจริง · Codex re-review (commit `11fb970`, ไม่ใช้ web search): 15 FIXED, 1 PARTIAL (test ไม่ assert login 200) และพบ 5 ข้อใหม่จากการตัดตอนโค้ดเป็นเฉลย (forbidden ไม่ถูกนิยาม, บรรทัด limit 10kb ถูกตัด, ไม่แสดง signature ใหม่ของ createApp, helper ปิดวงเล็บไม่ครบ, จำนวน test ไม่ตรง) — แก้ครบ โดย be-architecture แสดง app.mjs ทั้งไฟล์และ be-testing-api รวม test ทั้ง 12 กรณี | commit `20001ba` + commit แก้ |

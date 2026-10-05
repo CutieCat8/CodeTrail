@@ -162,3 +162,6 @@ button{min-width:24px;min-height:24px}
 .app-shell:has(.lesson-v2.focus-mode) .desktop-nav-toggle{display:none}
 @media(min-width:761px){.app-shell.sidebar-collapsed>.sidebar{transform:translateX(-100%)}.app-shell.sidebar-collapsed>.content-shell{margin-left:0}}
 @media(max-width:760px){.desktop-nav-toggle{display:none}}
+
+/* Lab → curriculum review links */
+.related-topics div{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.related-topics .text-button{min-height:32px;padding:4px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:transparent;color:var(--color-info);cursor:pointer;font-size:13px;text-align:left}.related-topics .text-button:hover,.related-topics .text-button:focus-visible{border-color:var(--color-info);color:var(--color-text-primary)}

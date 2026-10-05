@@ -64,18 +64,19 @@ export const typescriptLessons: Record<string, RichLesson> = {
     ],
     traceHint: "ข้างแต่ละบรรทัด เขียนสองคอลัมน์: “tsc ว่าอย่างไร” และ “ตอนรันได้อะไร” แล้วสังเกตว่าสองคอลัมน์นี้ไม่จำเป็นต้องตรงกันเมื่อเลี่ยงการตรวจ",
     practiceHints: [
-      "เพิ่ม type ให้ parameter ทั้งสองตัวและ return type ของ function",
-      "amount: number, currency: string และ return type : string หลังวงเล็บ parameter",
-      "function formatPrice(amount: number, currency: string): string { ... } แล้วลองเรียก formatPrice(\"120\", \"THB\") เพื่อดู error ก่อนลบบรรทัดนั้น",
+      "ทำตามลำดับ: ติดตั้ง typescript → สร้าง tsconfig.json → เขียนโค้ดใน src/index.ts → npx tsc -p .",
+      "เพิ่ม type ให้ parameter ทั้งสองตัวและ return type ของ function แล้วเขียนให้คืนข้อความจากสองค่า",
+      "function formatPrice(amount: number, currency: string): string { return amount + \" \" + currency; } แล้วลองเรียก formatPrice(\"120\", \"THB\") เพื่อดู error ก่อนลบบรรทัดนั้น",
     ],
     acceptance: [
-      "ตรวจเอง: npx tsc --noEmit index.ts ผ่านโดยไม่มี error",
+      "ตรวจเอง: โฟลเดอร์ ts-lab มี typescript ใน devDependencies และ tsconfig.json ที่ strict: true",
+      "ตรวจเอง: npx tsc -p . ผ่านโดยไม่มี error",
       "ตรวจเอง: เมื่อส่ง string แทน amount tsc แจ้ง error ที่บรรทัดนั้น",
-      "ตรวจเอง: รัน node index.ts (Node 22.18+) ได้ 120 THB",
     ],
     solutionNotes: [
       "return type : string ทำให้ tsc เตือนถ้าวันหนึ่งเผลอ return ตัวเลข",
-      "เว็บนี้รัน TypeScript ไม่ได้ จึงตรวจในเครื่อง — ถ้าไม่มี tsc ใน PATH ใช้ npx tsc (จะดาวน์โหลด typescript ชั่วคราว) หรือติดตั้งในโปรเจกต์ (บท ts-config)",
+      "เว็บนี้รัน TypeScript ไม่ได้ จึงตรวจในเครื่อง ติดตั้ง typescript ในโปรเจกต์ก่อน (npm install --save-dev typescript) แล้ว npx tsc จะใช้ตัวที่ติดตั้ง — ถ้ายังไม่ติดตั้ง npx tsc อาจไปดึง package ชื่อ tsc ที่ไม่ใช่ TypeScript",
+      "tsc -p . ใช้ tsconfig.json ในโฟลเดอร์ (strict, target ES2022) ส่วน tsc index.ts แบบระบุไฟล์จะไม่อ่าน tsconfig และไม่เปิด strict",
     ],
     reflection: [
       "นึกถึงบั๊กจากโปรเจกต์เก่าหนึ่งตัวที่ TypeScript น่าจะจับได้ และอีกหนึ่งตัวที่ TypeScript ช่วยไม่ได้",
@@ -89,13 +90,13 @@ export const typescriptLessons: Record<string, RichLesson> = {
         heading: "1) inference: ปล่อยให้ TypeScript เดาเมื่อชัด",
         text: [
           "const title = \"Hiking\" รู้ทันทีว่าเป็น string (และเพราะเป็น const จึงแคบลงเป็นค่าตายตัว \"Hiking\") let joined = 3 เป็น number",
-          "เขียน annotation เมื่อค่าเริ่มต้นไม่บอกชนิดครบ เช่นตัวแปรที่เริ่มเป็น null แต่ภายหลังเป็น string: let note: string | null = null;",
+          "เขียน annotation เมื่อต้องการประกาศสัญญาให้ชัด เช่นตัวแปรที่อาจเป็นข้อความหรือว่าง: let note: string | null = null; (ตัวแปร let ที่เริ่มเป็น null โดยไม่ระบุ type TypeScript อาจ infer เปลี่ยนตามค่าที่ assign ทีหลังได้ แต่ annotation ทำให้ผู้อ่านและส่วนอื่นของโค้ดรู้สัญญาตั้งแต่บรรทัดแรก)",
         ],
       },
       {
         heading: "2) parameter ต้องมี type เสมอ",
         text: [
-          "TypeScript ไม่รู้ว่าผู้เรียกจะส่งอะไรมา parameter ที่ไม่ได้ระบุ type จะเป็น any โดยนัย ในโหมด strict ได้ error noImplicitAny",
+          "TypeScript ไม่รู้ว่าผู้เรียกจะส่งอะไรมา parameter ที่ไม่ได้ระบุ type และไม่มีบริบทให้เดา จะเป็น any โดยนัย ในโหมด strict ได้ error noImplicitAny (ยกเว้น callback ที่ส่งให้ function อื่น เช่น map((n) => ...) ซึ่ง TypeScript เดาจากบริบทได้ — contextual typing)",
           "นี่คือเหตุผลที่ starter ในบทนี้ (ไม่มี type) ใช้ไม่ได้ทันทีเมื่อเปิด strict",
         ],
       },
@@ -111,7 +112,7 @@ export const typescriptLessons: Record<string, RichLesson> = {
     ],
     walkthrough: [
       "title และ joined ไม่ต้องเขียน type เพราะ infer จากค่าเริ่มต้นได้",
-      "note เริ่มเป็น null แต่ต่อมาเป็นข้อความ จึงต้องประกาศ string | null เอง ไม่งั้น TypeScript จะคิดว่าเป็น null อย่างเดียว",
+      "note ประกาศ string | null ไว้ตั้งแต่ต้นเพื่อบอกสัญญาว่า “อาจว่าง หรือเป็นข้อความ” ชัดเจน แม้ TypeScript จะ infer let ที่เริ่มเป็น null ได้ในบางกรณี",
       "fromApi ประกาศเป็น unknown การใช้ + 1 ทำได้เฉพาะใน if ที่พิสูจน์แล้วว่าเป็น number",
       "บรรทัดสุดท้ายใช้ title เป็น string ได้เลยเพราะ type ชัดตั้งแต่ต้น",
     ],
@@ -199,8 +200,8 @@ export const typescriptLessons: Record<string, RichLesson> = {
     traceHint: "ทำตารางการเรียกแต่ละครั้ง: ค่าของทุก parameter (รวมค่าที่มาจาก default หรือเป็น undefined) แล้วตามกิ่งที่ทำงาน",
     practiceHints: [
       "percent ไม่ส่งก็ได้ ให้มีค่าเริ่มต้น 0 แทน optional จะได้ไม่ต้องจัดการ undefined",
-      "function applyDiscount(price: number, percent: number = 0): number และใช้ Math.floor(price * (100 - percent) / 100)",
-      "const calc: (price: number) => number = applyDiscount; ใช้ได้เพราะ parameter ตัวที่สองมีค่าเริ่มต้น",
+      "ใส่ type ให้ทั้งสอง parameter (percent ใช้ default) และ return type คิดเป็นสองขั้น: ราคาที่เหลือกี่เปอร์เซ็นต์ แล้วปัดลงเป็นจำนวนเต็ม",
+      "function applyDiscount(price: number, percent: number = 0): number { return Math.floor(price * (100 - percent) / 100); } และ const calc: (price: number) => number = applyDiscount;",
     ],
     acceptance: [
       "ตรวจเอง: tsc --noEmit --strict ผ่าน",
@@ -229,7 +230,7 @@ export const typescriptLessons: Record<string, RichLesson> = {
       {
         heading: "2) optional และ readonly property",
         text: [
-          "place?: string แปลว่าอาจไม่มี field นี้ ใช้ ?? หรือตรวจก่อนอ่าน",
+          "place?: string แปลว่าอาจไม่มี field นี้ ใช้ ?? (ใช้ค่าทางขวาเมื่อทางซ้ายเป็น null/undefined เรียนแล้วใน Planner M2 และจะลงลึกในบท null safety) หรือตรวจก่อนอ่าน",
           "readonly id: number ห้าม assign ใหม่หลังสร้าง (ตรวจตอน compile) เหมาะกับ id ที่ไม่ควรเปลี่ยน",
         ],
       },
@@ -247,7 +248,7 @@ export const typescriptLessons: Record<string, RichLesson> = {
       "Activity กำหนด field บังคับสี่ตัว (id เป็น readonly) และ place เป็น optional",
       "describe อ่าน place ด้วย ?? จึงจัดการกรณีที่ไม่มีได้",
       "hiking ไม่มี place จึงได้ “ยังไม่กำหนดสถานที่” ส่วน cafe มี place",
-      "ถ้าสะกด field ผิดใน object literal tsc จะแจ้งทั้ง field ที่ขาดและ field ที่เกิน",
+      "ถ้าสะกด field ผิดใน object literal tsc จะแจ้ง error ที่ field ที่เกิน (และมักแนะนำชื่อที่ถูก)",
     ],
     pitfalls: [
       "แก้ error “property does not exist” ด้วย any หรือ as: ปัญหาอยู่ที่ type ไม่ตรงกับข้อมูล ให้แก้ type หรือข้อมูล",
@@ -634,7 +635,8 @@ export const typescriptLessons: Record<string, RichLesson> = {
     ],
     solutionNotes: [
       "Record<string, T[]> บอกว่าแต่ละกลุ่มยังเป็น T เต็มรูป ใช้ field อื่นต่อได้",
-      "String(item[key]) จำเป็นเพราะ key ของ object ใน JavaScript เป็น string เสมอ",
+      "String(item[key]) แปลงค่าที่ใช้จัดกลุ่มให้เป็นข้อความ เพราะ key ของ object ธรรมดาเป็น string (หรือ symbol) ข้อควรระวัง: ค่าต่างชนิดที่แปลงแล้วเหมือนกัน เช่น 1 กับ \"1\" จะรวมอยู่กลุ่มเดียว",
+      "Object.create(null) สร้าง object ที่ไม่มี prototype จึงจัดกลุ่มค่าอย่าง \"constructor\" หรือ \"toString\" ได้ถูกต้อง (object {} ธรรมดามี property เหล่านี้สืบทอดมาแล้ว)",
     ],
     reflection: [
       "function ไหนใน Planner ที่เขียนซ้ำสำหรับข้อมูลต่างชนิด และควรเป็น generic",
@@ -678,6 +680,7 @@ export const typescriptLessons: Record<string, RichLesson> = {
       "เขียน type ของฟอร์มซ้ำด้วยมือ: เพิ่ม field ใหม่แล้วลืมอัปเดต ใช้ Omit/Pick จาก model",
       "คิดว่า Pick ตัด field ออกจาก object ตอนรัน: เป็นแค่ type ต้องสร้าง object ใหม่เองถ้าต้องการซ่อนข้อมูล",
       "ใช้ Partial กับข้อมูลสร้างใหม่: ทำให้ field ที่ต้องมีกลายเป็นไม่บังคับ",
+      "Partial ยอมให้ส่ง { title: undefined } ได้ แล้ว spread จะทับ title เดิมเป็น undefined ทั้งที่ Activity บังคับ string ตรวจ/ตัดค่า undefined ออกก่อน merge หรือเปิด exactOptionalPropertyTypes ใน tsconfig",
     ],
     checks: [
       { question: "Omit<Activity, \"id\" | \"joined\"> มี field อะไรบ้างเมื่อ Activity มี id, title, capacity, joined", answer: "title และ capacity" },
@@ -691,8 +694,8 @@ export const typescriptLessons: Record<string, RichLesson> = {
     traceHint: "เขียน field ของแต่ละ type ที่สร้างจาก Activity ออกมาเป็นรายการ แล้วตรวจว่า object ในตัวอย่างมี field ตรงกัน",
     practiceHints: [
       "MemberForm คือ Member ที่ยังไม่มี id ส่วน PublicMember เลือกแค่สอง field",
-      "type MemberForm = Omit<Member, \"id\">; type PublicMember = Pick<Member, \"id\" | \"name\">;",
-      "ใน toPublic สร้าง object ใหม่ return { id: member.id, name: member.name }; อย่า return member ทั้งก้อน",
+      "เลือก utility ให้ตรงงาน: “ตัดออก” ใช้ Omit, “เลือกเฉพาะ” ใช้ Pick และใน toPublic ต้องสร้าง object ใหม่ ไม่ใช่คืนตัวเดิม",
+      "type MemberForm = Omit<Member, \"id\">; type PublicMember = Pick<Member, \"id\" | \"name\">; และ return { id: member.id, name: member.name };",
     ],
     acceptance: [
       "ตรวจเอง: tsc --noEmit --strict ผ่าน และไม่มี type ที่เขียนซ้ำด้วยมือ",
@@ -780,7 +783,7 @@ export const typescriptLessons: Record<string, RichLesson> = {
         heading: "1) tsconfig.json คือกติกาของโปรเจกต์",
         text: [
           "include บอกไฟล์ที่ตรวจ compilerOptions บอกกติกา strict: true เปิดชุดการตรวจที่สำคัญ (strictNullChecks, noImplicitAny และอื่น ๆ) ควรเปิดตั้งแต่เริ่มโปรเจกต์",
-          "target บอกเวอร์ชัน JavaScript ที่ต้องการ module บอกระบบ module เช่น NodeNext สำหรับ Node แบบ ESM",
+          "target บอกเวอร์ชัน JavaScript ที่ต้องการ module: \"NodeNext\" ทำตามกติกาของ Node ที่ตัดสินจาก \"type\": \"module\" ใน package.json (หรือนามสกุล .mts) ว่าไฟล์เป็น ESM — ถ้าไม่ตั้งจะถือเป็น CommonJS",
         ],
       },
       {
@@ -793,7 +796,7 @@ export const typescriptLessons: Record<string, RichLesson> = {
       {
         heading: "3) รัน TypeScript ใน Node",
         text: [
-          "Node 22.18 ขึ้นไปรัน node index.ts ได้เลยด้วย type stripping (ลบ type ทิ้ง) เวอร์ชันก่อนหน้าต้องใช้ --experimental-strip-types",
+          "Node 22.18 ขึ้นไปรัน node index.ts ได้เลยด้วย type stripping (ลบ type ทิ้ง) ส่วน Node 22.6–22.17 ต้องใช้ --experimental-strip-types และเวอร์ชันที่เก่ากว่านั้นไม่รองรับ",
           "type stripping ไม่ตรวจ type และไม่รองรับ syntax ที่ต้องแปลงโค้ด เช่น enum, namespace ที่มีโค้ด และ parameter properties ถ้าใช้ต้องผ่านเครื่องมือที่ transpile",
         ],
       },
@@ -932,7 +935,7 @@ export const typescriptLessons: Record<string, RichLesson> = {
     walkthrough: [
       "BaseActivity มี field ร่วม Activity เพิ่ม kind พร้อม url หรือ room ตามแบบ",
       "NewActivity ตัด field ที่ระบบเป็นคนกำหนด (id, joined, votes) แต่ยังบังคับให้ระบุแบบพร้อม field ของแบบนั้น",
-      "summarizePlanner มี return type Summary tsc จึงตรวจว่า topTitle เป็น string | null ครบทุกกรณี",
+      "summarizePlanner มี return type Summary tsc ตรวจว่าทุก field มีชนิดตรง ส่วนกรณีรายการว่าง (ranked[0] เป็น undefined) เราจัดการเองด้วย ?. และ ?? เพราะ strict อย่างเดียวไม่บังคับ",
       "create สร้าง Activity ที่สมบูรณ์ จากนั้นสรุปได้ total 2 และที่นั่งรวม 16",
     ],
     pitfalls: [

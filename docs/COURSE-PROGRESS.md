@@ -85,4 +85,5 @@ react, nextjs, postgres — คง planned; ปรับคำอธิบาย
 |---|---|---|---|
 | B0 research | Codex (JS/Java/OOP, web tool) + Claude (TS/Node/Back-end, WebFetch + GitHub) | เสร็จ | `docs/COURSE-RESEARCH.md` |
 | B1 มาตรฐาน + js-functions | Claude เขียน; Codex review 2 รอบ (รอบ 1: 7 ข้อ เช่น Submit ข้าม tests, editor แก้ระหว่างรัน; รอบ 2: 4 ข้อใน snippet runner ใหม่) | เสร็จ แก้ครบ | commit `01f6048` |
+| B3 TypeScript | Claude เขียน; Codex audit 1 รอบ (commit `80d905e`): 14 ข้อ เช่นคำสั่ง tsc ไม่ใช้ tsconfig/strict, npx tsc อาจดึง package ผิด, Planner M3 ลืมตรวจวัน, groupBy กับ key \"constructor\", Partial ยอม undefined, ความหมายของ NodeNext | แก้ครบ — ตั้ง ts-lab (tsconfig strict) ในบท ts-why แล้วทุกบทใช้ `npx tsc -p .` | commit `80d905e` + commit แก้ |
 | B2 JavaScript Foundations | Claude เขียน; Codex audit 1 รอบ: 12 ข้อ (prerequisite ใช้ก่อนสอน, Infinity ในราคา, ลำดับ microtask, สาเหตุ fetch reject, การตรวจ non-mutation, key "constructor", hint ที่เฉลยเร็ว ฯลฯ) | เสร็จ แก้ครบ — เพิ่ม outputCheck สำหรับโจทย์แบบสคริปต์ช่วงต้น | commit ชุด B2 |

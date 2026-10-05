@@ -11,8 +11,8 @@
 
 | ชุด | เจ้าของไฟล์ | ส่งมอบ | สถานะ |
 |---|---|---|---|
-| R1 เครื่องมือ | Codex: developer-foundations topics/lessons, prerequisites ของ ts-why; docs | workspace/save/terminal ก่อนรัน, Node/npm ขั้นขั้นต่ำไม่วน prerequisite, Git setup | in progress |
-| R2 ภาษาเริ่มต้น | Codex: JavaScript และ Java Foundations topics/lessons | ลำดับ syntax, loop/function/array ฝึกแยก, checkpoint และ assessment | planned |
+| R1 เครื่องมือ | Codex: developer-foundations topics/lessons, prerequisites ของ ts-why; docs | workspace/save/terminal ก่อนรัน, Node/npm ขั้นขั้นต่ำไม่วน prerequisite, Git setup | implemented; pending independent review |
+| R2 ภาษาเริ่มต้น | Codex: JavaScript และ Java Foundations topics/lessons | ลำดับ syntax, loop/function/array ฝึกแยก, checkpoint และ assessment | JavaScript implemented; Java Foundations next; independent review pending |
 | R3 ต่อยอด | Codex: TypeScript/Node/Back-end/Java OOP topics/lessons | แยกแนวคิดหนาแน่น, SQL พื้นฐาน, file I/O/JUnit, acceptance ตรงเฉลย | planned |
 | R4 ประกอบทักษะ | Codex: projects, lessons.ts | milestones ลดตัวช่วย, 22 labs ครบ contract และตรวจซ้ำได้ | planned |
 | R5 ตรวจส่งมอบ | Codex: UI ที่จำเป็น, verification/docs | browser routes/interaction/focus/mobile/TypeScript illustration, checks, local production preview | planned |
@@ -35,3 +35,11 @@ Import/XP/streak/AI assistant เป็น backlog; React/Next.js/PostgreSQL เ
 | Java OOP | Java Foundations; ไม่บังคับผ่านเว็บ | state/behavior/references → encapsulation/composition/interfaces → collections/exceptions → I/O/JUnit; Library M1–M3/RPG | ออกแบบระบบจองอุปกรณ์จาก use case | concurrency/reflection/advanced patterns |
 
 ตารางนี้เป็นแผน ไม่ได้ปิด coverage เพียงเพราะมีชื่อกิจกรรม ต้องเชื่อมบท/กิจกรรม/ผลตรวจจริงก่อนเปลี่ยนสถานะ
+
+## R2-JS: ลำดับและการตรวจทักษะที่ลงมือแล้ว
+
+เจ้าของ Codex: javascript-foundations.ts, lessons/javascript-foundations.ts, javascript-start.ts, javascript-bridges.ts, javascript-checkpoints.ts; test โครงสร้างปรับเฉพาะข้อบังคับจำนวนส่วนสอน
+ทางเริ่ม: js-start → values → variables → strings/numbers → conditions → function-basics → functions → runtime; จากนั้น loop-basics → accumulator → array-basics → function-values/scope/objects → loop-control → loops/nested-loops → arrays → errors/references/callbacks → Planner/exception/modules/async
+คง IDs เดิมทั้ง20บท/100steps; บทใหม่ไม่แทนชื่อเดิม เปลี่ยน prerequisite พร้อมลำดับจริง
+การประเมินเป็น manual: เก็บคำตอบ/โค้ด/ผลทดลองแล้วเปิด rubric/model answer หลังส่ง ไม่ให้คะแนนจากข้อความไม่ว่าง; เปิด documentation ได้ วัดการประยุกต์และอธิบาย ไม่วัดจำ syntax
+Independent review จาก Claude: pending; Codex เขียน ตรวจกลไกและทบทวนการสอนเองเท่านั้น

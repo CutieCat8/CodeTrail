@@ -186,6 +186,7 @@ export const javascriptFoundationLessons: Record<string, RichLesson> = {
   "js-errors": {
     hook: "หน้าเว็บขึ้นจอขาว และใน Console มีข้อความสีแดงยาว ๆ หลายคนรีบลบโค้ดที่เพิ่งเขียนทิ้ง ทั้งที่ข้อความนั้นบอกอยู่แล้วว่าพังที่ไหนและเพราะอะไร บทนี้ฝึกอ่านข้อความนั้นให้เป็นเบาะแส",
     explain: [
+      { heading: "เครื่องมืออ่าน error: try/catch แบบเล็ก", text: ["try { ... } ครอบคำสั่งที่อาจผิด ถ้าเกิด error จะหยุดส่วนที่เหลือใน try แล้วเข้า catch (error) { ... } ชื่อ error รับข้อมูลข้อผิดพลาด .name คือชนิด .message คือข้อความ ตัวอย่างนี้ใช้เพื่อแสดง error โดยหน้าไม่หยุด ไม่ได้ทำให้คำสั่งผิดกลายเป็นถูก", "ก่อนรันลอง console.log(cart.item) แยก จะเห็น undefined ส่วน Object.keys(cart) คืน array ของชื่อ property จึงเห็นว่า items มี s ต่อท้าย บท exceptions จะสอนการสร้างและส่ง error เอง ส่วนนี้ยังไม่ใช้ throw/new"], code: 'try { console.log(undefined.length); } catch (error) { console.log(error.name); }', output: "TypeError" },
       {
         heading: "1) error มีสามส่วน: ชนิด ข้อความ ตำแหน่ง",
         text: [
@@ -255,15 +256,15 @@ export const javascriptFoundationLessons: Record<string, RichLesson> = {
       {
         heading: "1) ทุกค่ามีชนิด",
         text: [
-          "primitive ที่ใช้บ่อย: string (\"ซี\"), number (42, 3.5), boolean (true/false), undefined (ยังไม่มีค่า), null (ตั้งใจว่างเปล่า) และยังมีอีกสองชนิดที่เจอน้อยกว่าคือ bigint (จำนวนเต็มขนาดใหญ่ เช่น 10n) และ symbol",
-          "ค่าที่ไม่ใช่ primitive เป็น object ทั้งหมด รวมถึง array และ function",
+          "primitive ที่ฝึกในบทนี้: string (\"ซี\"), number (42, 3.5), boolean (true/false), undefined (ยังไม่มีค่า), null (ตั้งใจว่างเปล่า) ส่วน bigint และ symbol อยู่นอกขอบเขตกิจกรรมนี้",
+          "บทนี้ฝึกค่าพื้นฐานก่อน ข้อมูลหลายค่าใน array และ object จะเรียนภายหลัง ไม่ต้องใช้ syntax ของสองชนิดนั้นในกิจกรรมนี้",
         ],
       },
       {
         heading: "2) typeof ใช้ดูชนิด แต่มีข้อยกเว้น",
         text: [
           "typeof คืนชื่อชนิดเป็น string เช่น typeof 25 ได้ \"number\"",
-          "ข้อยกเว้นที่ต้องจำ: typeof null ได้ \"object\" (ข้อผิดพลาดเก่าของภาษาที่แก้ไม่ได้แล้ว) และ typeof [] ได้ \"object\" ตรวจ array ด้วย Array.isArray",
+          "ข้อยกเว้นที่ต้องจำ: typeof null ได้ \"object\" จากพฤติกรรมเก่าของภาษา ส่วน null คือค่าที่บอกว่าตั้งใจไม่มีข้อมูล",
         ],
       },
       {
@@ -280,20 +281,20 @@ export const javascriptFoundationLessons: Record<string, RichLesson> = {
       "บรรทัดแรกเทียบ typeof ของ \"25\" (มีเครื่องหมายคำพูด = string) กับ 25 (number)",
       "\"25\" + 1: มี string ฝั่งหนึ่ง + จึงต่อข้อความได้ \"251\"",
       "\"25\" - 1: - ใช้กับตัวเลขเท่านั้น JavaScript แปลง \"25\" เป็น 25 แล้วลบได้ 24",
-      "typeof null และ typeof [] ได้ \"object\" ทั้งคู่ จึงต้องใช้ Array.isArray เพื่อแยก array",
+      "typeof null ได้ \"object\" เป็นข้อยกเว้น ส่วน typeof true ได้ \"boolean\"",
     ],
     pitfalls: [
       "คิดว่าค่าจากฟอร์มหรือ URL เป็นตัวเลข: เป็น string เสมอ แปลงด้วย Number(...) ก่อนคำนวณ",
-      "ใช้ typeof value === \"object\" เพื่อตรวจ object: null ก็ผ่าน และ array ก็ผ่าน ตรวจ null และ Array.isArray แยกก่อน",
+      "คิดว่า typeof null ได้ object จึงใช้เหมือนข้อมูลเป็นกลุ่ม: null หมายถึงไม่มีค่า ไม่ใช่กลุ่มข้อมูล",
       "เข้าใจว่า undefined กับ null เหมือนกัน: undefined = ยังไม่ได้กำหนด null = ตั้งใจให้ว่าง ใช้ null เมื่ออยากบอกว่า “ไม่มีค่า” อย่างตั้งใจ",
     ],
     checks: [
       { question: "\"10\" * 2 ได้อะไร และ \"10\" + 2 ได้อะไร", answer: "\"10\" * 2 ได้ 20 (แปลงเป็นตัวเลข) ส่วน \"10\" + 2 ได้ \"102\" (ต่อข้อความ)" },
-      { question: "ทำไม typeof ใช้ตรวจว่าเป็น array ไม่ได้", answer: "เพราะ typeof ของ array คือ \"object\" เหมือน object ทั่วไป ต้องใช้ Array.isArray" },
+      { question: "typeof null ได้อะไร และ null หมายถึงอะไร?", answer: "ได้ object เป็นข้อยกเว้นเก่าของภาษา แต่ null หมายถึงตั้งใจไม่มีค่า" },
     ],
     recap: [
       "primitive: string number boolean undefined null (และ bigint, symbol) — นอกนั้นเป็น object",
-      "typeof null และ typeof [] ได้ \"object\" ใช้ === null และ Array.isArray",
+      "typeof null ได้ \"object\" เป็นข้อยกเว้น อย่าใช้ชื่อจาก typeof เพียงอย่างเดียวตัดสินความหมาย",
       "แปลงชนิดเองก่อนคำนวณ อย่าพึ่ง coercion",
     ],
     traceHint: "เขียนชนิดของค่าทุกตัวข้างแต่ละบรรทัดก่อน (string/number/…) แล้วค่อยตัดสินว่า operator ตัวนั้นจะต่อข้อความหรือคำนวณ",
@@ -335,19 +336,19 @@ export const javascriptFoundationLessons: Record<string, RichLesson> = {
         ],
       },
       {
-        heading: "3) block scope และ const กับ object",
+        heading: "3) block scope: ชื่อใช้ได้ในกลุ่มคำสั่งที่ประกาศ",
         text: [
           "ตัวแปร const/let มองเห็นเฉพาะใน { } ที่ประกาศและ block ที่ซ้อนข้างใน",
-          "const กันการ assign ใหม่ แต่ไม่กันการแก้ข้างใน object: const trip = { days: 2 }; trip.days = 3; ทำได้ (เรื่อง mutation จะเรียนในบท reference)",
+          "block สร้างด้วย { } ได้โดยไม่ต้องมี if ในบทนี้ทำคำสั่งภายในหนึ่งครั้ง เมื่อออกจาก block ชื่อที่ประกาศข้างในใช้ไม่ได้ ส่วนชื่อจากข้างนอกยังอ่านข้างในได้",
         ],
-        code: "const trip = { days: 2 };\ntrip.days = 3;\nconsole.log(trip.days);",
-        output: "3",
+        code: "const outside = 3;\n{\n  const inside = 2;\n  console.log(outside + inside);\n}",
+        output: "5",
       },
     ],
     walkthrough: [
       "friends เป็น const เพราะจำนวนเพื่อนไม่เปลี่ยนในโปรแกรมนี้ budget เป็น let เพราะถูกหักหลายครั้ง",
       "budget = budget - 250 ได้ 750 แล้ว budget -= 150 ได้ 600",
-      "if เห็น 600 > 500 เป็นจริง สร้าง note ใน block นั้นแล้วพิมพ์ “ยังเหลือพอ” note หายไปเมื่อออกจาก block",
+      "เข้า block สร้าง note แล้วพิมพ์ งบหลังหัก 600 ชื่อ note มองเห็นเฉพาะใน block",
       "บรรทัดสุดท้ายพิมพ์ 4 600",
     ],
     pitfalls: [
@@ -357,7 +358,7 @@ export const javascriptFoundationLessons: Record<string, RichLesson> = {
     ],
     checks: [
       { question: "let total = 10; total += 5; total = total * 2; total มีค่าเท่าไร", answer: "30 — 10 + 5 = 15 แล้ว 15 × 2 = 30" },
-      { question: "const scores = []; scores.push(90); เกิด error ไหม เพราะอะไร", answer: "ไม่ error เพราะ push แก้ข้างใน array ไม่ได้ assign ชื่อ scores ใหม่" },
+      { question: "const total = 10; total = 15; เกิดอะไร และแก้ได้สองทางอย่างไร?", answer: "TypeError เพราะ assign ใหม่ให้ const ใช้ let เมื่อต้องเปลี่ยน หรือสร้าง const ชื่อใหม่เก็บผลแทน" },
     ],
     recap: [
       "= คำนวณทางขวาก่อนแล้วผูกให้ชื่อทางซ้าย",
@@ -382,7 +383,7 @@ export const javascriptFoundationLessons: Record<string, RichLesson> = {
     reflection: [
       "ทางเลือกที่ไม่มี let เลยกับทางที่ใช้ let ตัวเดียว แบบไหนอ่านง่ายกว่าสำหรับซี เพราะอะไร",
     ],
-    extension: "เพิ่มค่ารถ 300 บาท และพิมพ์ “งบไม่พอ” ถ้าเงินคงเหลือติดลบ ใช้ if ที่อยู่หลังการหักครั้งสุดท้าย",
+    extension: "ฝึกจากไฟล์ว่าง: เครดิตเริ่ม 800 ซื้อสมุด 120 และกระเป๋า 450 แสดงเงินหลังซื้อแต่ละครั้ง แล้วเปลี่ยนราคาและไล่ค่าใหม่ ไม่ใช้ starter เดิม",
   },
   "js-strings": {
     hook: "ระบบค้นหากิจกรรมของกลุ่มเพื่อน พิมพ์ “ boardgame” ไม่เจอ “Board Game” ทั้งที่เป็นกิจกรรมเดียวกัน ปัญหาคือช่องว่างและตัวพิมพ์ใหญ่เล็ก การจัดการ string ให้เป็นมาตรฐานก่อนเทียบช่วยแก้ปัญหาแบบนี้ได้",
@@ -405,10 +406,10 @@ export const javascriptFoundationLessons: Record<string, RichLesson> = {
         heading: "3) template literal อ่านง่ายกว่าการต่อด้วย +",
         text: [
           "ใช้ backtick ` แล้วแทรกค่าด้วย ${expression} เช่น `คนละ ${share} บาท` ใส่ได้ทั้งตัวแปรและการคำนวณ",
-          "split(separator) แยก string เป็น array และ join(separator) รวม array กลับเป็น string",
+          "replaceAll(ข้อความที่หา, ข้อความแทน) คืน string ใหม่ที่แทนทุกตำแหน่ง เช่น replaceAll(\" \", \"-\") แทนช่องว่างแต่ละตัวด้วย - ไม่ใช่การยุบช่องว่างซ้อน",
         ],
-        code: "const words = \"night market tour\".split(\" \");\nconsole.log(words);\nconsole.log(words.join(\"-\"));\nconsole.log(`มี ${words.length} คำ`);",
-        output: "[\"night\",\"market\",\"tour\"]\nnight-market-tour\nมี 3 คำ",
+        code: "const tag = \"night market tour\".replaceAll(\" \", \"-\");\nconsole.log(tag);\nconsole.log(tag.length);",
+        output: "night-market-tour\n17",
       },
     ],
     walkthrough: [
@@ -430,13 +431,13 @@ export const javascriptFoundationLessons: Record<string, RichLesson> = {
     recap: [
       "index เริ่ม 0 slice ไม่รวม index ปลาย",
       "method ของ string คืนค่าใหม่เสมอ ต้องเก็บผล",
-      "template literal `${...}` สำหรับประกอบข้อความ split/join แปลง string ↔ array",
+      "template literal `${...}` ประกอบข้อความ; replaceAll แทนข้อความทุกตำแหน่ง",
     ],
     traceHint: "เขียน string พร้อมเลข index ใต้แต่ละตัวอักษร (รวมช่องว่าง) แล้วนับตำแหน่งที่ slice ตัด",
     practiceHints: [
       "ทำทีละขั้นและเก็บผลแต่ละขั้น (หรือเรียกต่อกันเป็นสาย) เพราะ method ของ string คืนค่าใหม่",
       "rawTag.trim().toLowerCase() ได้ \"night market tour\" ขั้นต่อไปคือเปลี่ยนช่องว่างเป็น -",
-      "ใช้ .split(\" \").join(\"-\") ต่อท้าย แล้วพิมพ์ tag และ tag.length ควรได้ night-market-tour และ 17",
+      "ใช้ .replaceAll(\" \", \"-\") ต่อท้าย แล้วพิมพ์ tag และ tag.length ควรได้ night-market-tour และ 17",
     ],
     acceptance: [
       "บรรทัดแรกพิมพ์ night-market-tour",
@@ -445,13 +446,13 @@ export const javascriptFoundationLessons: Record<string, RichLesson> = {
     ],
     solutionNotes: [
       "trim ก่อนเสมอ ไม่งั้นช่องว่างหัวท้ายจะกลายเป็น - เกิน",
-      "split(\" \").join(\"-\") แทนทุกช่องว่าง ส่วน replace(\" \", \"-\") แทนแค่ตัวแรก (ใช้ replaceAll ถ้าต้องการทุกตัว)",
-      "ถ้าข้อมูลอาจมีช่องว่างซ้อน ให้กรองคำว่าง .filter((word) => word !== \"\") ก่อน join (จะเรียน filter ในบท arrays) หรือใช้ split(/\\s+/)",
+      "replaceAll แทนทุกช่องว่าง ส่วน replace แทนเฉพาะตัวแรกเมื่อใช้ข้อความธรรมดาเป็นคำค้น",
+      "โจทย์นี้กำหนดหนึ่งช่องว่างระหว่างคำ ถ้ามีช่องว่างซ้อน replaceAll จะได้ - ซ้อน ต้องตกลง requirements ก่อน ไม่อ้างว่าการทำ tag นี้รองรับทุกข้อความ",
     ],
     reflection: [
       "ทำไมการทำ tag ให้เป็นรูปแบบเดียวกันก่อนบันทึก ดีกว่าการแก้ตอนค้นหาทุกครั้ง",
     ],
-    extension: "เขียน initials(fullName) ที่คืนอักษรตัวแรกของแต่ละคำเป็นตัวพิมพ์ใหญ่ เช่น \"sea kanok\" → \"SK\"",
+    extension: "ฝึกจากไฟล์ว่าง: รหัสสินค้า \"  Ab C  \" ต้องกลายเป็น ab-c พร้อมข้อความ \"รหัส: ab-c\" แสดงค่าเดิมและค่าที่ทำสะอาด แล้วอธิบายว่าทำไมค่าเดิมไม่เปลี่ยน",
   },
   "js-numbers": {
     hook: "ระบบหารบิลแสดงว่าเพื่อนต้องจ่ายคนละ NaN บาท ทั้งที่ทุกคนกรอกราคาแล้ว สาเหตุคือมีคนพิมพ์ “120 บาท” ลงไป ตัวเลขที่มาจากข้อความต้องผ่านการแปลงและตรวจก่อนเสมอ",
@@ -1161,7 +1162,7 @@ export const javascriptFoundationLessons: Record<string, RichLesson> = {
       "จำนวนในช่วงคืนตัวเลข",
     ],
     solutionNotes: [
-      "Number.isInteger(NaN) เป็น false จึงจับทั้ง “สี่” และ “2.5” ได้ในเงื่อนไขเดียว",
+      "Number.isInteger(value) คืน true เฉพาะ number ที่เป็นจำนวนเต็ม ไม่แปลง string ให้เอง Number.isInteger(NaN) และ Number.isInteger(2.5) เป็น false จึงจับทั้ง “สี่” และ “2.5” หลัง Number() ได้ในเงื่อนไขเดียว",
       "ต้องดักข้อความว่างแยกเพราะ Number(\"  \") ได้ 0 ซึ่งเป็นจำนวนเต็ม จะถูกจับในเงื่อนไขช่วงด้วยข้อความที่ผิดความหมาย",
       "คืน null แทนการ throw ก็ใช้ได้ถ้าผู้เรียกต้องการแค่รู้ว่าผิด แต่จะเสียข้อมูลว่า “ผิดเพราะอะไร”",
     ],
@@ -1184,8 +1185,8 @@ export const javascriptFoundationLessons: Record<string, RichLesson> = {
       {
         heading: "2) รันหลายไฟล์ต้องรันในเครื่อง",
         text: [
-          "runner บนเว็บนี้รันโค้ดได้ทีละไฟล์ จึงใช้ import/export ไม่ได้ ทดลองในเครื่องด้วย Node: ตั้งชื่อไฟล์เป็น .mjs หรือใส่ \"type\": \"module\" ใน package.json แล้วรัน node main.js",
-          "ใน browser ใช้ <script type=\"module\" src=\"main.js\"> และต้องเปิดผ่าน web server ไม่ใช่เปิดไฟล์ตรง",
+          "runner บนเว็บนี้รันโค้ดได้ทีละไฟล์ จึงใช้ import/export ไม่ได้ วิธีทดลองที่เลือกในบทนี้: เปิดโฟลเดอร์ modules-lab สร้าง planner.mjs กับ main.mjs แยกโค้ดตามป้ายไฟล์ในตัวอย่าง เปลี่ยน import เป็น ./planner.mjs และ Save ทั้งคู่ เปิด terminal ในโฟลเดอร์นั้น PowerShell และ Bash/WSL ใช้ node main.mjs เหมือนกัน ควรแสดง true; .mjs ระบุว่าเป็น module โดยไม่ต้องแก้ package.json",
+          "ถ้า Cannot find module ตรวจชื่อและตำแหน่งไฟล์ ถ้า requested module does not provide an export ตรวจชื่อที่ export กับ import ให้ตรง ก่อนทดลองแบบ .js และ type:module ใน package.json ให้ทำทาง .mjs นี้สำเร็จก่อน",
         ],
       },
       {
@@ -1394,6 +1395,7 @@ export const javascriptFoundationLessons: Record<string, RichLesson> = {
   "js-project-planner-2": {
     hook: "ข้อมูลกิจกรรมที่โหลดมาจาก API มีบางรายการชื่อว่าง บางรายการเวลา “25:00” ถ้านำไปแสดงตรง ๆ ตารางสัปดาห์จะเพี้ยน M2 ทำ pipeline ที่แยกข้อมูลดีออกจากข้อมูลเสีย แล้วจัดตารางให้อ่านง่าย",
     explain: [
+      { heading: "ฝึกส่วนย่อยก่อนประกอบ M2", text: ["forEach(callback) เรียก callback(value, index) ทีละสมาชิกตามลำดับ ไม่คืน array ใหม่ return ใน callback ข้ามเฉพาะรอบนั้น ไม่ได้ออกจาก planWeek ส่วน map คืนรายการผลใหม่; เลือก for แบบ index ที่เรียนแล้วแทน forEach ได้", "split(ตัวคั่น) แยก string เป็น array เช่น time.split(':') ได้สองข้อความ const [hours, minutes] = ... คือ array destructuring: จับค่าตามตำแหน่ง0และ1เป็นชื่อ ไม่ใช่ object destructuring ที่จับตามชื่อ property; .map(Number) ส่ง Number เป็น callback เพื่อแปลงแต่ละข้อความ", "?? อ่านว่าเลือกค่าทดแทนเมื่อทางซ้ายเป็น null หรือ undefined เช่น groups[day] ?? [] สร้างรายการว่างเมื่อยังไม่มีวันนั้น ไม่เหมือน || ที่เปลี่ยนค่าศูนย์หรือข้อความว่างด้วย ก่อนใช้ในโจทย์ ลองตัวอย่างเล็กนี้ เปลี่ยน parts เป็น '00:00' แล้วทำนายอีกครั้ง"], code: 'const parts = "07:30".split(":");\nconst [hours, minutes] = parts.map(Number);\nconsole.log(hours, minutes);\nconst missing = undefined;\nconsole.log(missing ?? "ใหม่");\nconsole.log(0 ?? "ใหม่");', output: "7 30\nใหม่\n0" },
       {
         heading: "1) async อยู่ที่ขอบ แกนกลางเป็น pure function",
         text: [

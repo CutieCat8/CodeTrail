@@ -1,10 +1,14 @@
 import type { TopicSource } from "@/types/curriculum";
 
+import { javascriptBridgeTopics } from "./javascript-bridges";
+import { javascriptCheckpoints } from "./javascript-checkpoints";
+import { javascriptStartTopic } from "./javascript-start";
+
 const courseId = "javascript-foundations";
 const v = (a: string, b: string): [string, string] => [a, b];
 
 // Order is the learning order. Topic IDs are stored in learner progress: never rename them.
-export const javascriptFoundationTopics: TopicSource[] = [
+const originalTopics: TopicSource[] = [
 {
   id: "js-runtime",
   courseId,
@@ -15,7 +19,7 @@ export const javascriptFoundationTopics: TopicSource[] = [
   explanation: "JavaScript engine อ่านโค้ดแล้วรันทีละคำสั่งบน call stack เมื่อเรียก function จะวางกรอบ (frame) ใหม่ทับไว้บนสุด ทำจนเสร็จแล้วค่อยถอดออกและกลับมาทำต่อที่จุดเรียก โค้ดแบบนี้เรียกว่า synchronous ส่วน browser หรือ Node เป็น runtime ที่เพิ่มความสามารถรอบตัวภาษา เช่น console, timer, fetch",
   language: "javascript",
   standard: "v3",
-  prerequisites: [],
+  prerequisites: ["js-functions"],
   example: "function makeTea() {\n  console.log(\"2) ต้มน้ำ\");\n  pour();\n  console.log(\"4) ยกเสิร์ฟ\");\n}\n\nfunction pour() {\n  console.log(\"3) เทน้ำลงแก้ว\");\n}\n\nconsole.log(\"1) รับออร์เดอร์\");\nmakeTea();\nconsole.log(\"5) ปิดบิล\");",
   expectedOutput: "1) รับออร์เดอร์\n2) ต้มน้ำ\n3) เทน้ำลงแก้ว\n4) ยกเสิร์ฟ\n5) ปิดบิล",
   tracePrompt: "ก่อนรัน: เขียนว่า call stack มีอะไรอยู่บ้าง ตอนที่บรรทัด “3) เทน้ำลงแก้ว” ถูกพิมพ์ และทำไม function pour ที่ประกาศทีหลังจึงเรียกได้",
@@ -34,14 +38,14 @@ export const javascriptFoundationTopics: TopicSource[] = [
   title: "values, types และ typeof",
   objective: "จำแนกชนิดของค่าด้วย typeof และทำนายผลของ operator เมื่อชนิดต่างกัน",
   why: "JavaScript ตัดสินพฤติกรรมจากชนิดของค่าตอนรัน ค่าจากฟอร์มหรือ URL เป็น string เสมอ ถ้าไม่รู้ชนิดจะเจอ \"5\" + 1 ได้ \"51\" ในหน้าคิดเงิน",
-  explanation: "ค่าทุกค่ามีชนิด primitive ที่ใช้บ่อยคือ string, number, boolean, undefined และ null ส่วน array, object และ function เป็น object typeof ช่วยดูชนิดแต่มีข้อยกเว้นที่ต้องจำ เช่น typeof null ได้ \"object\" และ typeof [] ก็ได้ \"object\" ให้ใช้ Array.isArray ตรวจ array",
+  explanation: "ค่าพื้นฐานที่ใช้บ่อยคือ string (ข้อความ), number (ตัวเลข), boolean (true/false), undefined (ยังไม่ได้กำหนด) และ null (ตั้งใจไม่มีค่า) typeof คืนชื่อชนิดเป็นข้อความ เช่น typeof 25 ได้ \"number\" แต่ typeof null ได้ \"object\" เป็นข้อยกเว้นเก่าของภาษา ไม่ได้แปลว่า null เป็น object ข้อมูลเป็นกลุ่มจะเรียนในบท arrays และ objects",
   language: "javascript",
   standard: "v3",
-  prerequisites: ["js-runtime"],
-  example: "console.log(typeof \"25\", typeof 25);\nconsole.log(\"25\" + 1);\nconsole.log(\"25\" - 1);\nconsole.log(typeof null, typeof []);\nconsole.log(Array.isArray([]));",
-  expectedOutput: "string number\n251\n24\nobject object\ntrue",
+  prerequisites: ["js-start"],
+  example: "console.log(typeof \"25\", typeof 25);\nconsole.log(\"25\" + 1);\nconsole.log(\"25\" - 1);\nconsole.log(typeof null);\nconsole.log(typeof true);",
+  expectedOutput: "string number\n251\n24\nobject\nboolean",
   tracePrompt: "ทำนายแต่ละบรรทัดก่อนรัน แล้วอธิบายว่าทำไม \"25\" + 1 กับ \"25\" - 1 ได้ผลคนละแบบ",
-  traceAnswer: "string number / 251 / 24 / object object / true — เครื่องหมาย + เมื่อมี string อยู่ด้านหนึ่งจะต่อข้อความ จึงได้ \"251\" ส่วน - ใช้ได้กับตัวเลขอย่างเดียว JavaScript จึงแปลง \"25\" เป็น 25 แล้วลบได้ 24 การแปลงอัตโนมัติแบบนี้เรียก type coercion",
+  traceAnswer: "string number / 251 / 24 / object / boolean — + เมื่อมี string ฝั่งหนึ่งต่อข้อความ ส่วน - แปลงข้อความเป็นตัวเลขแล้วลบ การแปลงอัตโนมัติเรียก type coercion; typeof null เป็นข้อยกเว้นที่ต้องระวัง",
   practicePrompt: "ค่าทั้งสามด้านล่างมาจากฟอร์มทั้งหมด แปลง quantity และ price เป็นตัวเลขด้วย Number() แล้วพิมพ์ 2 บรรทัด: บรรทัดแรก typeof ของ quantity หลังแปลง บรรทัดที่สองราคารวม (quantity × price) ตามด้วย \" บาท\" — ห้ามพิมพ์ตัวเลขคำตอบเอง",
   starter: "const quantity = \"3\";\nconst price = \"45\";\n\n// แปลงเป็นตัวเลข แล้วพิมพ์ typeof และราคารวม\nconsole.log(typeof quantity);\nconsole.log(quantity * price + \" บาท\");",
   solution: "const quantity = \"3\";\nconst price = \"45\";\n\nconst count = Number(quantity);\nconst each = Number(price);\nconsole.log(typeof count);\nconsole.log(count * each + \" บาท\");",
@@ -61,16 +65,16 @@ export const javascriptFoundationTopics: TopicSource[] = [
   courseId,
   unit: "ค่าและตัวแปร",
   title: "const, let และ assignment",
-  objective: "เลือกใช้ const เป็นค่าเริ่มต้นและใช้ let เฉพาะตัวแปรที่ต้อง assign ใหม่ พร้อมอธิบาย block scope",
+  objective: "เลือก const หรือ let ตามการเปลี่ยนค่า ไล่ assignment และระบุขอบเขตของชื่อใน block ได้",
   why: "ตัวแปรที่เปลี่ยนค่าได้ทุกที่ทำให้ตามไม่ทันว่าค่าปัจจุบันมาจากไหน การจำกัดด้วย const ทำให้อ่านโค้ดแล้วรู้ทันทีว่าอะไรคงที่",
-  explanation: "const สร้างชื่อที่ผูกกับค่าแล้ว assign ใหม่ไม่ได้ let ผูกใหม่ได้ ทั้งคู่มี block scope คือมองเห็นเฉพาะใน { } ที่ประกาศ assignment (=) คำนวณค่าทางขวาก่อนแล้วจึงใส่ให้ชื่อทางซ้าย const ห้าม assign ใหม่ แต่ไม่ได้ห้ามแก้ข้างใน object/array ที่มันชี้อยู่",
+  explanation: "const ประกาศชื่อพร้อมค่าตั้งต้นแล้ว assign ใหม่ไม่ได้ let ผูกค่าใหม่ได้ assignment (=) คำนวณทางขวาก่อนใส่ชื่อทางซ้าย -= เป็นรูปย่อของการลบแล้ว assign เช่น budget -= 150 เท่ากับ budget = budget - 150; { } ครอบกลุ่มคำสั่งเรียกว่า block ชื่อที่ประกาศข้างในมองเห็นเฉพาะข้างใน นี่คือ block scope",
   language: "javascript",
   standard: "v3",
   prerequisites: ["js-values"],
-  example: "const friends = 4;\nlet budget = 1000;\n\nbudget = budget - 250;\nbudget -= 150;\n\nif (budget > 500) {\n  const note = \"ยังเหลือพอ\";\n  console.log(note);\n}\n\nconsole.log(friends, budget);",
-  expectedOutput: "ยังเหลือพอ\n4 600",
+  example: "const friends = 4;\nlet budget = 1000;\nbudget = budget - 250;\nbudget -= 150;\n{\n  const note = \"งบหลังหัก\";\n  console.log(note, budget);\n}\nconsole.log(friends, budget);",
+  expectedOutput: "งบหลังหัก 600\n4 600",
   tracePrompt: "ทำนาย output และบอกว่าถ้าเพิ่มบรรทัด console.log(note) ไว้ท้ายไฟล์ จะเกิดอะไรขึ้น ทำไม",
-  traceAnswer: "พิมพ์ “ยังเหลือพอ” แล้ว “4 600” (1000 − 250 − 150 = 600) ถ้าเพิ่ม console.log(note) ท้ายไฟล์จะได้ ReferenceError: note is not defined เพราะ note ประกาศด้วย const ใน block ของ if มองเห็นได้เฉพาะใน { } นั้น",
+  traceAnswer: "งบหลังหัก 600 / 4 600 — 1000 − 250 − 150 = 600; note ใช้ได้ใน { } เท่านั้น เพิ่ม console.log(note) ท้ายไฟล์ได้ ReferenceError เพราะอยู่นอก block",
   practicePrompt: "เขียนโปรแกรมเล็ก ๆ: เริ่มงบ 1500 บาท ใช้ const สำหรับราคาที่พัก 900 และราคาอาหาร 350 ใช้ let สำหรับเงินคงเหลือ แล้วพิมพ์เงินคงเหลือหลังหักทีละรายการ",
   starter: "// ประกาศงบเริ่มต้น ราคาที่พัก และราคาอาหาร\n// เลือกว่าตัวไหนควรเป็น const ตัวไหนควรเป็น let\n\n// หักที่พัก แล้วพิมพ์ยอดคงเหลือ\n\n// หักอาหาร แล้วพิมพ์ยอดคงเหลือ",
   solution: "const lodging = 900;\nconst food = 350;\nlet remaining = 1500;\n\nremaining = remaining - lodging;\nconsole.log(\"หลังจ่ายที่พัก\", remaining);\n\nremaining = remaining - food;\nconsole.log(\"หลังจ่ายอาหาร\", remaining);",
@@ -80,8 +84,8 @@ export const javascriptFoundationTopics: TopicSource[] = [
       "const lodging = 900;\nconst food = 350;\nlet remaining = 1500;\nconsole.log(\"หลังจ่ายที่พัก\", remaining - lodging);\nconsole.log(\"หลังจ่ายอาหาร\", remaining - food);",
     ],
   },
-  buggy: "const total = 0;\nconst prices = [120, 80];\nfor (const price of prices) {\n  total = total + price;\n}\nconsole.log(total);",
-  bugExplanation: "เกิด TypeError: Assignment to constant variable เพราะ total เป็น const แต่ถูก assign ใหม่ในลูป แก้เป็น let total = 0; — const เหมาะกับ prices ที่ไม่ถูก assign ใหม่ (การวนอ่านไม่ใช่การ assign)",
+  buggy: "const total = 120;\ntotal = total + 80;\nconsole.log(total);",
+  bugExplanation: "คาด 200 แต่ TypeError: Assignment to constant variable เพราะ assign ใหม่ให้ const ถ้า total ต้องเปลี่ยนให้ประกาศ let total = 120; อีกทางคือ const combined = total + 80; แล้วพิมพ์ combined ทดลองยืนยัน output 200",
   vocabulary: [v("variable", "ชื่อที่ผูกกับค่า"), v("const", "ประกาศชื่อที่ assign ใหม่ไม่ได้"), v("let", "ประกาศชื่อที่ assign ใหม่ได้"), v("assignment", "การใส่ค่าทางขวาให้ชื่อทางซ้ายด้วย ="), v("block scope", "ขอบเขตที่มองเห็นตัวแปรได้เฉพาะใน { } ที่ประกาศ")],
 },
 {
@@ -94,18 +98,18 @@ export const javascriptFoundationTopics: TopicSource[] = [
   explanation: "string คือลำดับตัวอักษร เข้าถึงตัวที่ index ได้และมี length string เปลี่ยนแปลงไม่ได้ (immutable): method อย่าง trim หรือ toUpperCase คืน string ใหม่เสมอ template literal ใช้ backtick และแทรกค่าด้วย ${...} อ่านง่ายกว่าการต่อด้วย +",
   language: "javascript",
   standard: "v3",
-  prerequisites: ["js-values"],
+  prerequisites: ["js-variables"],
   example: "const rawName = \"  Sea Kanok  \";\nconst name = rawName.trim();\nconst first = name.slice(0, 3);\n\nconsole.log(`[${rawName}] → [${name}]`);\nconsole.log(name.length, first);\nconsole.log(name.toLowerCase().includes(\"sea\"));\nconsole.log(rawName.length);",
   expectedOutput: "[  Sea Kanok  ] → [Sea Kanok]\n9 Sea\ntrue\n13",
   tracePrompt: "ทำนายทุกบรรทัด และอธิบายว่าทำไมบรรทัดสุดท้าย rawName.length ยังเป็น 13 ทั้งที่เรียก trim ไปแล้ว",
   traceAnswer: "[  Sea Kanok  ] → [Sea Kanok] / 9 Sea / true / 13 — trim ไม่ได้แก้ rawName แต่คืน string ใหม่ที่เก็บใน name เพราะ string เป็น immutable rawName ยังมีช่องว่างหน้า 2 หลัง 2 รวม 13 ตัว slice(0, 3) เอา index 0–2 (ไม่รวม 3)",
   practicePrompt: "ตัวแปร rawTag มาจากช่องพิมพ์ tag ของกิจกรรม ทำให้เป็นรูปแบบมาตรฐาน: ตัดช่องว่างหัวท้าย ทำเป็นตัวพิมพ์เล็ก แล้วแทนช่องว่างระหว่างคำด้วย - จากนั้นพิมพ์ผลลัพธ์ และพิมพ์ความยาวของผลลัพธ์ในบรรทัดถัดไป (ห้ามพิมพ์คำตอบเอง)",
   starter: "const rawTag = \"  Night Market Tour \";\n\n// 1) ตัดช่องว่างหัวท้าย  2) ตัวพิมพ์เล็ก  3) แทนช่องว่างด้วย -\nconst tag = rawTag;\nconsole.log(tag);\nconsole.log(tag.length);",
-  solution: "const rawTag = \"  Night Market Tour \";\n\nconst tag = rawTag.trim().toLowerCase().split(\" \").join(\"-\");\nconsole.log(tag);\nconsole.log(tag.length);",
+  solution: "const rawTag = \"  Night Market Tour \";\n\nconst tag = rawTag.trim().toLowerCase().replaceAll(\" \", \"-\");\nconsole.log(tag);\nconsole.log(tag.length);",
   outputCheck: {
     expected: "night-market-tour\n17",
     wrongAnswers: [
-      "const rawTag = \"  Night Market Tour \";\nconst tag = rawTag.toLowerCase().split(\" \").join(\"-\");\nconsole.log(tag);\nconsole.log(tag.length);",
+      "const rawTag = \"  Night Market Tour \";\nconst tag = rawTag.toLowerCase().replaceAll(\" \", \"-\");\nconsole.log(tag);\nconsole.log(tag.length);",
       "const rawTag = \"  Night Market Tour \";\nconst tag = rawTag.trim().toLowerCase().replace(\" \", \"-\");\nconsole.log(tag);\nconsole.log(tag.length);",
     ],
   },
@@ -123,7 +127,7 @@ export const javascriptFoundationTopics: TopicSource[] = [
   explanation: "JavaScript ใช้ชนิด number ชนิดเดียวทั้งจำนวนเต็มและทศนิยม operator ที่ใช้บ่อยคือ + - * / และ % (เศษจากการหาร) Number(\"42\") แปลงข้อความทั้งก้อน ถ้าแปลงไม่ได้ได้ NaN (Not a Number) ซึ่งเป็นชนิด number แต่ไม่เท่ากับอะไรเลยแม้แต่ตัวเอง จึงต้องตรวจด้วย Number.isNaN ทศนิยมบางค่าเก็บไม่ตรงเป๊ะ เช่น 0.1 + 0.2 เงินจึงมักคำนวณเป็นหน่วยสตางค์ (จำนวนเต็ม ซึ่งตรงเสมอในช่วงที่ปลอดภัย คือไม่เกิน Number.MAX_SAFE_INTEGER)",
   language: "javascript",
   standard: "v3",
-  prerequisites: ["js-values"],
+  prerequisites: ["js-variables"],
   example: "console.log(17 % 5, 7 / 2);\nconsole.log(Number(\"42\") + 8);\nconsole.log(Number(\"42 บาท\"));\nconsole.log(Number.isNaN(Number(\"abc\")));\nconsole.log(0.1 + 0.2);\nconsole.log((10 + 20) / 100);",
   expectedOutput: "2 3.5\n50\nNaN\ntrue\n0.30000000000000004\n0.3",
   tracePrompt: "ทำนายทุกบรรทัด โดยเฉพาะ Number(\"42 บาท\") และ 0.1 + 0.2 แล้วอธิบายว่าบรรทัดสุดท้ายแก้ปัญหาทศนิยมอย่างไร",
@@ -182,7 +186,7 @@ export const javascriptFoundationTopics: TopicSource[] = [
   explanation: "function คือชุดคำสั่งที่ตั้งชื่อไว้ รับค่าเข้าทาง parameter และส่งผลกลับด้วย return การประกาศยังไม่ทำงานจนกว่าจะถูกเรียก return ส่งค่ากลับแล้วจบ function ทันที ส่วน console.log แค่แสดงผล pure function คำนวณจาก input เท่านั้นและไม่มี side effect",
   language: "javascript",
   standard: "v3",
-  prerequisites: ["js-conditions", "js-variables"],
+  prerequisites: ["js-function-basics", "js-numbers"],
   example: "function splitCost(total, people) {\n  const share = total / people;\n  return Math.ceil(share);\n}\n\nconst perPerson = splitCost(1250, 4);\nconsole.log(perPerson);\nconsole.log(splitCost(900, 3));\nconsole.log(splitCost(100, 3) * 3);",
   expectedOutput: "313\n300\n102",
   tracePrompt: "ก่อนกด Run: ทำนาย output ทั้งสามบรรทัด และบอกว่าตัวแปร perPerson เก็บค่าอะไร ทำไมบรรทัดสุดท้ายจึงไม่ได้ 100",
@@ -218,11 +222,11 @@ export const javascriptFoundationTopics: TopicSource[] = [
   unit: "Functions",
   title: "scope, closure และ state ที่ function จำได้",
   objective: "ทำนายว่าตัวแปรไหนมองเห็นได้จากตรงไหน และใช้ closure สร้าง function ที่จำค่าของตัวเองโดยไม่ใช้ตัวแปร global",
-  why: "event handler, middleware factory และ React hooks ล้วนพึ่ง closure ถ้าไม่เข้าใจจะเจอค่าที่ “ค้าง” หรือ state ที่แชร์กันโดยไม่ตั้งใจ",
+  why: "เครื่องออกบัตรสองเครื่องต้องจำเลขของตนเอง ถ้าใช้ชื่อเดียวจากภายนอกจะเพิ่มเลขปนกัน closure ช่วยเก็บข้อมูลแยกไว้ให้แต่ละ function",
   explanation: "scope คือขอบเขตที่ชื่อตัวแปรมองเห็นได้ JavaScript ใช้ lexical scope: ดูจากตำแหน่งที่เขียนโค้ด function ข้างในอ่านตัวแปรของ function ข้างนอกได้ แต่ข้างนอกมองเข้าไปข้างในไม่ได้ closure คือ function ที่จำตัวแปรรอบตัวตอนที่ถูกสร้างไว้ แม้ function ข้างนอกจะ return ไปแล้ว แต่ละครั้งที่เรียก function ข้างนอกจะได้ชุดตัวแปรใหม่แยกกัน",
   language: "javascript",
   standard: "v3",
-  prerequisites: ["js-functions"],
+  prerequisites: ["js-runtime", "js-function-values"],
   example: "function makeTicketMachine(prefix) {\n  let next = 1;\n  return function () {\n    const ticket = prefix + \"-\" + next;\n    next = next + 1;\n    return ticket;\n  };\n}\n\nconst food = makeTicketMachine(\"F\");\nconst drink = makeTicketMachine(\"D\");\n\nconsole.log(food());\nconsole.log(food());\nconsole.log(drink());\nconsole.log(food());",
   expectedOutput: "F-1\nF-2\nD-1\nF-3",
   tracePrompt: "ทำนายทั้งสี่บรรทัดก่อนรัน แล้วอธิบายว่าทำไม drink() ได้ D-1 ทั้งที่ food ถูกเรียกไปแล้วสองครั้ง",
@@ -255,7 +259,7 @@ export const javascriptFoundationTopics: TopicSource[] = [
   explanation: "for ใช้เมื่อรู้จำนวนรอบ: เริ่มค่า; เงื่อนไขทำต่อ; ขั้นถัดไป while ใช้เมื่อหยุดตามเงื่อนไขที่ไม่รู้ล่วงหน้า for...of วนค่าทีละตัวใน array โดยไม่ต้องจัดการ index accumulator คือตัวแปรที่ประกาศก่อนลูปและสะสมผลทุกรอบ break ออกจากลูปทันที continue ข้ามไปรอบถัดไป",
   language: "javascript",
   standard: "v3",
-  prerequisites: ["js-conditions", "js-variables"],
+  prerequisites: ["js-loop-control"],
   example: "const prices = [120, 80, 300, 50];\n\nlet total = 0;\nfor (const price of prices) {\n  total = total + price;\n}\nconsole.log(\"รวม\", total);\n\nfor (let i = 0; i < prices.length; i++) {\n  if (prices[i] > 100) continue;\n  console.log(\"ราคาไม่เกิน 100 ที่ index\", i);\n}\n\nlet budget = 250;\nlet bought = 0;\nwhile (bought < prices.length && budget >= prices[bought]) {\n  budget = budget - prices[bought];\n  bought = bought + 1;\n}\nconsole.log(\"ซื้อได้\", bought, \"ชิ้น เหลือ\", budget);",
   expectedOutput: "รวม 550\nราคาไม่เกิน 100 ที่ index 1\nราคาไม่เกิน 100 ที่ index 3\nซื้อได้ 2 ชิ้น เหลือ 50",
   tracePrompt: "ทำตารางรอบของ while: budget และ bought ก่อนตรวจเงื่อนไขแต่ละรอบ แล้วบอกว่าทำไมลูปหยุดทั้งที่ยังมีของราคา 50 อยู่",
@@ -291,7 +295,7 @@ export const javascriptFoundationTopics: TopicSource[] = [
   explanation: "map เรียก function กับทุกสมาชิกแล้วได้ array ใหม่ความยาวเท่าเดิม filter เก็บเฉพาะสมาชิกที่ function คืนค่า truthy ได้ array ใหม่ที่อาจสั้นลง find คืนสมาชิกตัวแรกที่ตรงเงื่อนไขหรือ undefined includes ตรวจว่ามีค่าหรือไม่ ทั้งหมดนี้ไม่แก้ array เดิม ต่างจาก push หรือ sort ที่แก้ของเดิม",
   language: "javascript",
   standard: "v3",
-  prerequisites: ["js-loops", "js-functions"],
+  prerequisites: ["js-objects", "js-function-values"],
   example: "const activities = [\n  { title: \"Board game\", capacity: 6, joined: 4 },\n  { title: \"Hiking\", capacity: 8, joined: 8 },\n  { title: \"Cafe hop\", capacity: 5, joined: 1 },\n];\n\nconst open = activities.filter((activity) => activity.joined < activity.capacity);\nconst labels = open.map((activity) => activity.title + \" (เหลือ \" + (activity.capacity - activity.joined) + \")\");\nconst full = activities.find((activity) => activity.joined === activity.capacity);\n\nconsole.log(labels);\nconsole.log(full.title);\nconsole.log(activities.length, open.length);",
   expectedOutput: "[\"Board game (เหลือ 2)\",\"Cafe hop (เหลือ 4)\"]\nHiking\n3 2",
   tracePrompt: "ทำนายผลของ labels ก่อนรัน และบอกว่าทำไม activities.length ยังเป็น 3 หลัง filter",
@@ -326,7 +330,7 @@ export const javascriptFoundationTopics: TopicSource[] = [
   explanation: "object จับคู่ key กับ value อ่านด้วย activity.title หรือ activity[\"title\"] (bracket ใช้เมื่อชื่อ key อยู่ในตัวแปร) destructuring ดึง field ออกเป็นตัวแปร: const { title, joined } = activity spread {...activity, joined: 5} คัดลอก field ทั้งหมดลง object ใหม่แล้ว field ทางขวาทับของเดิม การคัดลอกนี้เป็นแบบตื้น (shallow): array หรือ object ที่อยู่ข้างในยังเป็นตัวเดิม",
   language: "javascript",
   standard: "v3",
-  prerequisites: ["js-arrays"],
+  prerequisites: ["js-array-basics", "js-function-values"],
   example: "const activity = { title: \"Board game\", capacity: 6, joined: 4 };\n\nconst { title, joined } = activity;\nconsole.log(title, joined);\n\nconst key = \"capacity\";\nconsole.log(activity[key]);\n\nconst updated = { ...activity, joined: activity.joined + 1, place: \"Cafe\" };\nconsole.log(updated);\nconsole.log(activity.joined);",
   expectedOutput: "Board game 4\n6\n{\"title\":\"Board game\",\"capacity\":6,\"joined\":5,\"place\":\"Cafe\"}\n4",
   tracePrompt: "ทำนายผลของ updated และ activity.joined ก่อนรัน แล้วอธิบายว่าถ้าสลับเป็น { joined: 99, ...activity } จะได้ joined เท่าไร",
@@ -642,3 +646,10 @@ export const javascriptFoundationTopics: TopicSource[] = [
   vocabulary: [v("pipeline", "ลำดับขั้นการแปลงข้อมูลที่ผลของขั้นหนึ่งเป็น input ของขั้นถัดไป"), v("validation", "การตรวจว่าข้อมูลถูกต้องก่อนใช้"), v("grouping", "จัดรายการเป็นกลุ่มตาม key"), v("?? (nullish coalescing)", "ใช้ค่าทางขวาเมื่อทางซ้ายเป็น null หรือ undefined"), v("regular expression", "รูปแบบสำหรับตรวจข้อความ เช่น /^\\d{2}:\\d{2}$/")],
 },
 ];
+
+const order = ["js-start", "js-values", "js-variables", "js-strings", "js-numbers", "js-conditions", "js-function-basics", "js-functions", "js-runtime", "js-loop-basics", "js-accumulator", "js-array-basics", "js-function-values", "js-scope", "js-objects", "js-loop-control", "js-loops", "js-nested-loops", "js-arrays", "js-errors", "js-references", "js-callbacks", "js-project-planner-1", "js-exceptions", "js-modules-json", "js-promises", "js-async", "js-project-planner-2"];
+const byId = new Map([...originalTopics, javascriptStartTopic, ...javascriptBridgeTopics].map(topic => [topic.id, topic]));
+export const javascriptFoundationTopics: TopicSource[] = order.map(id => {
+  const topic = byId.get(id)!;
+  return javascriptCheckpoints[id] ? { ...topic, checkpoint: javascriptCheckpoints[id] } : topic;
+});

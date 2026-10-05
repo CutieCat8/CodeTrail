@@ -91,3 +91,7 @@
 ## แหล่งเครื่องมือรอบแก้หลัง audit (Codex, 2026-10-05)
 
 อ่าน Node download/npm introduction, Git first setup, Adoptium Windows/Linux และ Playwright library ใหม่เพื่อแก้เครื่องมือ ดู URL สิ่งที่เข้าถึงได้และข้อจำกัดจริงใน [COURSE-REPAIR-EVIDENCE.md](COURSE-REPAIR-EVIDENCE.md#แหล่งที่เปิดจริงสำหรับงานใหม่) ไม่อ้างว่าเปิดบทของแพลตฟอร์มเรียนเต็มจาก syllabus; ตารางเดิมเป็นประวัติการค้นคว้ารอบก่อน
+
+### R2-JS source access
+
+Codex เปิด MDN Grammar/types, Loops and iteration และ String.replaceAll จริงใน2026-10-05; รายละเอียดการใช้และข้อจำกัดใน COURSE-REPAIR-EVIDENCE.md ส่วนR2-JS ไม่มีการอ้างว่าอ่านบทแพลตฟอร์มเต็มใหม่

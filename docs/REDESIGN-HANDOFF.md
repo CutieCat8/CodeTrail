@@ -10,7 +10,8 @@ Claude ติด usage limit ตามผู้ใช้; Codex เขียน�
 R1 implement แล้ว: ลำดับ files → terminal → Node/npm tools → editor → program → process → errors → Git → docs; คง IDs เดิมและเพิ่ม dev-runtime-tools
 เพิ่ม checkpoint เฉพาะเรื่องใน Developer Foundations พร้อม rubric/model answer หลังส่ง ไม่มี starter algorithm; การส่งข้อความบันทึกความพยายาม ไม่ใช่ยืนยันถูก
 แก้ความขัดกัน oop-constructor / oop-polymorphism / M0→M1; เพิ่ม JDK setup และ prerequisite npm ของ ts-why
-R2–R4 ยัง planned: การแยกบทและฝึก/assessment ของอีกหกคอร์ส, SQL, projects และการยกระดับ 22 labs ยังไม่ได้ปิด
+R2-JS implement และตรวจแล้ว: ทางเริ่มจากศูนย์/สะพาน function-loop-array/28 checkpoint เฉพาะเรื่อง; IDs เดิมคงอยู่ รายละเอียดใน COURSE-REPAIR-EVIDENCE
+R2-Java และ R3–R4 ยัง planned: Java Foundations, TypeScript/Node/Back-end/OOP, SQL, projects และ 22 labs ยังไม่ปิด
 R5 ตรวจ baseline ชุดแรกแล้ว: build Webpack ผ่าน; browser เปิด 7 courses/545 steps/22 labs และตรวจ interaction ตัวแทน/TypeScript/mobile ผ่าน ต้องรันใหม่หลัง R2–R4; ไม่ใช่ final acceptance ทั้งรอบ
 
 

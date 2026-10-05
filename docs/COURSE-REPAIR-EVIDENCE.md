@@ -91,3 +91,41 @@ PLAYWRIGHT_BROWSERS_PATH=/tmp/sea-quest-browser/browsers LD_LIBRARY_PATH=/tmp/se
 fonts.conf เป็น fontconfig ของ context นี้ที่ include /etc/fonts/fonts.conf, เพิ่ม dir /tmp/sea-quest-browser/libs/usr/share/fonts และใช้ cachedir /tmp/sea-quest-browser/font-cache
 Environment นี้ sandbox บล็อก socket/ดาวน์โหลด/เขียน .git; ใช้ approval ที่รองรับ ไม่มี Codex bypass
 Browser script เป็นหลักฐานตรวจชุดแรก ต้องปรับ manifest และรันใหม่เมื่อชุด R2–R4 เปลี่ยนบท/interaction
+
+## R2-JS — JavaScript Foundations (2026-10-05)
+
+ฐาน b7f8aa5, branch feat/curriculum-learning-repair; เจ้าของการผลิตและตรวจ Codex คนเดียว
+ตรวจ process เพิ่มหลัง permissions เปลี่ยน: มี Claude เปิดค้าง cwd repo ต้นฉบับ แต่ session log ล่าสุดจบ audit เวลา07:02UTC ไม่มีงานเขียนใหม่ใน Linux; ไม่แตะ repo ต้นฉบับ ไม่เรียก agent เพิ่ม
+Snapshot ของชุดนี้: commit subject `fix(curriculum): scaffold JavaScript foundations and topic assessments` (ดู git log)
+Independent review ใหม่: **pending ทุกไฟล์ในชุดนี้** ไม่อ้างว่า Claude ตรวจแล้ว
+
+### สิ่งที่แก้และ coverage ที่ตรวจ
+
+| ทักษะ/ช่องว่าง | บทสอน | ฝึก | assessment / หลักฐาน |
+|---|---|---|---|
+| save/run/คำสั่งก่อน function | js-start → values → variables | แยกชื่อ/ข้อความ, เปลี่ยนข้อมูลแล้วทำนาย; debugชื่อผิด/assign const | เส้นทางเดินทาง, เครดิต; browser output check ปฏิเสธผิด/ยอมรับเฉลย |
+| function ก่อน call stack | js-function-basics → js-functions → js-runtime | เติมreturn →เขียนคำนวณหลายinput → traceการเรียกซ้อน; return/log debug | แปลงอุณหภูมิ, ค่าถ่ายเอกสาร, traceแพ็กสินค้า; function tests/feedback gated |
+| loopก่อนการประกอบ | loop-basics → accumulator → array-basics → loop-control → loops → nested-loops | เติมขอบ → sumToจากชื่อfunction → countAbove → หยุด0 → affordableCount → สร้างทุกคู่ | นับถอยหลัง/คูปอง/เซนเซอร์/บริจาค/เวลางาน/ห้อง; ปกติ ศูนย์รอบ ขอบรวม ไม่ข้ามหลังหยุด |
+| array/arrow/objectก่อนmap | array-basics → function-values → objects → arrays | index/length/push/for-of, ส่งfunctionกับเรียก, arrow block return | กฎราคา/พัสดุ; correct/wrong function/output fixtures |
+| errors/ข้อมูลเปลี่ยนได้ | errors (สอนtry/catchก่อนใช้), references, callbacks | หลักฐาน i/value, copyชั้นที่เปลี่ยน, sort/reduce | เซสชันและstateหนังสือ; rubric แยกmanualตรวจmutationจากผลreturn |
+| async/modules/validation | exceptions → modules-json → promises → async → Planner M2 | คำสั่ง.mjsแน่นอน, catch/rejection, ฝึกsplit/destructure/??ก่อนpipeline | ชั่วโมง, modulesค่าซอง, Promiseลำดับ, simulatedasync; ท้ายคอร์สรายงานยืมอุปกรณ์เลือกวิธีเอง |
+
+แก้ values ไม่ใช้[]ก่อนarray; variables ไม่ใช้if/array/loopก่อนสอน; stringsสอนreplaceAllและใช้แทนsplit/joinในช่วงต้น คงreturn/console.log, analogiesและPlannerเดิม
+Checkpointทั้ง28บทเป็นโจทย์เฉพาะเรื่องพร้อมrubric/คำตอบจริง มีกรณีขอบ/ผิดเหมาะกับแต่ละเรื่อง Feedbackหลังส่งยังกลับทบทวนได้ แต่การบันทึก completed เป็นหลักฐานการส่ง ไม่ใช่คะแนนความถูกต้อง
+Tests โครงสร้างเดิมบังคับexplainอย่างน้อย3ส่วน แม้แบ่งแนวคิดเล็ก จึงเอาจำนวนขั้นต่ำออก ไม่เติมข้อความเพื่อผ่านจำนวน ส่วนตรวจoutput/fixtures/prerequisite/เนื้อหาที่แสดงยังอยู่
+
+### ผลตรวจ
+
+- lint ผ่าน; TypeScript --noEmit ผ่าน; Vitest 8 files / 408 tests ผ่าน รวมตัวอย่างและอธิบายย่อยรันได้ เฉลยผ่าน starter/คำตอบผิดที่กำหนดไม่ผ่าน
+- production build `npm run build -- --webpack` ผ่านบน Next16.3.6 / Node24.21.0 / TypeScript5.9.2; ไม่แก้buildconfig
+- scriptเทียบgitshow b7f8aa5กับsourceปัจจุบัน:20 IDsเดิมอยู่ครบ ไม่มีschema/hashเปลี่ยน
+- Browser production contextแยก:140 JavaScript stepsเปิดได้ ไม่มีpageerror; ไม่ใช่อ่านทุกบทหรือยืนยันการเรียนรู้
+- ตัวแทนinteraction: new output/function testsถูก/ผิด, hints, assessmentไม่เห็นเฉลยก่อนส่ง→feedback→save/reload, เรียนต่อเข้าสู่runtimeที่ย้าย, reviewlinkไปjs-startพร้อมfocus, longcontent1440/390ไม่ล้น, Tabออกจากassessment
+- หลักฐาน [browser report](verification/R2-JS/browser-report.json), [script](verification/R2-JS/browser-script.cjs.txt), [manifest](verification/R2-JS/browser-manifest.ts.txt)
+- Previewในเครื่อง http://127.0.0.1:3100/#step/js-start-concept ไม่มีdeploy
+
+### แหล่งและข้อจำกัด
+
+เปิดอ่านเอกสารทางการ MDN [Grammar/types](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Grammar_and_types), [Loops](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Loops_and_iteration), [replaceAll](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replaceAll) เพื่อตรวจกลไก declaration/ขอบลูป/string replacement; โจทย์และข้อความเขียนใหม่ ไม่อ้างอ่านคอร์สแพลตฟอร์มเต็ม
+ยังไม่มี learner trial หรือ independent review ผลเทคนิคไม่ยืนยันความสามารถผู้เริ่มต้น ยังไม่ปิดอีกห้าคอร์ส/projects/22labs หรือfinal browserรวม
+ถัดไป R2-Java: declaration/castก่อนใช้, array/ArrayList/minimum/copyก่อนwithoutLowest, checkpoint/assessmentใหม่ แล้วR3→R4→R5ตามแผน ไม่ต้องขออนุญาตซ้ำ

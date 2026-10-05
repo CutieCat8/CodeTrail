@@ -1,0 +1,4 @@
+import { writeFileSync } from 'node:fs';
+import { learningSteps, curriculumCourses, topicSources } from '/home/cnux/work/sea-fullstack-quest/src/content/curriculum/index';
+import { lessons } from '/home/cnux/work/sea-fullstack-quest/src/content/lessons';
+writeFileSync('/tmp/sea-quest-browser/manifest.json', JSON.stringify({ steps: learningSteps.map(s => ({id:s.id,title:s.title})), courses:curriculumCourses, labs:lessons.map(l=>({id:l.id,title:l.title})), functionSolution:topicSources.find(t=>t.id==='js-functions')!.solution }));

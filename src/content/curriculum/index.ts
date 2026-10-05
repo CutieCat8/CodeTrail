@@ -4,7 +4,15 @@ import { javaFoundationTopics } from "./java-foundations";
 import { javaOopTopics } from "./java-oop";
 import { javascriptFoundationTopics } from "./javascript-foundations";
 import { nodeFoundationTopics } from "./node-foundations";
+import { typescriptTopics } from "./typescript";
+import { backendTopics } from "./backend";
 import { developerFoundationLessons } from "./lessons/developer-foundations";
+import { javascriptFoundationLessons } from "./lessons/javascript-foundations";
+import { typescriptLessons } from "./lessons/typescript";
+import { nodeFoundationLessons } from "./lessons/node-foundations";
+import { backendLessons } from "./lessons/backend";
+import { javaFoundationLessons } from "./lessons/java-foundations";
+import { javaOopLessons } from "./lessons/java-oop";
 import type { RichLesson, TopicSource } from "@/types/curriculum";
 
 const withLessons = (topics: TopicSource[], lessons: Record<string, RichLesson>): TopicSource[] =>
@@ -14,10 +22,12 @@ export { curriculumCourses } from "./courses";
 
 export const topicSources = [
   ...withLessons(developerFoundationTopics, developerFoundationLessons),
-  ...javaFoundationTopics,
-  ...javaOopTopics,
-  ...javascriptFoundationTopics,
-  ...nodeFoundationTopics,
+  ...withLessons(javaFoundationTopics, javaFoundationLessons),
+  ...withLessons(javaOopTopics, javaOopLessons),
+  ...withLessons(javascriptFoundationTopics, javascriptFoundationLessons),
+  ...withLessons(typescriptTopics, typescriptLessons),
+  ...withLessons(nodeFoundationTopics, nodeFoundationLessons),
+  ...withLessons(backendTopics, backendLessons),
 ];
 
 export const learningSteps = expandTopics(topicSources);

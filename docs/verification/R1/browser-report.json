@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-05T08:44:02.694Z",
+  "base": "http://127.0.0.1:3100",
+  "profile": "fresh Playwright browser context; no primary profile; no screenshots",
+  "routeScope": "open every step and lab; this does not mean every lesson was read",
+  "courses": [
+    "developer-foundations",
+    "java-foundations",
+    "java-oop",
+    "javascript-foundations",
+    "node-foundations",
+    "backend",
+    "typescript"
+  ],
+  "steps": 545,
+  "labs": 22,
+  "interactions": [
+    "TypeScript artwork: CSS background URL present and nonzero bounds on desktop; not a visual quality certification",
+    "assessment: blank starter, no early feedback, submit→feedback, localStorage save→reload",
+    "continue navigates to the next step in repaired order",
+    "review link navigates and focuses step heading",
+    "practice hints; wrong function rejected; solution passes browser worker tests",
+    "lab checklist and notes save/restore; checklist is learner self-report, not automated correctness",
+    "long tools lesson has no page overflow; assessment Tab leaves answer field at 1440px",
+    "long tools lesson has no page overflow; assessment Tab leaves answer field at 390px",
+    "TypeScript world image decodes and featured course fits 390px mobile"
+  ],
+  "errors": [],
+  "artwork": {
+    "width": 150,
+    "height": 150
+  }
+}

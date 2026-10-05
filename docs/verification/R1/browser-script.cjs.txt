@@ -1,0 +1,89 @@
+const {chromium} = require('playwright');
+const fs = require('node:fs');
+const assert = require('node:assert/strict');
+const manifest = JSON.parse(fs.readFileSync('/tmp/sea-quest-browser/manifest.json','utf8'));
+let activeBrowser;
+(async()=>{
+ const browser = await chromium.launch({headless:true});
+ activeBrowser=browser;
+ const context = await browser.newContext({viewport:{width:1440,height:900}});
+ const page = await context.newPage();
+ const errors=[]; page.on('pageerror',e=>errors.push(e.message));
+ const report={date:new Date().toISOString(),base:'http://127.0.0.1:3100',profile:'fresh Playwright browser context; no primary profile; no screenshots',routeScope:'open every step and lab; this does not mean every lesson was read',courses:[],steps:0,labs:0,interactions:[],errors};
+ async function route(hash,title){
+  await page.evaluate(h=>location.hash=h,hash);
+  await page.waitForFunction(t=>[...document.querySelectorAll('h1')].some(h=>h.textContent===t),title,{timeout:10000});
+ }
+ if(process.argv.includes('--diagnose')) {
+  await page.setViewportSize({width:390,height:900});await page.goto(report.base+'/#step/dev-runtime-tools-concept');await page.locator('#step-title').waitFor();
+  console.log(await page.evaluate(()=>[...document.querySelectorAll('body *')].map(e=>({tag:e.tagName,cls:e.className,x:e.getBoundingClientRect().x,right:e.getBoundingClientRect().right,width:e.getBoundingClientRect().width,text:e.textContent.slice(0,80)})).filter(e=>e.right>innerWidth+1&&e.width>30).slice(0,25)));
+  await browser.close();return;
+ }
+ await page.goto(report.base+'/#curriculum');
+ await page.locator('.course-card').first().waitFor();
+ for(const course of manifest.courses.filter(c=>c.status==='live')){
+  await page.locator('.course-card').filter({hasText:course.title}).click();
+  await page.locator('.featured-course h2').filter({hasText:course.title}).waitFor();
+  report.courses.push(course.id);
+ }
+ const tsCard=page.locator('.course-card').filter({hasText:'TypeScript Foundations'});
+ const art=page.locator('.featured-course-art .world-landmark-art.typescript');
+ const artStyle=await art.evaluate(e=>({background:getComputedStyle(e).backgroundImage,rect:e.getBoundingClientRect().toJSON()}));
+ assert.ok(artStyle.rect.width>0&&artStyle.rect.height>0);assert.match(artStyle.background,/url/);
+ const artworkDecoded=await page.evaluate(async()=>{const image=new Image();image.src='/art/typescript-observatory.svg';await image.decode();return {width:image.naturalWidth,height:image.naturalHeight};});
+ assert.ok(artworkDecoded.width>0&&artworkDecoded.height>0);report.artwork=artworkDecoded;
+ report.interactions.push('TypeScript artwork: CSS background URL present and nonzero bounds on desktop; not a visual quality certification');
+ for(const step of manifest.steps){await route('step/'+step.id,step.title);report.steps++;}
+ for(const lab of manifest.labs){await route('lesson/'+lab.id,lab.title);report.labs++;}
+ await route('step/dev-files-checkpoint',manifest.steps.find(s=>s.id==='dev-files-checkpoint').title);
+ assert.equal(await page.getByRole('button',{name:'Hint / Solution',exact:true}).count(),0);
+ const response=page.getByRole('textbox',{name:/Code editor/});
+ assert.equal(await response.inputValue(),'');
+ await response.fill('../data/menu.txt เพราะ .. ถอยไป club');
+ await page.getByRole('button',{name:'ส่งคำตอบเพื่อเทียบเกณฑ์'}).click();
+ await page.getByRole('button',{name:'Hint / Solution',exact:true}).click();
+ await page.locator('.reveal').waitFor();
+ await page.waitForFunction(()=>JSON.parse(localStorage.getItem('seas-fullstack-quest:v1')||'{}').stepProgress?.['dev-files-checkpoint']?.answerRevealed===true);
+ await page.reload(); await page.locator('.reveal').waitFor();
+ assert.match(await page.getByRole('textbox',{name:/Code editor/}).inputValue(),/data\/menu.txt/);
+ report.interactions.push('assessment: blank starter, no early feedback, submit→feedback, localStorage save→reload');
+ await page.getByRole('button',{name:'ไป step ถัดไป'}).click();
+ await page.waitForFunction(()=>location.hash==='#step/dev-terminal-concept');
+ report.interactions.push('continue navigates to the next step in repaired order');
+ const prereq=page.locator('.prereq button').first();await prereq.click();
+ await page.waitForFunction(()=>document.activeElement?.id==='step-title');
+ report.interactions.push('review link navigates and focuses step heading');
+ await route('step/js-functions-practice',manifest.steps.find(s=>s.id==='js-functions-practice').title);
+ await page.locator('.hints > summary').click(); await page.locator('.hint-level > summary').first().click();
+ assert.equal(await page.locator('.hint-level').first().getAttribute('open'),'');
+ const code=page.getByRole('textbox',{name:/Code editor/});await code.fill('function costPerPerson(){return 0;}');
+ await page.getByRole('button',{name:'Run tests',exact:true}).click();await page.locator('.micro-test-results.has-failed').waitFor();
+ await code.fill(manifest.functionSolution);await page.getByRole('button',{name:'Run tests',exact:true}).click();await page.locator('.micro-test-results.all-passed').waitFor();
+ report.interactions.push('practice hints; wrong function rejected; solution passes browser worker tests');
+ await route('lesson/java-run',manifest.labs.find(l=>l.id==='java-run').title);
+ const check=page.locator('.lesson-study-pane input[type=checkbox]').first();await check.check();
+ await page.locator('.lesson-practice-pane .notes-editor').fill('manual evidence: java --version');
+ await page.waitForFunction(()=>JSON.parse(localStorage.getItem('seas-fullstack-quest:v1')||'{}').progress?.['java-run']?.notes==='manual evidence: java --version');
+ await page.reload();await page.locator('.lesson-study-pane input[type=checkbox]').first().waitFor();
+ assert.equal(await page.locator('.lesson-study-pane input[type=checkbox]').first().isChecked(),true);
+ assert.equal(await page.locator('.lesson-practice-pane .notes-editor').inputValue(),'manual evidence: java --version');
+ report.interactions.push('lab checklist and notes save/restore; checklist is learner self-report, not automated correctness');
+ for(const width of [1440,390]){
+  await page.setViewportSize({width,height:900});
+  await route('step/dev-runtime-tools-concept',manifest.steps.find(s=>s.id==='dev-runtime-tools-concept').title);
+  const bounds=await page.evaluate(()=>({viewport:innerWidth,document:document.documentElement.scrollWidth}));
+  assert.ok(bounds.document<=bounds.viewport+1,JSON.stringify(bounds));
+  await route('step/dev-files-checkpoint',manifest.steps.find(s=>s.id==='dev-files-checkpoint').title);
+  await page.getByRole('textbox',{name:/Code editor/}).focus();await page.keyboard.press('Tab');
+  assert.equal(await page.getByRole('textbox',{name:/Code editor/}).evaluate(e=>e===document.activeElement),false);
+  report.interactions.push(`long tools lesson has no page overflow; assessment Tab leaves answer field at ${width}px`);
+ }
+ await page.evaluate(()=>location.hash='curriculum');await page.locator('.course-card').first().waitFor();
+ await page.locator('.course-card').filter({hasText:'TypeScript Foundations'}).click();
+ const mobileArt=await page.locator('.featured-course-art .typescript').boundingBox();assert.ok(mobileArt?.width>0&&mobileArt?.height>0);
+ assert.ok(await page.locator('.featured-course').evaluate(e=>e.getBoundingClientRect().right<=innerWidth+1));
+ report.interactions.push('TypeScript world image decodes and featured course fits 390px mobile');
+ assert.deepEqual(errors,[]);
+ fs.writeFileSync('/tmp/sea-quest-browser/report.json',JSON.stringify(report,null,2));
+ console.log(JSON.stringify(report,null,2));await context.close();await browser.close();
+})().catch(async e=>{console.error(e);await activeBrowser?.close();process.exitCode=1});

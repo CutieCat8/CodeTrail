@@ -25,7 +25,7 @@ describe("stepRecommendation", () => {
     const data = emptyData();
     data.mode = "fullstack";
 
-    expect(stepRecommendation(data).step.id).toBe("dev-program-concept");
+    expect(stepRecommendation(data).step.id).toBe("dev-files-concept");
   });
 
   it("starts Java mode with Java Foundations", () => {
@@ -41,7 +41,7 @@ describe("stepRecommendation", () => {
 
     const result = stepRecommendation(data);
 
-    expect(result.step.id).toBe("dev-program-concept");
+    expect(result.step.id).toBe("dev-files-concept");
     expect(result.companionStep?.id).toBe("java-jdk-concept");
     expect(result.reason).toContain("Developer Foundations");
     expect(result.reason).toContain("Java Foundations");
@@ -50,7 +50,7 @@ describe("stepRecommendation", () => {
   it("balances mixed mode by choosing Java after one Developer Foundations step", () => {
     const data = emptyData();
     data.mode = "mixed";
-    data.stepProgress["dev-program-concept"] = completed("dev-program-concept");
+    data.stepProgress["dev-files-concept"] = completed("dev-files-concept");
 
     expect(stepRecommendation(data).step.id).toBe("java-jdk-concept");
   });
@@ -58,17 +58,17 @@ describe("stepRecommendation", () => {
   it("returns to Developer Foundations when both routes have equal completion", () => {
     const data = emptyData();
     data.mode = "mixed";
-    data.stepProgress["dev-program-concept"] = completed("dev-program-concept");
+    data.stepProgress["dev-files-concept"] = completed("dev-files-concept");
     data.stepProgress["java-jdk-concept"] = completed("java-jdk-concept");
 
-    expect(stepRecommendation(data).step.id).toBe("dev-program-trace");
+    expect(stepRecommendation(data).step.id).toBe("dev-files-trace");
   });
 
   it("resumes a mixed-route draft before selecting a different route", () => {
     const data = emptyData();
     data.mode = "mixed";
-    data.stepProgress["dev-program-concept"] = {
-      stepId: "dev-program-concept",
+    data.stepProgress["dev-files-concept"] = {
+      stepId: "dev-files-concept",
       answer: "source code คือข้อความที่ผู้พัฒนาเขียน",
       notes: "กลับมาอธิบาย instruction ต่อ",
       completed: false,
@@ -77,7 +77,7 @@ describe("stepRecommendation", () => {
 
     const result = stepRecommendation(data);
 
-    expect(result.step.id).toBe("dev-program-concept");
+    expect(result.step.id).toBe("dev-files-concept");
     expect(result.reason).toMatch(/กลับมาทำต่อ/);
   });
 
@@ -118,7 +118,7 @@ describe("stepRecommendation", () => {
       updatedAt: "2026-10-01T00:00:00.000Z",
     };
 
-    expect(stepRecommendation(data).step.id).toBe("dev-program-concept");
+    expect(stepRecommendation(data).step.id).toBe("dev-files-concept");
   });
 
   it("finishes both second-stage routes before entering Node Foundations", () => {

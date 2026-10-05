@@ -12,6 +12,7 @@ import { typescriptLessons } from "./lessons/typescript";
 import { nodeFoundationLessons } from "./lessons/node-foundations";
 import { backendLessons } from "./lessons/backend";
 import { javaFoundationLessons } from "./lessons/java-foundations";
+import { javaOopLessons } from "./lessons/java-oop";
 import type { RichLesson, TopicSource } from "@/types/curriculum";
 
 const withLessons = (topics: TopicSource[], lessons: Record<string, RichLesson>): TopicSource[] =>
@@ -22,7 +23,7 @@ export { curriculumCourses } from "./courses";
 export const topicSources = [
   ...withLessons(developerFoundationTopics, developerFoundationLessons),
   ...withLessons(javaFoundationTopics, javaFoundationLessons),
-  ...javaOopTopics,
+  ...withLessons(javaOopTopics, javaOopLessons),
   ...withLessons(javascriptFoundationTopics, javascriptFoundationLessons),
   ...withLessons(typescriptTopics, typescriptLessons),
   ...withLessons(nodeFoundationTopics, nodeFoundationLessons),

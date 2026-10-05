@@ -4,7 +4,8 @@
 //     npx vite-node --config vitest.config.ts scripts/verify-java-lessons.ts
 //
 // For every v3 topic with language "java":
-//   - example (and explain blocks with output) compile and print exactly expectedOutput, fed `stdin` when given
+//   - example (and explain blocks with output) compile and print exactly expectedOutput, fed `stdin` when given;
+//     an example made of JUnit tests (no expectedOutput) must pass at least one test with no failures
 //   - starter compiles; solution compiles and, with solutionCheck, prints exactly solutionCheck.output
 //   - a solution that contains test-input.txt and expected-output.txt prints the expected file for that input
 //   - sources that import org.junit compile against JUNIT_JAR; solutionCheck.junitTests runs the JUnit
@@ -123,6 +124,10 @@ const expectOutput = (label: string, result: RunResult, expected: string) =>
 for (const topic of topics) {
   try {
     if (topic.expectedOutput !== undefined) expectOutput(`${topic.id} · example`, execute(topic.example, topic.stdin), topic.expectedOutput);
+    if (topic.expectedOutput === undefined && usesJunit(topic.example)) {
+      const result = runJunit(topic.example);
+      report(result.successful > 0 && result.failed === 0, `${topic.id} · example JUnit tests pass`, result.detail.slice(-1500));
+    }
     for (const block of topic.lesson?.explain ?? []) {
       if (block.code && block.output !== undefined) expectOutput(`${topic.id} · ${block.heading}`, execute(block.code), block.output);
     }

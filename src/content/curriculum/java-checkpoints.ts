@@ -321,40 +321,166 @@ switch แบบ -> คืนค่าของ expression และไม่ไ
 default ทำงานเมื่อไม่ตรงทุก case เก็บค่า mode ที่ตัดช่องว่างแล้วไว้ใช้ในข้อความ unknown`,
   },
   "java-methods": {
-    "prompt": "ประเมินบริบทใหม่ — เปิด documentation ได้ ไม่เปิดrubric/เฉลยก่อนส่ง: ค่าตั๋วเริ่ม80 ส่วนลดเป็นบาทผ่านparameter แต่ยอดสุดท้ายต้องไม่ติดลบ สร้างmethodเลือกชื่อเองรับราคาและส่วนลด คืนยอด แล้วmethodอีกตัวจัดข้อความ Ticket: ยอด ทดสอบส่วนลด0,20,100กับราคา80 อธิบายreturnและpass-by-value\nแนบโค้ด/คำสั่ง/ค่าทำนายและoutputหรือerrorจริง การส่งเป็นบันทึกความพยายาม ยังต้องเทียบเกณฑ์ด้วยตนเอง",
-    "rubric": [
-      "ผล80,60,0และข้อความตรง",
-      "ทั้งสองmethodประกอบกันได้",
-      "อธิบายการassignparameterไม่เปลี่ยนตัวแปรcaller"
+    prompt: prompt(
+      "ตั๋วราคาเริ่มต้น 80 บาท มีส่วนลดเป็นบาทส่งผ่าน parameter แต่ยอดสุดท้ายต้องไม่ติดลบ สร้าง method (เลือกชื่อเอง) ที่รับราคาและส่วนลดแล้วคืนยอดสุทธิ และ method อีกตัวที่คืนข้อความ Ticket: ยอด",
+      "ทดสอบส่วนลด 0, 20 และ 100 กับราคา 80 อธิบาย return และเหตุที่การรับ parameter ไม่เปลี่ยนตัวแปรของผู้เรียก",
+    ),
+    rubric: [
+      "ได้ Ticket: 80, Ticket: 60 และ Ticket: 0 ตามข้อความที่กำหนด",
+      "method ทั้งสองทำงานประกอบกันได้",
+      "อธิบายได้ว่า parameter รับสำเนาของค่า การเปลี่ยนค่าใน method ไม่เปลี่ยนตัวแปรใน main",
     ],
-    "modelAnswer": "static int discounted(int price,int discount){return Math.max(0,price-discount);}static String label(int price,int discount){return \"Ticket: \"+discounted(price,discount);} mainเรียกlabel(80,0/20/100)ได้ตามrubric; parameterรับสำเนาค่าint ไม่แก้priceในmain"
+    modelAnswer: `public class Main {
+    static int discounted(int price, int discount) {
+        int result = price - discount;
+        if (result < 0) {
+            return 0;
+        }
+        return result;
+    }
+
+    static String label(int price, int discount) {
+        return "Ticket: " + discounted(price, discount);
+    }
+
+    public static void main(String[] args) {
+        int price = 80;
+        System.out.println(label(price, 0));
+        System.out.println(label(price, 20));
+        System.out.println(label(price, 100));
+        System.out.println(price);
+    }
+}
+
+ผลที่ได้: Ticket: 80 / Ticket: 60 / Ticket: 0 และบรรทัดสุดท้ายยังเป็น 80
+return ส่งค่ากลับให้ผู้เรียกนำไปใช้ต่อ (label นำค่าจาก discounted ไปต่อข้อความ)
+parameter price ใน method รับสำเนาของค่า 80 จึงไม่แก้ตัวแปร price ใน main`,
   },
   "java-arrays": {
-    "prompt": "ประเมินบริบทใหม่ — เปิด documentation ได้ ไม่เปิดrubric/เฉลยก่อนส่ง: มีอุณหภูมิ[18,25,25,31] คืนarrayใหม่เฉพาะค่าระหว่าง20ถึง30รวมขอบ ลำดับเดิมและค่าซ้ำต้องอยู่ ต้นฉบับไม่เปลี่ยน ตรวจ[],[20,30,19,31] เลือกวิธีเอง\nแนบโค้ด/คำสั่ง/ค่าทำนายและoutputหรือerrorจริง การส่งเป็นบันทึกความพยายาม ยังต้องเทียบเกณฑ์ด้วยตนเอง",
-    "rubric": [
-      "ผล[25,25],[],[20,30]",
-      "ไม่เปลี่ยนต้นฉบับและผลเป็นarrayใหม่",
-      "อธิบายขนาดผลกับindexอ่าน/เขียนหรือวิธีอื่น"
+    prompt: prompt(
+      "สถานีอ่านรหัสซ้ำ ๆ ได้ [1, 1, 2, 2, 2, 3, 1] ให้เขียน method ที่คืน array ใหม่โดยตัดค่าที่ซ้ำกับค่าก่อนหน้าที่อยู่ติดกันออก เหลือ [1, 2, 3, 1] ลำดับเดิม ต้นฉบับไม่เปลี่ยน",
+      "ทดสอบกับ [], [5], [4, 4, 4] และ [1, 2, 1] เลือกวิธีเอง",
+    ),
+    rubric: [
+      "ผล [1, 2, 3, 1], [], [5], [4], [1, 2, 1]",
+      "ไม่เปลี่ยนต้นฉบับ และผลเป็น array ใหม่",
+      "อธิบายการกำหนดขนาดผลลัพธ์และ index ที่ใช้อ่านกับเขียน (หรือวิธีอื่นที่ถูกต้อง)",
     ],
-    "modelAnswer": "static int[] range(int[] values){int count=0;for(int value:values){if(value>=20 && value<=30)count++;}int[] result=new int[count];int next=0;for(int value:values){if(value>=20 && value<=30)result[next++]=value;}return result;} ต้องแสดงArrays.toStringทั้งต้นฉบับและผลและทดลองแก้resultเมื่อไม่ว่างก่อนยืนยันต้นฉบับ"
+    modelAnswer: `import java.util.Arrays;
+
+public class Main {
+    static int[] compress(int[] values) {
+        int count = 0;
+        for (int i = 0; i < values.length; i++) {
+            if (i == 0 || values[i] != values[i - 1]) {
+                count++;
+            }
+        }
+        int[] result = new int[count];
+        int next = 0;
+        for (int i = 0; i < values.length; i++) {
+            if (i == 0 || values[i] != values[i - 1]) {
+                result[next] = values[i];
+                next++;
+            }
+        }
+        return result;
+    }
+
+    public static void main(String[] args) {
+        int[] readings = {1, 1, 2, 2, 2, 3, 1};
+        int[] empty = {};
+        int[] single = {5};
+        int[] same = {4, 4, 4};
+        int[] pattern = {1, 2, 1};
+        System.out.println(Arrays.toString(compress(readings)));
+        System.out.println(Arrays.toString(compress(empty)));
+        System.out.println(Arrays.toString(compress(single)));
+        System.out.println(Arrays.toString(compress(same)));
+        System.out.println(Arrays.toString(compress(pattern)));
+        System.out.println(Arrays.toString(readings));
+    }
+}
+
+ผลที่ได้: [1, 2, 3, 1] / [] / [5] / [4] / [1, 2, 1] และต้นฉบับยังเป็น [1, 1, 2, 2, 2, 3, 1]
+รอบแรกนับว่าต้องเก็บกี่ค่าเพื่อกำหนดขนาดของ result รอบสองอ่านด้วย i และเขียนลง result ด้วย next ที่เดินเฉพาะตอนเก็บค่า
+ค่าที่ซ้ำแต่ไม่ติดกัน (1 ตัวสุดท้าย) ต้องถูกเก็บไว้ จึงเทียบกับค่าก่อนหน้าเท่านั้น`,
   },
   "java-arraylist": {
-    "prompt": "ประเมินบริบทใหม่ — เปิด documentation ได้ ไม่เปิดrubric/เฉลยก่อนส่ง: รายการรหัสอุปกรณ์[2,5,2,9] ลบรหัส2เฉพาะครั้งแรก เพิ่ม7ท้าย ให้ได้[5,2,9,7] โดยต้นฉบับไม่เปลี่ยน ทดลองไม่มีรหัส2และรายการว่าง เลือกวิธีเองและอธิบายremoveตำแหน่งกับremoveค่า\nแนบโค้ด/คำสั่ง/ค่าทำนายและoutputหรือerrorจริง การส่งเป็นบันทึกความพยายาม ยังต้องเทียบเกณฑ์ด้วยตนเอง",
-    "rubric": [
-      "ผลตรงและไม่ลบสมาชิกindex2โดยผิดความหมาย",
-      "ต้นฉบับคงเดิม;ไม่มี2เพิ่ม7อย่างเดียว",
-      "remove(Integer.valueOf(2))ต่างจากremove(2)"
+    prompt: prompt(
+      "รายการรหัสอุปกรณ์ [2, 5, 2, 9] ให้ลบรหัส 2 เฉพาะตัวแรก แล้วเพิ่ม 7 ที่ท้าย ได้ [5, 2, 9, 7] โดยรายการต้นฉบับไม่เปลี่ยน",
+      "ทดลองรายการที่ไม่มีรหัส 2 และรายการว่าง เลือกวิธีเอง และอธิบายความต่างของ remove ตามตำแหน่งกับ remove ตามค่า",
+    ),
+    rubric: [
+      "ผลตรง และไม่ลบสมาชิกที่ index 2 โดยผิดความหมาย",
+      "ต้นฉบับคงเดิม กรณีไม่มี 2 เพิ่ม 7 อย่างเดียว",
+      "remove(Integer.valueOf(2)) ต่างจาก remove(2)",
     ],
-    "modelAnswer": "ArrayList<Integer> next=new ArrayList<>(original);next.remove(Integer.valueOf(2));next.add(7);System.out.println(next); remove(2)รับintจึงลบindex2 ส่วนIntegervalueเลือกoverloadลบค่า; []ได้[7]"
+    modelAnswer: `import java.util.ArrayList;
+
+public class Main {
+    static ArrayList<Integer> update(ArrayList<Integer> original) {
+        ArrayList<Integer> next = new ArrayList<>(original);
+        next.remove(Integer.valueOf(2));
+        next.add(7);
+        return next;
+    }
+
+    public static void main(String[] args) {
+        ArrayList<Integer> codes = new ArrayList<>();
+        codes.add(2);
+        codes.add(5);
+        codes.add(2);
+        codes.add(9);
+        ArrayList<Integer> noTwo = new ArrayList<>();
+        noTwo.add(5);
+        noTwo.add(9);
+        ArrayList<Integer> empty = new ArrayList<>();
+
+        System.out.println(update(codes));
+        System.out.println(codes);
+        System.out.println(update(noTwo));
+        System.out.println(update(empty));
+    }
+}
+
+ผลที่ได้: [5, 2, 9, 7] / [2, 5, 2, 9] (ต้นฉบับไม่เปลี่ยน) / [5, 9, 7] / [7]
+remove(2) รับ int จึงลบสมาชิกที่ตำแหน่ง (index) 2 ส่วน remove(Integer.valueOf(2)) เลือกแบบลบตามค่า จึงลบเลข 2 ตัวแรก`,
   },
   "java-exceptions-basic": {
-    "prompt": "ประเมินบริบทใหม่ — เปิด documentation ได้ ไม่เปิดrubric/เฉลยก่อนส่ง: อ่านจำนวนกล่องจากข้อความ รับจำนวนเต็ม1ถึง5 ถ้ารูปแบบเสียแสดงbad format ถ้านอกช่วงแสดงout of range ให้โปรแกรมกลับอ่านคำสั่งต่อได้จนEOF ทดลองabc,0,5,6และบรรทัดว่าง อธิบายว่าจับอะไรและไม่ซ่อนerrorอะไร\nแนบโค้ด/คำสั่ง/ค่าทำนายและoutputหรือerrorจริง การส่งเป็นบันทึกความพยายาม ยังต้องเทียบเกณฑ์ด้วยตนเอง",
-    "rubric": [
-      "formatเสียและช่วงผิดแยกกัน",
-      "ข้อมูลถูกหลังข้อมูลผิดยังประมวลผล",
-      "catchเฉพาะปัญหาinputและเก็บหลักฐานจริง"
+    prompt: prompt(
+      "อ่านจำนวนกล่องทีละบรรทัดจนหมด input รับจำนวนเต็ม 1 ถึง 5 ถ้ารูปแบบเสียแสดง bad format ถ้านอกช่วงแสดง out of range และโปรแกรมต้องกลับไปอ่านบรรทัดถัดไปได้",
+      "ทดลอง input abc, 0, 5, 6 และบรรทัดว่าง อธิบายว่าจับ exception อะไร และไม่ซ่อน error อะไร",
+    ),
+    rubric: [
+      "แยก format เสียกับช่วงผิดออกจากกัน",
+      "ข้อมูลถูกหลังข้อมูลผิดยังถูกประมวลผล",
+      "catch เฉพาะปัญหาจาก input และเก็บหลักฐานจริง",
     ],
-    "modelAnswer": "ในwhile(input.hasNextLine()): String raw=input.nextLine().strip();try{int count=Integer.parseInt(raw);if(count<1 || count>5){System.out.println(\"out of range\");}else{System.out.println(count);}}catch(NumberFormatException error){System.out.println(\"bad format\");} abcกับว่างbadformat,0/6นอกช่วง,5แสดง5 ไม่catchExceptionกว้างเพื่อกลบบั๊กอื่น"
+    modelAnswer: `import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+        while (input.hasNextLine()) {
+            String raw = input.nextLine().strip();
+            try {
+                int count = Integer.parseInt(raw);
+                if (count < 1 || count > 5) {
+                    System.out.println("out of range");
+                } else {
+                    System.out.println(count);
+                }
+            } catch (NumberFormatException error) {
+                System.out.println("bad format");
+            }
+        }
+    }
+}
+
+input abc, 0, 5, 6 และบรรทัดว่าง ได้ bad format / out of range / 5 / out of range / bad format ตามลำดับ
+ช่วงที่ผิดเป็นเงื่อนไขที่ตรวจด้วย if ส่วน format ที่เสียเกิดจาก parseInt จึงจับด้วย NumberFormatException
+ไม่ catch Exception กว้าง ๆ เพราะจะกลบบั๊กอื่นที่ไม่เกี่ยวกับ input`,
   },
   "java-multi-file": {
     "prompt": "ประเมินบริบทใหม่ — เปิด documentation ได้ ไม่เปิดrubric/เฉลยก่อนส่ง: แยกapp.Mainกับapp.Priceคนละไฟล์ Priceมีstatic methodคืนราคาหลังเพิ่มค่าห่อ5 ให้Mainเรียกด้วย20แสดง25 ส่งโครงโฟลเดอร์ คำสั่งcompile/runและทดลองclasspathผิดก่อนแก้\nแนบโค้ด/คำสั่ง/ค่าทำนายและoutputหรือerrorจริง การส่งเป็นบันทึกความพยายาม ยังต้องเทียบเกณฑ์ด้วยตนเอง",

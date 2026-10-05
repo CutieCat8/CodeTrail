@@ -171,3 +171,6 @@ button{min-width:24px;min-height:24px}
 .rich-block p, .rich-block li, .rich-block h3 { overflow-wrap: anywhere; }
 .analogy-map { width: 100%; table-layout: fixed; }
 .analogy-map th, .analogy-map td { overflow-wrap: anywhere; }
+
+/* Model answers and rubrics wrap instead of scrolling one long line. */
+.reveal pre{white-space:pre-wrap;overflow-wrap:anywhere}

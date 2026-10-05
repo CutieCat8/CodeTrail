@@ -49,4 +49,15 @@ describe("manual assessment workspace", () => {
     await screen.findByRole("heading", { name: /ประเมินการอ่าน path/ });
     expect(screen.queryByText(/จาก club\/src ใช้/)).toBeNull();
   });
+  it("lets JavaScript assessments run code for evidence but keeps non-JS assessments run-free", async () => {
+    window.location.hash = "#step/js-start-checkpoint";
+    render(<QuestApp />);
+    await screen.findByRole("textbox", { name: /Code editor/ });
+    expect(screen.getByRole("button", { name: "Run" })).toBeTruthy();
+    cleanup();
+    window.location.hash = "#step/dev-files-checkpoint";
+    render(<QuestApp />);
+    await screen.findByRole("textbox", { name: /Code editor/ });
+    expect(screen.queryByRole("button", { name: "Run" })).toBeNull();
+  });
 });

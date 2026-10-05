@@ -483,23 +483,145 @@ input abc, 0, 5, 6 และบรรทัดว่าง ได้ bad format 
 ไม่ catch Exception กว้าง ๆ เพราะจะกลบบั๊กอื่นที่ไม่เกี่ยวกับ input`,
   },
   "java-multi-file": {
-    "prompt": "ประเมินบริบทใหม่ — เปิด documentation ได้ ไม่เปิดrubric/เฉลยก่อนส่ง: แยกapp.Mainกับapp.Priceคนละไฟล์ Priceมีstatic methodคืนราคาหลังเพิ่มค่าห่อ5 ให้Mainเรียกด้วย20แสดง25 ส่งโครงโฟลเดอร์ คำสั่งcompile/runและทดลองclasspathผิดก่อนแก้\nแนบโค้ด/คำสั่ง/ค่าทำนายและoutputหรือerrorจริง การส่งเป็นบันทึกความพยายาม ยังต้องเทียบเกณฑ์ด้วยตนเอง",
-    "rubric": [
-      "package/pathตรงและผล25",
-      "คำสั่งjavac -d outกับjava -cp out app.Mainครบ",
-      "errorclasspathต่างจากsourcecompileerror"
+    prompt: prompt(
+      "แยกโปรแกรมเป็น app.Main กับ app.Price คนละไฟล์ Price มี static method ที่คืนราคาหลังเพิ่มค่าห่อ 5 บาท ให้ Main เรียกด้วยราคา 20 แล้วแสดง 25",
+      "ส่งโครงโฟลเดอร์ คำสั่ง compile และ run แล้วทดลองให้ classpath ผิดหนึ่งครั้ง เก็บ error ก่อนแก้",
+    ),
+    rubric: [
+      "package และ path ตรงกัน ผลคือ 25",
+      "คำสั่ง javac -d out และ java -cp out app.Main ครบ",
+      "error จาก classpath ต่างจาก compile error ของ source",
     ],
-    "modelAnswer": "src/app/Price.java: package app;public class Price{public static int wrapped(int amount){return amount+5;}}\nsrc/app/Main.java: package app;public class Main{public static void main(String[] args){System.out.println(Price.wrapped(20));}}\nPowerShellและBash: javac -encoding UTF-8 -d out src/app/Price.java src/app/Main.java แล้ว java -cp out app.Main; -cp wrongหาclassไม่พบ"
+    modelAnswer: `src/app/Price.java
+package app;
+
+public class Price {
+    public static int wrapped(int amount) {
+        return amount + 5;
+    }
+}
+
+src/app/Main.java
+package app;
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println(Price.wrapped(20));
+    }
+}
+
+คำสั่ง (ใช้ได้ทั้ง PowerShell และ Bash):
+javac -encoding UTF-8 -d out src/app/Price.java src/app/Main.java
+java -cp out app.Main
+
+ผลที่ได้คือ 25
+ถ้าใช้ java -cp wrong app.Main จะเกิด error ว่าหา class ไม่พบ (ClassNotFoundException หรือ Could not find or load main class) ซึ่งเป็นปัญหา classpath ที่ตอน run ต่างจาก compile error ที่เกิดตอน javac`,
   },
   "java-project-library-0": {
-    "prompt": "ประเมินบริบทใหม่ — เปิด documentation ได้ ไม่เปิดrubric/เฉลยก่อนส่ง: ประเมินท้ายคอร์สบริบทใหม่: CLIอุปกรณ์รองรับ add ชื่อ, list, take หมายเลข, return หมายเลข, quit อ่านจนEOFหรือquit หมายเลขเริ่ม1ไม่ซ้ำ รายการใหม่available, takeเปลี่ยนเป็นborrowedเฉพาะที่available, returnกลับavailableเฉพาะที่borrowed; ข้อมูลว่าง/หมายเลขเสีย/ไม่มีรายการ/สถานะไม่ตรงให้ข้อความerrorและรับคำสั่งถัดไปต่อได้ เลือกarrayหรือArrayListและmethodเอง ไม่มีข้อบังคับclassOOP/file/database ใช้documentationได้ กำหนดรูปoutputให้ชัดแล้วส่งtestsปกติ/ขอบ/ผิดพร้อมdebugหนึ่งเรื่อง\nแนบโค้ด/คำสั่ง/ค่าทำนายและoutputหรือerrorจริง การส่งเป็นบันทึกความพยายาม ยังต้องเทียบเกณฑ์ด้วยตนเอง",
-    "rubric": [
-      "add/list/take/returnทำตามสถานะและหมายเลข",
-      "errorไม่เปลี่ยนข้อมูลและคำสั่งต่อยังทำได้",
-      "EOFและquitหยุดโดยไม่ประมวลผลข้อความต่อ",
-      "โค้ดแยกหน้าที่หรือวิธีอื่นอธิบายได้ พร้อมหลักฐานทดลอง",
-      "rubricเทียบด้วยตนเอง ไม่อ้างว่าเว็บไซต์รันJavaให้"
+    prompt: prompt(
+      "ประเมินท้ายคอร์ส: เขียน CLI จัดการอุปกรณ์ที่รองรับคำสั่ง add ชื่อ, list, take หมายเลข, return หมายเลข และ quit อ่านจนหมด input หรือเจอ quit",
+      "หมายเลขเริ่มที่ 1 และไม่ซ้ำ รายการใหม่มีสถานะ available, take เปลี่ยนเป็น borrowed ได้เฉพาะรายการที่ available, return เปลี่ยนกลับเป็น available ได้เฉพาะรายการที่ borrowed",
+      "ข้อมูลว่าง หมายเลขเสีย ไม่มีรายการ หรือสถานะไม่ตรง ให้แสดงข้อความ error แล้วรับคำสั่งถัดไปต่อได้",
+      "เลือกใช้ array หรือ ArrayList และแบ่ง method เอง ไม่บังคับ class แบบ OOP ไฟล์ หรือฐานข้อมูล ใช้ documentation ได้",
+      "กำหนดรูปแบบ output ให้ชัดก่อน แล้วส่งชุดทดสอบ (กรณีปกติ กรณีขอบ และกรณีผิด) พร้อม debug หนึ่งเรื่อง",
+    ),
+    rubric: [
+      "add / list / take / return ทำงานตามสถานะและหมายเลข",
+      "error ไม่เปลี่ยนข้อมูล และคำสั่งถัดไปยังทำงานได้",
+      "EOF และ quit หยุดโดยไม่ประมวลผลข้อความที่ตามมา",
+      "โค้ดแยกหน้าที่ หรือวิธีอื่นที่อธิบายได้ พร้อมหลักฐานจากการทดลอง",
+      "เทียบ rubric ด้วยตนเอง ไม่อ้างว่าเว็บไซต์รัน Java ให้",
     ],
-    "modelAnswer": "ตัวอย่างหนึ่งที่ตรงพฤติกรรม ไม่บังคับใช้สถาปัตยกรรมนี้ บันทึก EquipmentMain.java; PowerShell/Bash: javac -encoding UTF-8 EquipmentMain.java แล้ว java EquipmentMain; ใช้inputไฟล์ PowerShell Get-Content input.txt | java EquipmentMain หรือ Bash java EquipmentMain < input.txt\n\nimport java.util.ArrayList;\nimport java.util.Scanner;\n\n// Model answer for the manual course assessment; JDK 21, no external dependencies.\npublic class EquipmentMain {\n    static String change(ArrayList<String> names, ArrayList<Boolean> borrowed,\n                         String argument, boolean take) {\n        final int id;\n        try {\n            id = Integer.parseInt(argument);\n        } catch (NumberFormatException error) {\n            return \"error: invalid id\";\n        }\n        if (id < 1 || id > names.size()) return \"error: missing id\";\n        int index = id - 1;\n        if (take && borrowed.get(index)) return \"error: already borrowed\";\n        if (!take && !borrowed.get(index)) return \"error: already available\";\n        borrowed.set(index, take);\n        return (take ? \"taken #\" : \"returned #\") + id;\n    }\n\n    public static void main(String[] args) {\n        ArrayList<String> names = new ArrayList<>();\n        ArrayList<Boolean> borrowed = new ArrayList<>();\n        Scanner input = new Scanner(System.in);\n        while (input.hasNextLine()) {\n            String line = input.nextLine().strip();\n            if (line.isEmpty()) {\n                System.out.println(\"error: empty command\");\n                continue;\n            }\n            int space = line.indexOf(' ');\n            String command = space < 0 ? line : line.substring(0, space);\n            String argument = space < 0 ? \"\" : line.substring(space + 1).strip();\n            if (command.equals(\"quit\")) {\n                if (!argument.isEmpty()) {\n                    System.out.println(\"error: unexpected argument\");\n                    continue;\n                }\n                System.out.println(\"bye\");\n                break;\n            }\n            switch (command) {\n                case \"add\" -> {\n                    if (argument.isEmpty()) {\n                        System.out.println(\"error: empty name\");\n                    } else {\n                        names.add(argument);\n                        borrowed.add(false);\n                        System.out.println(\"added #\" + names.size());\n                    }\n                }\n                case \"list\" -> {\n                    if (!argument.isEmpty()) {\n                        System.out.println(\"error: unexpected argument\");\n                    } else if (names.isEmpty()) {\n                        System.out.println(\"empty\");\n                    } else {\n                        for (int i = 0; i < names.size(); i++) {\n                            System.out.println((i + 1) + \" \" + names.get(i) + \" \"\n                                + (borrowed.get(i) ? \"borrowed\" : \"available\"));\n                        }\n                    }\n                }\n                case \"take\" -> System.out.println(change(names, borrowed, argument, true));\n                case \"return\" -> System.out.println(change(names, borrowed, argument, false));\n                default -> System.out.println(\"error: unknown command\");\n            }\n        }\n    }\n}\n\n\nกรณีปกติ add Lamp/add Cable/take 1/return 1/list/quit ได้added #1/added #2/taken #1/returned #1/1 Lamp available/2 Cable available/bye คนละบรรทัด; takeซ้ำerroralreadyborrowed,returnซ้ำerroralreadyavailable,idxxinvalid,idนอกช่วงmissing ไม่มีสถานะเปลี่ยน; EOFหยุดเอง ข้อความหลังquitไม่ประมวลผล เลือกoutputคำอื่นได้หากกำหนดก่อนและbehaviorตรง"
+    modelAnswer: `ตัวอย่างหนึ่งที่ทำงานตรงตามพฤติกรรมที่กำหนด ไม่บังคับให้ใช้โครงสร้างเดียวกัน
+บันทึกเป็น EquipmentMain.java แล้ว compile และ run (ใช้ได้ทั้ง PowerShell และ Bash):
+javac -encoding UTF-8 EquipmentMain.java
+java EquipmentMain
+
+ป้อน input จากไฟล์ input.txt:
+PowerShell: Get-Content input.txt | java EquipmentMain
+Bash: java EquipmentMain < input.txt
+
+import java.util.ArrayList;
+import java.util.Scanner;
+
+// Model answer for the manual course assessment; JDK 21, no external dependencies.
+public class EquipmentMain {
+    static String change(ArrayList<String> names, ArrayList<Boolean> borrowed,
+                         String argument, boolean take) {
+        final int id;
+        try {
+            id = Integer.parseInt(argument);
+        } catch (NumberFormatException error) {
+            return "error: invalid id";
+        }
+        if (id < 1 || id > names.size()) return "error: missing id";
+        int index = id - 1;
+        if (take && borrowed.get(index)) return "error: already borrowed";
+        if (!take && !borrowed.get(index)) return "error: already available";
+        borrowed.set(index, take);
+        return (take ? "taken #" : "returned #") + id;
+    }
+
+    public static void main(String[] args) {
+        ArrayList<String> names = new ArrayList<>();
+        ArrayList<Boolean> borrowed = new ArrayList<>();
+        Scanner input = new Scanner(System.in);
+        while (input.hasNextLine()) {
+            String line = input.nextLine().strip();
+            if (line.isEmpty()) {
+                System.out.println("error: empty command");
+                continue;
+            }
+            int space = line.indexOf(' ');
+            String command = space < 0 ? line : line.substring(0, space);
+            String argument = space < 0 ? "" : line.substring(space + 1).strip();
+            if (command.equals("quit")) {
+                if (!argument.isEmpty()) {
+                    System.out.println("error: unexpected argument");
+                    continue;
+                }
+                System.out.println("bye");
+                break;
+            }
+            switch (command) {
+                case "add" -> {
+                    if (argument.isEmpty()) {
+                        System.out.println("error: empty name");
+                    } else {
+                        names.add(argument);
+                        borrowed.add(false);
+                        System.out.println("added #" + names.size());
+                    }
+                }
+                case "list" -> {
+                    if (!argument.isEmpty()) {
+                        System.out.println("error: unexpected argument");
+                    } else if (names.isEmpty()) {
+                        System.out.println("empty");
+                    } else {
+                        for (int i = 0; i < names.size(); i++) {
+                            System.out.println((i + 1) + " " + names.get(i) + " "
+                                + (borrowed.get(i) ? "borrowed" : "available"));
+                        }
+                    }
+                }
+                case "take" -> System.out.println(change(names, borrowed, argument, true));
+                case "return" -> System.out.println(change(names, borrowed, argument, false));
+                default -> System.out.println("error: unknown command");
+            }
+        }
+    }
+}
+
+กรณีปกติ: add Lamp, add Cable, take 1, return 1, list, quit ได้
+added #1
+added #2
+taken #1
+returned #1
+1 Lamp available
+2 Cable available
+bye
+กรณีผิด: take ซ้ำได้ error: already borrowed, return ซ้ำได้ error: already available, หมายเลข xx ได้ error: invalid id, หมายเลขนอกช่วงได้ error: missing id และทุกกรณีสถานะไม่เปลี่ยน
+EOF หยุดโปรแกรมเอง และข้อความหลัง quit ไม่ถูกประมวลผล เลือกถ้อยคำ output แบบอื่นได้ถ้ากำหนดไว้ก่อนและพฤติกรรมตรงกัน`,
   }
 };

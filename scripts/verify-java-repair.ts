@@ -30,12 +30,12 @@ class Check {
   public static void main(String[] args) { ${body} System.out.println("PASS"); }
 }`;
 const contracts = [
-  { id: "java-array-basics", checks: "eq(Main.countPositive(new int[]{0,-1,4,2}),2); eq(Main.countPositive(new int[0]),0);", mutants: [(s: string) => s.replace("value>0", "value>=0")] },
-  { id: "java-array-minimum", checks: "eq(Main.minIndex(new int[]{5,2,2,8}),1); eq(Main.minIndex(new int[]{-2,-5}),1); eq(Main.minIndex(new int[0]),-1); eq(Main.minIndex(new int[]{9}),0);", mutants: [(s: string) => s.replace("values[i]<values[lowestIndex]", "values[i]<=values[lowestIndex]")] },
+  { id: "java-array-basics", checks: "eq(Main.countPositive(new int[]{0,-1,4,2}),2); eq(Main.countPositive(new int[0]),0);", mutants: [(s: string) => s.replace("value > 0", "value >= 0")] },
+  { id: "java-array-minimum", checks: "eq(Main.minIndex(new int[]{5,2,2,8}),1); eq(Main.minIndex(new int[]{-2,-5}),1); eq(Main.minIndex(new int[0]),-1); eq(Main.minIndex(new int[]{9}),0);", mutants: [(s: string) => s.replace("values[i] < values[lowestIndex]", "values[i] <= values[lowestIndex]")] },
   { id: "java-array-copy", checks: `int[] source={4,2,9};
     array(Main.copyExcept(source,0),new int[]{2,9}); array(Main.copyExcept(source,1),new int[]{4,9}); array(Main.copyExcept(source,2),new int[]{4,2});
     array(Main.copyExcept(new int[]{7},0),new int[0]); array(Main.copyExcept(new int[0],-1),new int[0]);
-    int[] result=Main.copyExcept(source,1); result[0]=99; array(source,new int[]{4,2,9});`, mutants: [(s: string) => s.replace("result[next]=values[i]", "result[next]=values[next]")] },
+    int[] result=Main.copyExcept(source,1); result[0]=99; array(source,new int[]{4,2,9});`, mutants: [(s: string) => s.replace("result[next] = values[i]", "result[next] = values[next]")] },
   { id: "java-arrays", checks: `int[] source={2,5,2,8}; array(Main.withoutLowest(source),new int[]{5,2,8}); array(source,new int[]{2,5,2,8});
     array(Main.withoutLowest(new int[0]),new int[0]); array(Main.withoutLowest(new int[]{7}),new int[0]);
     array(Main.withoutLowest(new int[]{-1,-3,-3}),new int[]{-1,-3});

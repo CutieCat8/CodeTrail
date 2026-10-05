@@ -60,12 +60,16 @@
 | ตรวจเชื่อม UI | build ผ่าน; ยังไม่ได้ตรวจใน browser |
 | ข้อจำกัด | เว็บไม่รันหรือตรวจ Express/SQL — ทุกบทที่ต้องใช้ package มีข้อความ "ตรวจเองในเครื่อง" ใน acceptance · package.json ของแอปไม่เพิ่ม dependency |
 
-## Java Foundations (`java-foundations`)
+## Java Foundations (`java-foundations`) — ชุด B6 เขียนแล้ว (18 หัวข้อ)
 
-| Topic | Inventory |
+ลำดับ: java-jdk → java-main → java-output → java-expressions → java-variables → java-primitives → java-string → java-casting → java-scanner → java-branch → java-switch → java-loops → java-methods → java-arrays → java-arraylist → java-exceptions-basic → java-multi-file → java-project-library-0 (Library CLI M0)
+
+| สถานะ | รายละเอียด |
 |---|---|
-| java-jdk, java-main, java-output, java-expressions, java-variables, java-primitives, java-string, java-casting, java-scanner, java-branch, java-loops, java-methods, java-arrays, java-arraylist | บาง (ไม่ได้ compile ตัวอย่าง; เครื่องนี้ยังไม่มี JDK) |
-| java-switch, java-exceptions-basic, java-multi-file, java-project-library-0 | ใหม่ |
+| เขียน | 18 หัวข้อ `standard: "v3"` (14 เดิม ID เดิม + 4 ใหม่) · field ใหม่ `stdin` (input ของตัวอย่าง Scanner) และ `solutionCheck` (input + output ที่เฉลยต้องได้) · โค้ดหลายไฟล์คั่นด้วย `// File: path` |
+| ตรวจเทคนิค | `scripts/verify-java-lessons.ts` ใช้ JDK 21 จริง (Temurin 21.0.12 แบบ portable นอก repo): example + code ใน explain ที่มี output ตรงทุกตัวอักษร, starter compile ได้, เฉลยรันกับ input ของ solutionCheck ได้ output ตรงกับที่โจทย์สัญญา (18/18), buggy ล้มตอน compile เฉพาะเมื่อคำอธิบายบอกว่าเป็น compile error · ตัวตรวจจับเลขผิดในโจทย์ java-loops (เพดานถึงวันที่ 20 ไม่ใช่ 19) และข้ออ้างสองข้อที่ไม่ตรงกับ JDK จริง (ข้อความ error ของ main ที่ไม่ static, การปัดของ printf กับ 2.675) แก้แล้ว · Codex review: ดูบันทึกชุดงาน |
+| ตรวจเชื่อม UI | build ผ่าน; ยังไม่ได้ตรวจใน browser |
+| ข้อจำกัด | เว็บไม่ compile/รัน Java — ทุกบทมี "ตรวจเองในเครื่อง" ใน acceptance · ยังไม่ใช้ JUnit (เริ่มในคอร์ส OOP) |
 
 ## Java OOP (`java-oop`)
 
@@ -95,5 +99,6 @@ react, nextjs, postgres — คง planned; ปรับคำอธิบาย
 | B1 มาตรฐาน + js-functions | Claude เขียน; Codex review 2 รอบ (รอบ 1: 7 ข้อ เช่น Submit ข้าม tests, editor แก้ระหว่างรัน; รอบ 2: 4 ข้อใน snippet runner ใหม่) | เสร็จ แก้ครบ | commit `01f6048` |
 | B4 Node.js | Claude เขียน; Codex audit 1 รอบ (commit `1a90cfd`): 14 ข้อ เช่น M4 CLI พังเมื่อรายการไม่ใช่ object, Node 24 ตรวจ ESM จาก syntax เมื่อไม่ตั้ง type, assert.equal ใช้ Object.is, เฉลยไม่ครบไฟล์, ข้ออ้างหน่วยความจำของ stream | แก้ครบ; เฉลย M4 รันจริงพร้อม test 6/6 ผ่านในโฟลเดอร์ชั่วคราว | commit `1a90cfd` + commit แก้ |
 | B3 TypeScript | Claude เขียน; Codex audit 1 รอบ (commit `80d905e`): 14 ข้อ เช่นคำสั่ง tsc ไม่ใช้ tsconfig/strict, npx tsc อาจดึง package ผิด, Planner M3 ลืมตรวจวัน, groupBy กับ key \"constructor\", Partial ยอม undefined, ความหมายของ NodeNext | แก้ครบ — ตั้ง ts-lab (tsconfig strict) ในบท ts-why แล้วทุกบทใช้ `npx tsc -p .` | commit `80d905e` + commit แก้ |
+| B6 Java Foundations | Claude เขียนและตรวจด้วย JDK 21; Codex audit — ผลบันทึกหลัง review | รอ review | commit ชุด B6 |
 | B5 Back-end | Claude เขียน; Codex audit 1 รอบ (commit `20001ba`, codex exec read-only, ไม่ได้ใช้ web search — ลิงก์ที่ Codex อ้างมาจากความรู้ของโมเดล ไม่ได้ fetch จริง): 16 ข้อ (High 1, Medium 11, Low 4) เช่น repository ของ M6 เรียก db.transaction ซึ่ง pg.Pool ไม่มี, เฉลย M5/auth/testing ไม่ครบตามโจทย์, scrypt ใช้ cost เริ่มต้นต่ำกว่า OWASP, อีเมลที่ไม่มีข้าม scrypt (timing enumeration), 401 ไม่มี WWW-Authenticate, error ของ express.json กลายเป็น 500, Vary: Origin ไม่ครบทุก response, service ใน be-architecture นำ race condition กลับมา, ชื่อหมวด OWASP ไม่ระบุฉบับ, CHECK กับ NULL | แก้ครบ 16 ข้อ — สร้างโปรเจกต์อ้างอิง planner-api สามระยะนอก repo (M5 in-memory 9 test, M6 PGlite 11 test, final auth/authz/security/service 16 test) แล้วนำไฟล์จริงไปเป็นเฉลย; adapter ของ pg ทดสอบกับ node-postgres จริงผ่าน PGlite socket server (join/update/rollback/remove); mutation 3 แบบ (ลบการตรวจสิทธิ์, Vary เฉพาะ origin ที่อนุญาต, ตอบอีเมลที่ไม่มีต่างออกไป) ทำให้ test ล้มทุกแบบ; transferSeat 4 กรณีรันจริง · Codex re-review (commit `11fb970`, ไม่ใช้ web search): 15 FIXED, 1 PARTIAL (test ไม่ assert login 200) และพบ 5 ข้อใหม่จากการตัดตอนโค้ดเป็นเฉลย (forbidden ไม่ถูกนิยาม, บรรทัด limit 10kb ถูกตัด, ไม่แสดง signature ใหม่ของ createApp, helper ปิดวงเล็บไม่ครบ, จำนวน test ไม่ตรง) — แก้ครบ โดย be-architecture แสดง app.mjs ทั้งไฟล์และ be-testing-api รวม test ทั้ง 12 กรณี | commit `20001ba` + commit แก้ |
 | B2 JavaScript Foundations | Claude เขียน; Codex audit 1 รอบ: 12 ข้อ (prerequisite ใช้ก่อนสอน, Infinity ในราคา, ลำดับ microtask, สาเหตุ fetch reject, การตรวจ non-mutation, key "constructor", hint ที่เฉลยเร็ว ฯลฯ) | เสร็จ แก้ครบ — เพิ่ม outputCheck สำหรับโจทย์แบบสคริปต์ช่วงต้น | commit ชุด B2 |

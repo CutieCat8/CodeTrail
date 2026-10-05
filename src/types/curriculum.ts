@@ -67,6 +67,10 @@ export type TopicSource = {
   language?: CodeLanguage;
   // npm packages the example/solution needs when run locally (verified outside the repo; see docs/COURSE-PROGRESS.md).
   requires?: string[];
+  // Standard input fed to `example` when it is verified (Java Scanner lessons); shown to the learner in the lesson text.
+  stdin?: string;
+  // Expected output of `solution` (with optional input), checked by scripts/verify-java-lessons.ts.
+  solutionCheck?: { stdin?: string; output: string };
   // Marks a topic rewritten to the lesson standard in docs/COURSE-PLAN.md; tests then require every part.
   standard?: "v3";
   // Topic IDs to review first; must exist and come earlier in the learning order.

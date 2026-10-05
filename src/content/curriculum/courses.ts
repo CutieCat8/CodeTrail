@@ -2,7 +2,7 @@ import type { CurriculumCourse } from "@/types/curriculum";
 
 export const curriculumCourses: CurriculumCourse[] = [
   { id: "developer-foundations", title: "Developer Foundations", description: "เข้าใจคอมพิวเตอร์ ไฟล์ terminal process error และ Git ก่อนพึ่ง framework", track: "foundation", status: "live", targetSteps: 48 },
-  { id: "java-foundations", title: "Java Foundations", description: "เริ่มจาก compile/run ไปถึง methods, arrays และ ArrayList แบบไม่สมมติพื้นฐาน", track: "java", status: "live", targetSteps: 120 },
+  { id: "java-foundations", title: "Java Foundations", description: "JDK 21 ตั้งแต่ compile/run, ชนิดข้อมูล, String, Scanner, if/switch, loops, methods, arrays, ArrayList, exception เบื้องต้น และโปรแกรมหลายไฟล์ พร้อม Library CLI M0", track: "java", status: "live", targetSteps: 90 },
   { id: "java-oop", title: "Java OOP Lab", description: "คิดจากปัญหาและความรับผิดชอบ แล้วจึงออกแบบ object ที่รักษาสถานะได้", track: "java", status: "live", targetSteps: 96 },
   { id: "javascript-foundations", title: "JavaScript Foundations", description: "ภาษาและการแก้ปัญหา: values, conditions, functions, loops, arrays/objects, references, callbacks, errors และ async พร้อม Activity Planner M1–M2", track: "web", status: "live", targetSteps: 100 },
   { id: "node-foundations", title: "Node.js Fundamentals", description: "runtime, process/CLI, modules, npm, files, event loop, streams, HTTP และ node:test พร้อม Activity Planner M4 ", track: "web", status: "live", targetSteps: 50 },

@@ -85,6 +85,7 @@ export type TopicSource = {
   standard?: "v3";
   // Topic IDs to review first; must exist and come earlier in the learning order.
   prerequisites?: string[];
+  checkpoint?: { prompt: string; rubric: string[]; modelAnswer: string };
   autoCheck?: AutoCheck;
   outputCheck?: OutputCheck;
   lesson?: RichLesson;
@@ -107,6 +108,7 @@ export type LearningStep = {
   starter?: string;
   sections?: StepSection[];
   language?: CodeLanguage;
+  assessment?: boolean;
   check?: AutoCheck;
   outputCheck?: OutputCheck;
   vocabulary: Array<[term: string, meaning: string]>;

@@ -21,6 +21,18 @@ export const javaFoundationLessons: Record<string, RichLesson> = {
       limits: "นักแปลจริงแปลครั้งเดียวจบ แต่ JVM ยังแปล bytecode เป็นคำสั่งเครื่องอีกชั้นระหว่างทำงาน (JIT) และ java File.java (single-file) ทำทั้งสองขั้นต่อกันในคำสั่งเดียวโดยไม่เก็บฉบับแปลไว้",
     },
     explain: [
+      { heading: "0) เตรียม editor/workspace ก่อน Java", text: ["เส้นทาง Java เริ่มจากศูนย์ได้โดยไม่เรียนเว็บ: ถ้ายังไม่เคยเปิด editor หรือ terminal ให้ทบทวน dev-files, dev-terminal และ dev-editor ก่อน บันทึกไฟล์ source ให้ชื่อตรง public class ในพื้นที่ java-lab ของตัวเอง ไม่ใช้ scratchpad ของผู้สอน", "โค้ดตรวจรุ่นในบทนี้ให้คัดลอกทั้งไฟล์เป็นเครื่องมือวัดก่อน: System.out.println แสดงข้อความ; Runtime.version().feature() ถามรุ่นหลักของ JVM ที่กำลังรัน โครง main/วงเล็บปีกกาเรียนแยกใน java-main ไม่ต้องออกแบบ class เองก่อนบทนั้น"] },
+      { heading: "ติดตั้ง JDK 21: Windows PowerShell", text: ["เปิด https://adoptium.net/temurin/releases เลือก Version 21, OS Windows, architecture ให้ตรงเครื่อง และ Package Type JDK ไม่ใช่ JRE สำหรับ Windows x64 ดาวน์โหลด .msi เปิด installer เลือกเพิ่ม PATH และ JAVA_HOME แล้ว Finish; ดู https://adoptium.net/installation/windows", "เปิด PowerShell ใหม่ ใช้ java --version และ javac --version ทั้งคู่ต้องเริ่มรุ่น 21 (patch ไม่ต้องตรงตัวเลขตัวอย่าง) ตรวจ Get-Command java และ Get-Command javac ว่ามาจาก JDK ที่ตั้งใจ", "ถ้า is not recognized ให้ดูว่าโฟลเดอร์ JDK มี bin/java.exe และ bin/javac.exe จริง จาก Settings ค้น Environment Variables เพิ่มโฟลเดอร์ bin นั้นใน User Path โดยเก็บค่าอื่นไว้ ตั้ง JAVA_HOME เป็นโฟลเดอร์ JDK ที่อยู่เหนือ bin เปิด terminal ใหม่แล้วตรวจสองคำสั่งซ้ำ", "หาก java กับ javac คนละรุ่น ไม่แก้ source ให้ตรวจ path ของทั้งคู่และจัดลำดับ JDK 21 bin ก่อนรุ่นอื่น JAVA_HOME อย่างเดียวไม่ได้บังคับ shell ให้เลือก java ตัวนั้น"] },
+      { heading: "ติดตั้ง JDK 21: Linux/WSL Bash แบบ archive", text: ["บนหน้า releases เลือก Version 21, Linux, JDK, architecture ตรง uname -m (x86_64 ใช้ x64; aarch64 ใช้ aarch64) ดาวน์โหลด tar.gz บันทึกชื่อ jdk21.tar.gz ในโฟลเดอร์ java-tools ว่าง; Windows installer ไม่ใช่การติดตั้งใน WSL", "ชุดคำสั่งต่อไปนี้ทำใน java-tools ที่มี archive แล้ว แตกไฟล์ลง jdk21 และเลือก JDK นั้นใน shell นี้ ถ้ามี jdk21 อยู่แล้วให้ใช้พื้นที่ใหม่ก่อน ไม่เขียนทับ", "เก็บถาวรได้โดยเพิ่ม export JAVA_HOME เป็น path เต็มที่แตกไฟล์จริง และ export PATH บรรทัดเดิมใน ~/.bashrc ผ่าน editor; เปิด Bash ใหม่แล้วตรวจ หาก command not found ตรวจ command -v java/javac, ไฟล์ bin และ environment ก่อนแก้โค้ด", "macOS: เลือก Version 21/macOS/JDK และ architecture ให้ตรง ดาวน์โหลด .pkg ตาม https://adoptium.net/installation/macOS เปิด terminal ใหม่ ตรวจ java/javac --version; ถ้ามีหลายรุ่นใช้ /usr/libexec/java_home -v 21 หา path แล้วตั้ง JAVA_HOME และ PATH ตาม JDK ที่พบ"], code: `uname -m
+mkdir jdk21
+tar -xf jdk21.tar.gz -C jdk21 --strip-components=1
+export JAVA_HOME="$PWD/jdk21"
+export PATH="$JAVA_HOME/bin:$PATH"
+java --version
+javac --version
+command -v java
+command -v javac`, output: "java แสดง openjdk 21...; javac แสดง javac 21...; path สองคำสั่งอยู่ใต้ java-tools/jdk21/bin" },
+
       {
         heading: "1) JDK คืออะไร และต้องเป็นเวอร์ชันไหน",
         text: [
@@ -1271,7 +1283,7 @@ export const javaFoundationLessons: Record<string, RichLesson> = {
         heading: "3) แยกการตัดสินใจออกจาก input/output",
         text: [
           "Catalog คืนข้อความผลลัพธ์ ไม่อ่าน input และไม่พิมพ์เอง Main อ่าน แยกคำสั่ง แล้วพิมพ์",
-          "เมื่อถึง M1 จะแทน ArrayList คู่ขนานด้วย class Book โดยที่ข้อความและ test-input เดิมยังใช้ตรวจได้",
+          "เมื่อถึง M1 จะแทน ArrayList คู่ขนานด้วย class Book และเพิ่ม Member คำสั่ง/ข้อความเปลี่ยน เช่น added #1 เป็น added book #1 จึงสร้าง fixtures ตาม contract ของ M1 ไม่ใช้ expected-output ของ M0 ตรวจ M1 ตรง ๆ",
         ],
       },
     ],

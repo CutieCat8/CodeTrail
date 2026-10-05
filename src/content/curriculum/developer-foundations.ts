@@ -1,9 +1,11 @@
+import { developerCheckpoints } from "./developer-checkpoints";
+import { developerToolsTopic } from "./developer-tools";
 import type { TopicSource } from "@/types/curriculum";
 
 const courseId = "developer-foundations";
 const v = (term: string, meaning: string): [string, string] => [term, meaning];
 
-export const developerFoundationTopics: TopicSource[] = [
+const originalTopics: TopicSource[] = [
   {
     id: "dev-program", courseId, standard: "v3", unit: "คอมพิวเตอร์รันโค้ดอย่างไร", title: "Program, source code และ instruction",
     objective: "แยก source code ออกจาก program ที่กำลังทำงานและอธิบายลำดับ instruction ได้", why: "ถ้าแยกไฟล์โค้ดกับ process ไม่ออก จะสับสนว่าทำไมแก้ไฟล์แล้วโปรแกรมเก่ายังไม่เปลี่ยน",
@@ -17,8 +19,8 @@ export const developerFoundationTopics: TopicSource[] = [
     objective: "อ่าน relative/absolute path และรู้ว่า extension สื่อชนิดไฟล์", why: "คำสั่ง build, import และ error ล้วนชี้ไปยัง path ถ้าอ่าน path ไม่ได้จะแก้ไฟล์ผิดตำแหน่ง",
     explanation: "ไฟล์มีชื่อ เนื้อหา และตำแหน่งในโครงสร้างโฟลเดอร์ Extension เช่น .ts หรือ .java ช่วยเครื่องมือเลือกวิธีอ่าน Absolute path เริ่มจากรากของระบบ ส่วน relative path เริ่มจากตำแหน่งปัจจุบัน",
     example: `quest/\n├─ src/\n│  └─ Main.java\n└─ notes.md\n\nจาก quest: src/Main.java\nabsolute: C:\\work\\quest\\src\\Main.java`, tracePrompt: "ถ้า current folder คือ quest/src path ../notes.md ชี้ไปไหน?", traceAnswer: ".. ถอยหนึ่งระดับไป quest แล้วเลือก notes.md",
-    starter: `project/\n├─ data/activities.json\n└─ src/read.js\n\nจาก src/read.js ต้องอ้างไฟล์ JSON ด้วย path: ____`, practicePrompt: "เติม relative path จากโฟลเดอร์ src ไปยังไฟล์ JSON", solution: `../data/activities.json`,
-    buggy: `node src\\server.js\n# terminal อยู่ที่ C:\\work ไม่ใช่ C:\\work\\quest`, bugExplanation: "relative path เริ่มจาก current working directory ไม่ใช่ตำแหน่งที่เราคิด ต้อง cd quest หรือใช้ path ที่รวม quest", vocabulary: [v("extension", "ส่วนท้ายชื่อไฟล์ เช่น .java"), v("path", "ที่อยู่ของไฟล์"), v("relative", "เทียบจากตำแหน่งปัจจุบัน")],
+    starter: `project/\n├─ data/activities.json\n└─ src/read.js\n\nจากโฟลเดอร์ src ต้องอ้างไฟล์ JSON ด้วย path: ____`, practicePrompt: "เติม relative path จากโฟลเดอร์ src ไปยังไฟล์ JSON", solution: `../data/activities.json`,
+    buggy: `ตำแหน่งปัจจุบัน: quest/src\nเป้าหมาย: quest/notes.md\npath ที่เสนอ: ./notes.md`, bugExplanation: "./notes.md ชี้ quest/src/notes.md ซึ่งไม่ใช่เป้าหมาย ต้องถอยหนึ่งระดับด้วย ../notes.md", vocabulary: [v("extension", "ส่วนท้ายชื่อไฟล์ เช่น .java"), v("path", "ที่อยู่ของไฟล์"), v("relative", "เทียบจากตำแหน่งปัจจุบัน")],
   },
   {
     id: "dev-terminal", courseId, standard: "v3", unit: "Terminal", title: "current working directory และคำสั่งพื้นฐาน",
@@ -26,13 +28,13 @@ export const developerFoundationTopics: TopicSource[] = [
     explanation: "Terminal คือโปรแกรมรับคำสั่งข้อความ Shell เป็นตัวตีความคำสั่ง ทุก session มี current working directory ใช้ pwd/Get-Location ตรวจ ใช้ ls/Get-ChildItem ดูรายการ และ cd/Set-Location ย้ายตำแหน่ง",
     example: `Get-Location\nGet-ChildItem\nSet-Location .\\quest\nGet-Location`, tracePrompt: "คำสั่งใดเปลี่ยนตำแหน่ง และคำสั่งใดเพียงอ่านข้อมูล?", traceAnswer: "Set-Location เปลี่ยน state; Get-Location และ Get-ChildItem เป็นการอ่าน",
     starter: `# ตอนนี้อยู่ C:\\work และมีโฟลเดอร์ quest\n# 1 ตรวจตำแหน่ง\n# 2 เข้า quest\n# 3 ดูไฟล์`, practicePrompt: "เขียน PowerShell สามคำสั่งตามลำดับ", solution: `Get-Location\nSet-Location .\\quest\nGet-ChildItem`,
-    buggy: `PS C:\\work> npm run dev\nnpm error Missing script: dev\n# package.json อยู่ C:\\work\\quest`, bugExplanation: "npm อ่าน package.json จาก working directory ให้ cd quest ก่อน ไม่ควรแก้ package.json ที่อื่น", vocabulary: [v("terminal", "หน้าต่างรับคำสั่งข้อความ"), v("shell", "โปรแกรมตีความคำสั่ง"), v("working directory", "โฟลเดอร์ฐานของคำสั่งปัจจุบัน")],
+    buggy: `# อยู่ที่ quest/src แล้ว\nSet-Location quest/src\n# หา path ไม่พบ`, bugExplanation: "relative path ถูกต่อจากตำแหน่งปัจจุบัน กลายเป็น quest/src/quest/src ให้ตรวจ Get-Location ก่อน ถ้าอยู่ src อยู่แล้วไม่ต้องเดินเข้า src ซ้ำ", vocabulary: [v("terminal", "หน้าต่างรับคำสั่งข้อความ"), v("shell", "โปรแกรมตีความคำสั่ง"), v("working directory", "โฟลเดอร์ฐานของคำสั่งปัจจุบัน")],
   },
   {
-    id: "dev-process", courseId, standard: "v3", unit: "Process และ runtime", title: "เริ่ม หยุด และอ่าน exit code",
+    id: "dev-process", courseId, language: "node", expectedOutput: "start", standard: "v3", unit: "Process และ runtime", title: "เริ่ม หยุด และอ่าน exit code",
     objective: "อธิบาย process, standard output/error และ exit code ได้", why: "server ที่ยังรันอยู่, port ชน หรือ command ล้มเหลว ล้วนเข้าใจได้จาก process model",
     explanation: "เมื่อรัน node, java หรือ npm ระบบสร้าง process ที่มีหน่วยความจำและ input/output ของตัวเอง Process จบเองหรือถูกหยุดได้ Exit code 0 โดย convention หมายถึงสำเร็จ ค่าอื่นหมายถึงล้มเหลว",
-    example: `node server.js\n# process รอต่อเพราะ server ฟัง request\n# Ctrl+C ส่งสัญญาณให้หยุด`, tracePrompt: "ทำไม terminal ยังไม่คืน prompt หลัง server แสดง Ready?", traceAnswer: "process ยังทำงานเพื่อรับ request จึงยังไม่ exit นี่ไม่ใช่อาการค้างโดยอัตโนมัติ",
+    example: `console.log("start");\nprocess.exitCode = 0;`, tracePrompt: "เมื่อรัน starter เห็น start แล้ว terminal คืน prompt แต่ exit code เป็น 1: โปรแกรมจบหรือยัง และถือว่าสำเร็จไหม?", traceAnswer: "process จบแล้วและมี output start แต่ exit code 1 รายงานความล้มเหลว ข้อความที่พิมพ์กับรหัสสรุปผลเป็นคนละหลักฐาน",
     starter: `console.log("start");\nprocess.exitCode = 1;\n// จะเห็น output และ exit code ใด`, practicePrompt: "ทำนายแล้วรัน จากนั้นเปลี่ยนให้ command สำเร็จ", solution: `console.log("start");\nprocess.exitCode = 0;`,
     buggy: `npm start\n# Error: listen EADDRINUSE: address already in use :::3000`, bugExplanation: "มี process อื่นครอง port 3000 ต้องหยุด process เดิมหรือเลือก port ใหม่ ไม่ใช่ติดตั้ง npm ซ้ำ", vocabulary: [v("process", "โปรแกรมหนึ่ง instance ที่กำลังทำงาน"), v("exit code", "ตัวเลขสรุปผลเมื่อ process จบ"), v("port", "หมายเลขจุดรับการเชื่อมต่อของ process")],
   },
@@ -64,8 +66,26 @@ export const developerFoundationTopics: TopicSource[] = [
     id: "dev-docs", courseId, standard: "v3", unit: "การเรียนรู้ด้วยเอกสาร", title: "อ่าน documentation และสร้าง minimal reproduction",
     objective: "หา contract จากเอกสารและลดปัญหาให้เหลือตัวอย่างเล็กที่สุด", why: "framework เปลี่ยนเร็ว การอ่านเอกสารและพิสูจน์สมมติฐานสำคัญกว่าจำ tutorial",
     explanation: "อ่าน documentation โดยหา version, input, output, defaults และ failure behavior เมื่อบั๊กซับซ้อนให้สร้าง minimal reproduction: โค้ดน้อยที่สุดที่ยังทำให้ปัญหาเกิด แล้วเปลี่ยนทีละตัวแปร",
-    example: `คำถาม: fetch cache ไหม?\n1 ระบุ Next.js version\n2 แยก browser fetch / server fetch\n3 สร้าง route เล็กหนึ่ง route\n4 ระบุ cache option แล้วสังเกต request`, tracePrompt: "ทำไมคำถามว่า fetch cache ไหมจึงยังตอบไม่ได้?", traceAnswer: "ขาด runtime/context, framework version และ options ซึ่งทำให้ behavior ต่างกัน",
-    starter: `ปัญหา: POST สร้างข้อมูลซ้ำ\nตัวแปรที่เกี่ยวข้อง: UI, network, route, database\nminimal reproduction: ____`, practicePrompt: "เขียนแผนลดปัญหาให้ทดสอบทีละชั้น", solution: `เรียก POST ด้วย curl request เดิมสองครั้ง → ตรวจ response/row count → ถ้ายังซ้ำปัญหาอยู่หลัง UI → เพิ่ม unique/idempotency test`,
-    buggy: `เปลี่ยน React, Express, schema และ dependency versions พร้อมกัน แล้วบั๊กหาย`, bugExplanation: "สรุปสาเหตุไม่ได้เพราะเปลี่ยนหลายตัวแปร ย้อนกลับแล้วทดลองทีละการเปลี่ยนพร้อมบันทึก expected/actual", vocabulary: [v("contract", "ข้อตกลงเรื่อง input/output/failure"), v("minimal reproduction", "ตัวอย่างเล็กที่สุดที่ยังเกิดปัญหา")],
+    example: `คู่มือย่อ Node 24:\nnode --version: รายงานรุ่น ไม่อ่านไฟล์ source\nnode --print "นิพจน์": คำนวณนิพจน์แล้วแสดงค่าผลลัพธ์\nไม่มี --print: node app.js อ่านไฟล์ตาม path\noption ที่ไม่รู้จัก: แจ้ง bad option และ exit code ไม่เป็น 0`,
+    tracePrompt: "node --print \"2 + 3\" คืนอะไร ต่างจาก node app.js อย่างไร และถ้าไม่รู้จัก option จะลองแก้ app.js ก่อนหรือไม่?",
+    traceAnswer: "ได้ 5 จากนิพจน์ที่ให้; node app.js อ่าน source ในไฟล์ option ที่ไม่รู้จักถูกปฏิเสธก่อนอ่านไฟล์ จึงตรวจชื่อ option/เวอร์ชัน ไม่แก้ app.js ก่อน",
+    starter: `เป้าหมาย: (4 + 2) คูณ 2 ต้องได้ 12\nactual: node --print "4 + 2 * 2" ได้ 8\nสมมติฐาน: ____\nคำสั่งทดลองโดยเปลี่ยนอย่างเดียว: ____\nexpected/actual หลังทดลอง: ____`,
+    practicePrompt: "อ่านคู่มือย่อด้านบน แยก input/output/default/failure แล้วลดปัญหาคำนวณผิดให้เหลือหนึ่งคำสั่ง ทดลองแก้โดยเปลี่ยนเพียงนิพจน์ บันทึก expected/actual และเพิ่มกรณี 3 + 1 ที่คูณ 2 ให้ได้ 8 เพื่อแยกการใช้วงเล็บกับการพิมพ์คำตอบตายตัว อ่าน syntax วงเล็บ: ( ) บังคับคำนวณข้างในก่อน ส่วน * คูณก่อน + ถ้าไม่มีวงเล็บ",
+    solution: `สมมติฐาน: * ทำก่อน + เมื่อไม่มีวงเล็บ\nnode --print "(4 + 2) * 2"\n# expected/actual: 12 / 12\nnode --print "(3 + 1) * 2"\n# expected/actual: 8 / 8\ninput = นิพจน์; output = ค่าที่คำนวณได้\nไม่มี --print เมื่อใช้ node app.js = อ่านไฟล์; option ผิด = bad option และ exit ไม่เป็น 0`,
+    buggy: `เปลี่ยน Node version, ชื่อไฟล์ และนิพจน์พร้อมกัน แล้วผลถูก`,
+    bugExplanation: "ผลถูกแต่ยังสรุปไม่ได้ว่าอะไรแก้สาเหตุ เก็บเวอร์ชันและทางรันเดิมไว้ ทดลองเปลี่ยนเฉพาะวงเล็บแล้วเทียบสองกรณี", vocabulary: [v("contract", "ข้อตกลงเรื่อง input/output/failure"), v("minimal reproduction", "ตัวอย่างเล็กที่สุดที่ยังเกิดปัญหา")],
   },
 ];
+
+// Preserve IDs: only the teaching order and prerequisite links change.
+const order = ["dev-files", "dev-terminal", "dev-runtime-tools", "dev-editor", "dev-program", "dev-process", "dev-errors", "dev-git", "dev-docs"];
+const prerequisites: Record<string, string[]> = {
+  "dev-terminal": ["dev-files"], "dev-editor": ["dev-runtime-tools"],
+  "dev-program": ["dev-editor"], "dev-process": ["dev-program"],
+  "dev-errors": ["dev-program"], "dev-git": ["dev-editor", "dev-errors"],
+  "dev-docs": ["dev-errors"],
+};
+export const developerFoundationTopics: TopicSource[] = order.map((id) => {
+  const topic = [...originalTopics, developerToolsTopic].find((item) => item.id === id)!;
+  return { ...topic, checkpoint: developerCheckpoints[id], prerequisites: prerequisites[id] ?? topic.prerequisites };
+});

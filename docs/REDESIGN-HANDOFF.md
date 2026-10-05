@@ -1,5 +1,19 @@
 # Redesign handoff
 
+## รอบแก้หลัง curriculum audit (Codex ลงมือหลัก)
+
+ฐาน faa1de2 → branch `feat/curriculum-learning-repair` · 2026-10-05
+สถานะทั้งรอบ: **in progress**; บันทึก B0–B8 ด้านล่างเป็นประวัติการเขียน ไม่ใช่การผ่านเกณฑ์คุณภาพรอบใหม่
+แผนล่าสุด: [COURSE-REPAIR-PLAN.md](COURSE-REPAIR-PLAN.md) · coverage/หลักฐาน: [COURSE-REPAIR-EVIDENCE.md](COURSE-REPAIR-EVIDENCE.md)
+Claude ติด usage limit ตามผู้ใช้; Codex เขียนและตรวจเองในรอบนี้ ยังไม่มี independent review ของ diff ใหม่ ไม่อ้างว่าทั้งสอง AI ตรวจแล้ว
+
+R1 implement แล้ว: ลำดับ files → terminal → Node/npm tools → editor → program → process → errors → Git → docs; คง IDs เดิมและเพิ่ม dev-runtime-tools
+เพิ่ม checkpoint เฉพาะเรื่องใน Developer Foundations พร้อม rubric/model answer หลังส่ง ไม่มี starter algorithm; การส่งข้อความบันทึกความพยายาม ไม่ใช่ยืนยันถูก
+แก้ความขัดกัน oop-constructor / oop-polymorphism / M0→M1; เพิ่ม JDK setup และ prerequisite npm ของ ts-why
+R2–R4 ยัง planned: การแยกบทและฝึก/assessment ของอีกหกคอร์ส, SQL, projects และการยกระดับ 22 labs ยังไม่ได้ปิด
+R5 ตรวจ baseline ชุดแรกแล้ว: build Webpack ผ่าน; browser เปิด 7 courses/545 steps/22 labs และตรวจ interaction ตัวแทน/TypeScript/mobile ผ่าน ต้องรันใหม่หลัง R2–R4; ไม่ใช่ final acceptance ทั้งรอบ
+
+
 อัปเดตล่าสุด: 2026-10-05  
 Branch: `feat/curriculum-expansion` (แตกจาก `fix/import-validation` ที่ `57e1cd2` ← `fix/runner-comparator` `480ad3f` ← `main` `f9a7613`; ทุก commit อยู่ในสำเนา Linux `~/work/sea-fullstack-quest` เท่านั้น ยังไม่ push/merge)  
 Remote: `origin` → `https://github.com/CutieCat8/CodeTrail.git`  

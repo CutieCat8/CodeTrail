@@ -18,7 +18,7 @@ export const javaFoundationTopics: TopicSource[] = [
   explanation: "JDK (Java Development Kit) มีเครื่องมือพัฒนา เช่น javac (compiler) และ java (launcher) javac อ่านไฟล์ .java ตรวจ syntax และชนิดข้อมูล แล้วสร้างไฟล์ .class ที่เก็บ bytecode คำสั่ง java เริ่ม JVM (Java Virtual Machine) ซึ่งโหลด .class แล้วเรียก method main ตั้งแต่ JDK 11 สั่ง java Hello.java ได้เลยสำหรับโปรแกรมไฟล์เดียว (compile ในหน่วยความจำแล้วรัน ไม่สร้าง .class) บทเรียนนี้ใช้ JDK 21 (LTS) ตรวจด้วย java --version และ javac --version ซึ่งต้องเป็น 21 ทั้งคู่",
   language: "java",
   standard: "v3",
-  prerequisites: ["dev-terminal", "dev-errors"],
+  prerequisites: ["dev-terminal", "dev-editor", "dev-errors"],
   example: java`// File: QuestStart.java
 public class QuestStart {
     public static void main(String[] args) {

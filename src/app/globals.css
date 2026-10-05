@@ -165,3 +165,9 @@ button{min-width:24px;min-height:24px}
 
 /* Lab → curriculum review links */
 .related-topics div{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.related-topics .text-button{display:inline-flex;align-items:center;text-decoration:none;min-height:32px;padding:4px 10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:transparent;color:var(--color-info);cursor:pointer;font-size:13px;text-align:left}.related-topics .text-button:hover,.related-topics .text-button:focus-visible{border-color:var(--color-info);color:var(--color-text-primary)}
+
+/* Long tool paths/URLs must fit the lesson column; code keeps its own horizontal scroll. */
+.rich-sections, .rich-sections > * { min-width: 0; }
+.rich-block p, .rich-block li, .rich-block h3 { overflow-wrap: anywhere; }
+.analogy-map { width: 100%; table-layout: fixed; }
+.analogy-map th, .analogy-map td { overflow-wrap: anywhere; }

@@ -1,6 +1,8 @@
+import { developerToolsLesson } from "../developer-tools";
 import type { RichLesson } from "@/types/curriculum";
 
 export const developerFoundationLessons: Record<string, RichLesson> = {
+  "dev-runtime-tools": developerToolsLesson,
   "dev-program": {
     hook: "คุณพิมพ์โค้ดในไฟล์ แล้วกดรัน โปรแกรมก็ทำงาน แต่พอแก้ไฟล์ตอนโปรแกรมยังเปิดอยู่ ทำไมหน้าจอยังเป็นแบบเดิม? คำตอบอยู่ที่ความต่างระหว่าง “ไฟล์โค้ด” กับ “โปรแกรมที่กำลังทำงาน”",
     analogy: {
@@ -130,7 +132,7 @@ export const developerFoundationLessons: Record<string, RichLesson> = {
     ],
     traceHint: "วาดโครงสร้างโฟลเดอร์เป็นต้นไม้บนกระดาษ วางนิ้วที่โฟลเดอร์ที่ยืนอยู่ แล้วทำตามสัญลักษณ์ทีละตัว  ..  คือนิ้วขยับขึ้นหนึ่งชั้น ชื่อโฟลเดอร์คือขยับลงไปข้างใน",
     practiceHints: [
-      "เราอยู่ที่ไฟล์ src/read.js ดังนั้นโฟลเดอร์ที่ยืนอยู่คือ src",
+      "โจทย์ระบุว่าตำแหน่งที่ยืนอยู่คือโฟลเดอร์ src; ไม่อนุมานจากตำแหน่งไฟล์ read.js",
       "ไฟล์ JSON อยู่ในโฟลเดอร์ data ซึ่งอยู่ข้างโฟลเดอร์ src ไม่ได้อยู่ข้างใน ต้องถอยออกไปก่อน",
       "คำตอบมี 3 ส่วน: ถอยหนึ่งชั้น + โฟลเดอร์ data + ชื่อไฟล์ → ../data/activities.json",
     ],
@@ -153,6 +155,19 @@ export const developerFoundationLessons: Record<string, RichLesson> = {
       limits: "ผู้ช่วยจริงจำได้ว่าเคยไปห้องไหน แต่ terminal แต่ละหน้าต่างมี current directory ของตัวเอง และ process ลูกที่สั่ง cd ไม่ได้ย้ายห้องของ terminal แม่",
     },
     explain: [
+      { heading: "0) เปิดและเลือก shell", text: ["Windows เปิด Start → PowerShell; Linux/WSL เปิด Terminal ของระบบนั้นและใช้ Bash ไม่พิมพ์ PS C:\\ หรือ $ ที่เป็น prompt ลงไปเป็นส่วนคำสั่ง"] },
+      { heading: "สร้างโฟลเดอร์ทดลอง (เลือกเพียง shell ของคุณ)", text: ["เริ่มในโฟลเดอร์ส่วนตัวที่มีสิทธิ์เขียน ตรวจตำแหน่งก่อน ถ้ามี quest อยู่แล้วให้เลือกชื่อใหม่เพื่อไม่ปนงานเก่า"], code: `# PowerShell
+Get-Location
+New-Item -ItemType Directory quest
+Set-Location quest
+Get-ChildItem
+
+# Bash / WSL
+pwd
+mkdir quest
+cd quest
+ls`, output: "คำสั่งตรวจตำแหน่งแสดง path เต็ม; หลังเข้า quest รายการไฟล์ว่างถ้าเพิ่งสร้างใหม่ (ข้อความอื่นขึ้นกับ shell)" },
+
       {
         heading: "1) Terminal กับ Shell ต่างกันอย่างไร",
         text: [
@@ -224,6 +239,8 @@ export const developerFoundationLessons: Record<string, RichLesson> = {
       limits: "พนักงานจริงเล่าปัญหาได้ยาว แต่ exit code เป็นตัวเลขตัวเดียว รายละเอียดต้องดูจาก stderr/log และโปรแกรมอาจพิมพ์ข้อความปกติแต่จบด้วย exit code ที่ไม่ใช่ 0 ได้",
     },
     explain: [
+      { heading: "0) รันกิจกรรมและอ่านรหัสทันที", text: ["บันทึก example หรือ starter เป็น process-lab.js ใน workspace แล้วใช้ node process-lab.js เห็น start ก่อนโปรแกรมจบ; process เป็น object ที่ Node เตรียมไว้ ส่วน .exitCode คือช่องเก็บรหัสที่จะคืนตอนจบ ไม่ต้องสร้าง function", "PowerShell: หลัง node process-lab.js พิมพ์ $LASTEXITCODE; Bash/WSL: หลัง node process-lab.js พิมพ์ echo $? ทันที ก่อนรันคำสั่งอื่น คาด 1 จาก starter; เปลี่ยนเป็น 0, save, รันใหม่ คาด output ยังเป็น start แต่รหัสเปลี่ยนเป็น 0", "ตัวอย่าง port/server ด้านล่างเป็นภาพอธิบาย ไม่ต้องสร้าง server.js ในบทนี้ คอร์ส Node สอนโปรแกรมที่รอ request ภายหลัง"] },
+
       {
         heading: "1) Process = โปรแกรมที่กำลังรันอยู่จริง",
         text: [
@@ -255,11 +272,7 @@ export const developerFoundationLessons: Record<string, RichLesson> = {
         ],
       },
     ],
-    walkthrough: [
-      "node server.js → สร้าง process ใหม่ที่อ่านไฟล์ server.js แล้วเริ่มทำงาน",
-      "# process รอต่อ... → server จองพอร์ตแล้วรอรับ request ตลอด มันจึงยังไม่จบ นี่ไม่ใช่อาการค้าง",
-      "# Ctrl+C ส่งสัญญาณให้หยุด → เป็นวิธีปกติที่จะบอกให้ process เลิกงาน terminal จะกลับมาให้พิมพ์ได้อีกครั้ง",
-    ],
+    walkthrough: ["console.log แสดง start ไป stdout", "ตัวอย่างตั้ง process.exitCode = 0 ส่วน starter ตั้ง 1; ทั้งคู่ตั้งรหัสแต่ไม่ตัดโปรแกรมทันที", "เมื่อทำงานจบ terminal คืน prompt; ตัวอย่างคืน 0 ส่วน starter คืน 1 แม้ไม่มี error message"],
     pitfalls: [
       "คิดว่า terminal ที่ไม่คืน prompt คือเครื่องค้าง ถ้าเป็น server นั่นคือสถานะปกติ",
       "เห็น EADDRINUSE แล้วติดตั้งโปรแกรมใหม่ สาเหตุจริงคือมี process เก่าจอง port อยู่ ให้หยุดตัวเก่า หรือเปลี่ยน port",
@@ -277,7 +290,7 @@ export const developerFoundationLessons: Record<string, RichLesson> = {
       "ถ้าอยากให้สำเร็จ ให้เปลี่ยนเป็น 0 แล้วรันอีกครั้ง",
     ],
     checks: [{"question": "โปรแกรมพิมพ์ start ครบแต่ exit code เป็น 1 ถือว่าสำเร็จไหม", "answer": "ไม่ เครื่องมืออย่าง CI ดู exit code ไม่ใช่ข้อความ 1 แปลว่าล้มเหลว"}, {"question": "ทำไม terminal ไม่คืนหน้าพิมพ์หลังสั่ง npm run dev", "answer": "server เป็น process ที่รันค้างรอ request จนกว่าจะหยุดด้วย Ctrl+C"}],
-    acceptance: ["ตรวจเอง: Run แล้วพิมพ์ start", "ตรวจเองในเครื่อง: node file.mjs แล้ว echo $? (หรือ $LASTEXITCODE ใน PowerShell) ได้ 0"],
+    acceptance: ["ตรวจเองในเครื่อง: node process-lab.js แสดง start ทั้งก่อนและหลังแก้", "PowerShell: $LASTEXITCODE ทันทีหลังรันเป็น 1 ก่อนแก้และ 0 หลังแก้; Bash: echo $? ได้ค่าเดียวกัน"],
     solutionNotes: ["process.exitCode = 0 ตั้งค่าที่จะส่งตอนจบโดยไม่ตัดการทำงานทันที ต่างจาก process.exit(0) ที่จบทันที"],
     reflection: ["ในงานที่เคยทำ มีคำสั่งไหนที่ดูเหมือนสำเร็จแต่จริง ๆ แล้ว exit code ไม่ใช่ 0"],
     extension: "เขียนสคริปต์ที่ตั้ง process.exitCode = 1 เมื่ออาร์กิวเมนต์แรกไม่ใช่ตัวเลข แล้วใช้ && ใน terminal ต่อคำสั่งที่ควรรันเฉพาะเมื่อสำเร็จ",
@@ -364,6 +377,13 @@ export const developerFoundationLessons: Record<string, RichLesson> = {
       limits: "บาง editor เปิด auto save และบางเครื่องมือ (dev server) จับการเปลี่ยนไฟล์แล้วรันใหม่เอง แต่ลำดับ edit → save → run ยังเป็นจริงเสมอ เครื่องมือแค่ทำบางขั้นให้อัตโนมัติ",
     },
     explain: [
+      { heading: "0) สร้าง workspace และไฟล์แรก", text: [
+        "Workspace คือโฟลเดอร์งานที่เปิดใน editor สร้างโฟลเดอร์ editor-lab ด้วยคำสั่งจาก dev-terminal แล้วใน VS Code เลือก File → Open Folder → editor-lab (macOS ใช้เมนูเดียวกัน)",
+        "ใน Explorer กด New File ตั้งชื่อ app.js แล้ววาง starter; console.log(\"version 1\"); หมายถึงแสดงข้อความในวงเล็บ คงเครื่องหมายคำพูด วงเล็บ และ ; ไว้ ยังไม่ต้องสร้าง function",
+        "กด Ctrl+S (macOS Cmd+S) เปิด Terminal → New Terminal ตรวจว่าเลือก PowerShell หรือ Bash ตามที่เรียน แล้วใช้ Get-Location หรือ pwd ตรวจว่าอยู่ editor-lab จากนั้น node app.js ควรแสดง version 1 หนึ่งบรรทัด",
+        "เปิด app.js ที่บันทึกจริง ตรวจว่าไม่เป็น app.js.txt ถ้าไม่พบ node กลับไป dev-runtime-tools; ถ้าไม่พบ app.js ตรวจ path/editor แทนการติดตั้ง Node ซ้ำ",
+      ] },
+
       {
         heading: "1) Edit, Save, Run คือสามการกระทำแยกกัน",
         text: [
@@ -430,6 +450,17 @@ export const developerFoundationLessons: Record<string, RichLesson> = {
       limits: "รูปถ่ายเก็บทั้งภาพ แต่ Git เก็บเฉพาะไฟล์ที่ track และ .gitignore มีผลกับไฟล์ที่ยังไม่ถูก track เท่านั้น — ไฟล์ที่ commit ไปแล้ว (เช่น .env ที่เผลอ commit) ยังถูก track ต่อจนกว่าจะ git rm --cached และยังอยู่ใน commit เก่า และ commit ที่ยังไม่ push ยังอยู่แค่ในเครื่องเรา",
     },
     explain: [
+      { heading: "0) ติดตั้งและทำ repository ทดลองก่อน", text: [
+        "ดาวน์โหลด Git สำหรับระบบของคุณจาก https://git-scm.com/downloads ทำตาม installer/คู่มือติดตั้งที่หน้านั้น เปิด terminal ใหม่แล้ว git --version ควรแสดง git version ตามด้วยเลขรุ่น",
+        "ถ้าไม่พบคำสั่ง: PowerShell ใช้ Get-Command git; Bash ใช้ command -v git ตรวจว่าติดตั้งในระบบเดียวกับ shell และ PATH มีโฟลเดอร์ executable ตามวิธีติดตั้ง อย่าแก้ไฟล์โค้ดเพื่อซ่อมคำสั่ง Git",
+        "สร้างโฟลเดอร์ git-lab ใหม่ด้วย New-Item -ItemType Directory git-lab (PowerShell) หรือ mkdir git-lab (Bash) แล้ว cd git-lab ใช้ editor เปิดโฟลเดอร์นี้ สร้าง README.md ใส่ข้อความวิธีรันหนึ่งบรรทัดและ save",
+        "รันคำสั่งด้านล่างใน git-lab เท่านั้น เปลี่ยนชื่อ/อีเมลตัวอย่างเป็นของคุณ เป็นข้อมูลผู้เขียนใน commit ไม่ใช่ login; config แบบ local มีผลเฉพาะ repo นี้",
+      ], code: `git init
+git config user.name "Your Name"
+git config user.email "you@example.com"
+git status --short`, output: "?? README.md" },
+      { heading: "อ่านสถานะและตรวจของที่จะ commit", text: ["?? คือไฟล์ใหม่ที่ยังไม่ติดตาม; หลัง git add README.md เห็น A อยู่คอลัมน์ซ้ายแปลว่าเพิ่มเข้า staging; M คอลัมน์ขวาคือไฟล์ที่แก้แต่ยังไม่ stage หลัง commit คำสั่ง status --short ไม่แสดงอะไรเมื่อไม่มีงานค้าง", "git diff ดูสิ่งที่แก้แต่ยังไม่ stage; git diff --cached ดูสิ่งที่ stage แล้ว ไฟล์ untracked ยังไม่ปรากฏใน git diff ให้เปิดอ่านก่อน add"] },
+
       {
         heading: "1) Repository คือโฟลเดอร์ที่ Git คอยดูแล",
         text: [
@@ -528,12 +559,7 @@ export const developerFoundationLessons: Record<string, RichLesson> = {
         ],
       },
     ],
-    walkthrough: [
-      "ข้อ 1 ระบุ Next.js version → เพราะพฤติกรรม cache ต่างกันในแต่ละเวอร์ชัน คำถามที่ไม่มีเวอร์ชันจึงตอบไม่ได้",
-      "ข้อ 2 แยก browser fetch / server fetch → ทั้งสองที่ทำงานคนละกฎ ต้องรู้ก่อนว่ากำลังสงสัยตัวไหน",
-      "ข้อ 3 สร้าง route เล็กหนึ่ง route → ตัดส่วนอื่นของแอปออกให้หมด เหลือแค่สิ่งที่ทดสอบ",
-      "ข้อ 4 ระบุ cache option แล้วสังเกต request → เปลี่ยนตัวแปรเดียว แล้วดูผลที่เกิดจริง",
-    ],
+    walkthrough: ["ระบุ Node 24 เพื่อรู้ว่าคู่มือใช้กับเครื่องมือรุ่นใด", "--print รับนิพจน์จาก command line ไม่อ่าน app.js จึงตัด editor/path ออกจากการทดลองนี้", "4 + 2 * 2 ได้ 8 เพราะคูณก่อน เมื่อเพิ่มวงเล็บได้ 12", "เปลี่ยน input เป็น 3 และ 1 แล้วยังทำตามกฎเดิม ได้ 8; จดทั้งคำสั่ง expected และ actual"],
     pitfalls: [
       "copy โค้ดจากบล็อกเก่ามาใช้โดยไม่ดูเวอร์ชัน ให้ดูวันที่และเวอร์ชันก่อนเสมอ",
       "เปลี่ยนหลายอย่างพร้อมกันแล้วปัญหาหาย ดีใจ แต่ไม่รู้สาเหตุ เท่ากับยังไม่ได้เรียนรู้",
@@ -545,14 +571,10 @@ export const developerFoundationLessons: Record<string, RichLesson> = {
       "เปลี่ยนทีละตัวแปร และจด expected กับ actual",
     ],
     traceHint: "ลองเขียนสิ่งที่ “ยังไม่รู้” ออกมาเป็นข้อ ๆ (เวอร์ชัน, ที่ที่รัน, ตัวเลือกที่ใช้) คำถามที่ตอบไม่ได้เพราะข้อมูลขาด ให้ชี้ว่าขาดอะไร",
-    practiceHints: [
-      "ปัญหาคือ POST แล้วข้อมูลซ้ำ ลองแยกเป็นชั้น: หน้าจอ → เครือข่าย → route → ฐานข้อมูล",
-      "เริ่มจากชั้นที่ตัดตัวแปรทิ้งได้เยอะที่สุด เช่นยิง request ตรงด้วย curl โดยไม่ผ่านหน้าจอ",
-      "ถ้ายิงตรงแล้วยังซ้ำ แปลว่าปัญหาอยู่หลังหน้าจอ ลองเพิ่มการป้องกันซ้ำที่ฝั่งข้อมูล แล้วทดสอบอีกรอบ",
-    ],
-    checks: [{"question": "ทำไมควรอ่าน documentation ของเวอร์ชันที่ใช้อยู่", "answer": "API เปลี่ยนตามเวอร์ชัน ตัวอย่างจากเวอร์ชันอื่นอาจใช้ไม่ได้หรือทำงานต่างไป"}, {"question": "minimal reproduction ที่ดีมีอะไรบ้าง", "answer": "โค้ดน้อยที่สุดที่ยังทำให้ปัญหาเกิด ขั้นตอนรันที่ชัด ผลที่คาดกับผลที่ได้จริง และเวอร์ชันของเครื่องมือ"}],
-    acceptance: ["ตรวจเอง: แผนแยกชั้นอย่างน้อยหน้าจอ → request → ฐานข้อมูล", "ตรวจเอง: ระบุการทดสอบที่ตัดหน้าจอออก (เช่น curl)"],
-    solutionNotes: ["ยิง request ตรงด้วย curl แยกได้ทันทีว่าปัญหาอยู่ที่ UI (กดซ้ำ) หรือ server/ฐานข้อมูล (ไม่มีการกันซ้ำ)"],
+    practiceHints: ["ใช้คู่มือดูว่าคำสั่งรับนิพจน์จากไหน", "ตรวจลำดับ * กับ + ก่อนเปลี่ยนเครื่องมือ", "ทดลอง node --print \"(4 + 2) * 2\" แล้วใช้กรณีที่สองตรวจว่าคุณอธิบายกฎได้"],
+    checks: [{ question: "--print ต้องเปิดไฟล์ app.js ไหม?", answer: "ไม่ มันรับนิพจน์ใน command line; node app.js จึงเป็นทางรันอีกแบบ" }, { question: "ผลหายผิดเมื่อแก้หลายอย่างพร้อมกันยืนยันสาเหตุไหม?", answer: "ยังไม่ยืนยัน ต้องทำซ้ำโดยเปลี่ยนอย่างเดียวและบันทึกก่อน/หลัง" }],
+    acceptance: ["บันทึก input/output/default/failure จากคู่มือย่อได้", "รันสองคำสั่งใน PowerShell หรือ Bash: (4 + 2) * 2 ได้ 12 และ (3 + 1) * 2 ได้ 8", "มีสมมติฐานเรื่องลำดับคำนวณและผลก่อน/หลัง ไม่ใช้ข้อความไม่ว่างหรือ checklist เป็นการยืนยันโดยระบบ"],
+    solutionNotes: ["วงเล็บเปลี่ยนลำดับคำนวณ ไม่ใช่บังคับพิมพ์คำตอบ; กรณีที่สองช่วยตรวจคำอธิบาย", "นี่เป็นการฝึกอ่าน contract และทดลอง ไม่ต้องรู้ HTTP/React/ฐานข้อมูล"],
     reflection: ["ครั้งล่าสุดที่ถามคนอื่นเรื่องบั๊ก ให้ข้อมูลพอให้เขาลองซ้ำได้ไหม"],
     extension: "เขียน minimal reproduction ของบั๊กจริงที่เคยเจอเป็นไฟล์เดียวที่คนอื่นรันได้ พร้อมผลที่คาดกับผลจริง",
   },

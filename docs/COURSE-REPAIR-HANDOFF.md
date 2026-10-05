@@ -23,7 +23,7 @@ Commits บน branch หลักหลัง Codex (2691362):
 
 | path | branch | HEAD | สถานะจริง |
 |---|---|---|---|
-| ../sfq-r2-javafix | r2/java-fix | e8260d2 | 1 commit แก้ตาม review Java (ข้อ 4) ไม่มีไฟล์ค้าง |
+| ../sfq-r2-javafix | r2/java-fix | (ดู git log) | e8260d2 + กลุ่ม 1 (C2 shell, C3 split) บันทึกที่ `docs/verification/R2-Java-fix/checks.md` ในบรานช์นั้น; ค้าง M1/M2 java-checkpoints, M3–M7, minors |
 | ../sfq-r2-jsfix | r2/js-fix | f7b3873 | **ปิดแล้ว (self-check)**: 3f60427 + 86cf82b ตรวจแล้ว + 7b08748 + f7b3873 (Developer Foundations) บันทึกที่ `docs/verification/R2-JS-fix/checks.md` ในบรานช์นั้น; รอ independent review (Gemini อ่านอย่างเดียว) |
 | ../sfq-r3-node | r3/node | e8c37e0 | WIP ร่าง `node-foundations.ts` (+907/−123) **compile ไม่ผ่าน**: import `./node-bridges` และ `./node-checkpoints` ที่ยังไม่ได้สร้าง |
 | ../sfq-r3-typescript | r3/typescript | de9bb5c | WIP มีเพียง `typescript-bridges.ts` (617 บรรทัด) ร่าง ยังไม่ wire เข้า `typescript.ts` ไม่ได้ตรวจ |
@@ -68,7 +68,7 @@ Preview :3100 **หยุดแล้ว** ต้อง build + start ใหม�
 
 ## 5.1 อัปเดต session Sonnet 5.5 (2026-10-06)
 
-ปิดชุด JavaScript + Developer Foundations บน r2/js-fix: tsc/eslint ผ่าน, vitest 349/349 (ต้องใช้ `NO_COLOR=1 FORCE_COLOR=0` ไม่งั้น test ตัวอย่าง Node ล้มเพราะสี ANSI), model answer JS รันใน Node ตรง rubric. ไม่ได้ทำ: M6 test guard, m6, m8. ต่อไป: Java บน r2/java-fix
+ปิดชุด JavaScript + Developer Foundations บน r2/js-fix: tsc/eslint ผ่าน, vitest 349/349 (ต้องใช้ `NO_COLOR=1 FORCE_COLOR=0` ไม่งั้น test ตัวอย่าง Node ล้มเพราะสี ANSI), model answer JS รันใน Node ตรง rubric. ไม่ได้ทำ: M6 test guard, m6, m8. Java กลุ่ม 1 เสร็จ (tsc/eslint/vitest 307/verifier 4 บทผ่าน) ต่อไป: M1/M2 ของ `java-checkpoints.ts` (17 model answers + ช่องว่างภาษาไทย) แล้ว M3–M7
 
 ## 6. งานแรกของ session ใหม่ (ทำเสร็จแล้วตามข้อ 5.1): ปิด JavaScript บน r2/js-fix ทีละกลุ่ม
 

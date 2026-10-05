@@ -1,13 +1,24 @@
-# สถานะล่าสุด (Claude รับช่วง 2026-10-05)
+# สถานะล่าสุด (Claude รับช่วง 2026-10-05/06)
 
 > ส่วนนี้ใหม่กว่าเนื้อหาด้านล่าง อ่านก่อน
 
-- Claude รับช่วงจาก Codex ที่ 2691362 (ตรวจแล้ว: branch ถูก, tree สะอาด, Codex CLI PID 236304 ไม่ได้เปิดไฟล์ใน repo, preview PID 258961 ยังรัน)
-- commit identity ของ Claude: `Claude <claude@local.invalid>` ผ่าน env ต่อคำสั่ง ไม่แก้ git config (แบบเดียวกับ Codex)
-- Independent review ของ R1, R2-JS, R2-Java: **กำลังทำ** โดย Claude reviewer แบบ read-only สองชุด ผลจะบันทึกใน docs/verification/REVIEW-R1-R2/
-- R3/R4 กำลังเขียนใน worktree แยก (เจ้าของไฟล์ไม่ทับกัน ตามสัญญา [R3-WRITER-BRIEF](R3-WRITER-BRIEF.md)):
-  | worktree | branch | ขอบเขต |
+- Claude รับช่วงจาก Codex ที่ 2691362; commit identity `Claude <claude@local.invalid>` ผ่าน env ต่อคำสั่ง ไม่แก้ git config
+- **Independent review R1/R2-JS/R2-Java เสร็จแล้ว (Claude, read-only)**: ทั้งสองชุด REQUEST CHANGES — [R1+JS](verification/REVIEW-R1-R2/review-R1-JS.md), [Java](verification/REVIEW-R1-R2/review-R2-Java.md) ข้อหลัก: concept step เผย trace/debug answer ใน bridge 14 บท, model answer/โค้ดถูกบีบเป็นบรรทัดเดียวและภาษาไทยถูกตัดช่องว่าง (บางประโยคความหมายกลับ), checkpoint หลายข้อแค่เปลี่ยนชื่อจาก practice, คำสั่ง Bash ใน PowerShell path ของ Java, split ใช้ก่อนสอน
+- แก้แล้วบน branch หลัก: 40f7646 JS assessment มีปุ่ม Run (ไม่มี tests) ให้เก็บ output ได้, reveal ตัดบรรทัด, ข้อความหลังส่ง
+- 2026-10-05 agents 7 ตัวพร้อมกันชน API session limit ก่อน commit → ต่อไปรันไม่เกิน 2 ตัวพร้อมกันและ commit ทีละส่วน
+- งานตาม worktree (merge เข้า feat/curriculum-learning-repair ทีละ branch ด้วย `git merge --no-ff`, แล้วรัน tsc/lint/vitest):
+  | worktree | branch | สถานะ |
   |---|---|---|
+  | ../sfq-r2-javafix | r2/java-fix | กำลังแก้ตาม review Java |
+  | ../sfq-r2-jsfix | r2/js-fix | กำลังแก้ตาม review R1+JS |
+  | ../sfq-r3-node | r3/node | WIP e8c37e0 ร่างค้าง ยัง compile ไม่ได้ (ขาด node-bridges/node-checkpoints) |
+  | ../sfq-r3-typescript | r3/typescript | WIP de9bb5c มีแค่ typescript-bridges.ts ร่าง |
+  | ../sfq-r3-backend, ../sfq-r3-oop, ../sfq-r4-labs | r3/backend, r3/oop, r4/labs | ยังไม่เริ่ม (ไม่มีการแก้) |
+- สัญญาการเขียนของทุกชุด: [R3-WRITER-BRIEF](R3-WRITER-BRIEF.md) + กฎเพิ่มจาก review: ห้ามคัด traceAnswer ลง walkthrough / bugExplanation ลง pitfalls, checkpoint ต้องเปลี่ยนรูปโจทย์ไม่ใช่เปลี่ยนชื่อ
+- เครื่องมือตรวจ: JDK/JUnit /tmp/sea-quest-java-tools, Express/PGlite /tmp/lesson-verify (สร้างใหม่: `mkdir -p /tmp/lesson-verify && cd /tmp/lesson-verify && npm init -y && npm pkg set type=module && npm install express@5.2.1 @electric-sql/pglite@0.5.8 pg`)
+- Preview :3100 หยุดแล้ว (process หายหลัง session เดิม) ต้อง build+start ใหม่ตอนตรวจ browser
+
+---|---|---|
   | ../sfq-r3-typescript | r3/typescript | TypeScript: narrowing/generics แยกบท, checkpoints ทุกบท, M3 |
   | ../sfq-r3-node | r3/node | Node: prerequisites, checkpoints, M4, assessment CLI ใหม่ |
   | ../sfq-r3-backend | r3/backend | Back-end: SQL tables→CRUD→constraints→relationships→JOIN→aggregation, auth แยก, เฉลย routes ครบ, M5–M7 |

@@ -24,7 +24,7 @@ function practiceSections(topic: TopicSource): StepSection[] | undefined {
   const l = topic.lesson;
   if (!l?.practiceHints && !l?.acceptance) return undefined;
   const sections: StepSection[] = [];
-  if (l.acceptance?.length) sections.push({ kind: "acceptance", title: topic.autoCheck ? "เกณฑ์ผ่าน (กด Run tests เพื่อตรวจ)" : "เกณฑ์ผ่าน (ตรวจเองตามรายการ)", items: l.acceptance });
+  if (l.acceptance?.length) sections.push({ kind: "acceptance", title: topic.autoCheck || topic.outputCheck ? "เกณฑ์ผ่าน (กด Run tests เพื่อตรวจ)" : "เกณฑ์ผ่าน (ตรวจเองตามรายการ)", items: l.acceptance });
   if (l.practiceHints?.length) sections.push({ kind: "hints", title: "ติดตรงไหน ค่อย ๆ เปิดดูทีละใบ้", items: l.practiceHints.map((hint, i) => l.practiceHints!.length === 3 ? `${hintLevels[i]} — ${hint}` : hint) });
   return sections;
 }
@@ -52,7 +52,7 @@ export function expandTopics(topics: TopicSource[]): LearningStep[] {
     const shared = { id: `${topic.id}-${kind}`, topicId: topic.id, courseId: topic.courseId, unit: topic.unit, position, kind, title: `${labels[kind]}: ${topic.title}`, objective: topic.objective, minutes: kind === "practice" || kind === "debug" ? 12 : 7, vocabulary: topic.vocabulary, language: topic.language };
     if (kind === "concept") return { ...shared, body: [topic.explanation, topic.why], code: topic.example, sections: conceptSections(topic) };
     if (kind === "trace") return { ...shared, body: ["อย่าเพิ่งรันโค้ด อ่านจากบนลงล่างและเขียนค่าที่เปลี่ยนในแต่ละบรรทัด การทำนายก่อนรันฝึก mental model ของภาษา"], code: topic.example, prompt: topic.tracePrompt, reveal: topic.traceAnswer, sections: topic.lesson?.traceHint ? [{ kind: "hints", title: "วิธีไล่ทีละบรรทัด", items: [topic.lesson.traceHint] }] : undefined };
-    if (kind === "practice") return { ...shared, body: ["เขียนด้วยตัวเองจาก starter code ก่อนเปิดคำตอบ เป้าหมายคืออธิบายได้ว่าแต่ละบรรทัดมีหน้าที่อะไร"], starter: topic.starter, prompt: topic.practicePrompt, reveal: practiceReveal(topic), sections: practiceSections(topic), check: topic.autoCheck };
+    if (kind === "practice") return { ...shared, body: ["เขียนด้วยตัวเองจาก starter code ก่อนเปิดคำตอบ เป้าหมายคืออธิบายได้ว่าแต่ละบรรทัดมีหน้าที่อะไร"], starter: topic.starter, prompt: topic.practicePrompt, reveal: practiceReveal(topic), sections: practiceSections(topic), check: topic.autoCheck, outputCheck: topic.outputCheck };
     if (kind === "debug") return { ...shared, body: ["บั๊กเป็นข้อมูลเกี่ยวกับ mental model ที่ยังคลาดเคลื่อน อ่าน error หรือผลลัพธ์จริง แล้วตั้งสมมติฐานก่อนแก้"], code: topic.buggy, prompt: "ระบุสาเหตุ แก้ให้น้อยที่สุด แล้วอธิบายว่าทำไมการแก้นี้จึงถูก", reveal: topic.bugExplanation };
     return { ...shared, body: ["ปิดตัวอย่างก่อนตอบ แล้วอธิบายด้วยคำของตัวเอง หากอธิบายไม่ได้ให้กลับไป trace อีกครั้ง", `Checkpoint: ${topic.objective}`], prompt: `1) ${topic.title} แก้ปัญหาอะไร 2) มีกฎสำคัญอะไร 3) เขียนตัวอย่างใหม่ที่ไม่เหมือนตัวอย่างด้านบน`, reveal: `คำตอบที่ดีต้องเชื่อมกับเหตุผลนี้: ${topic.why}`, sections: checkpointSections(topic) };
   }));

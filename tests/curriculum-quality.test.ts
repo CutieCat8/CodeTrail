@@ -120,6 +120,28 @@ function runSnippet(source: string) {
   });
 }
 
+describe("output-checked practice", () => {
+  const checked = topicSources.filter((topic) => topic.outputCheck);
+
+  it.each(checked.map((topic) => [topic.id, topic] as const))("%s: solution prints the expected output, starter and wrong scripts do not", async (_id, topic) => {
+    const { expected, wrongAnswers = [] } = topic.outputCheck!;
+    const solution = await runSnippet(topic.solution);
+    expect(solution.error).toBeUndefined();
+    expect(solution.output.join("\n")).toBe(expected);
+    const starter = await runSnippet(topic.starter);
+    expect(!starter.error && starter.output.join("\n") === expected).toBe(false);
+    for (const wrong of wrongAnswers) {
+      const result = await runSnippet(wrong);
+      expect(!result.error && result.output.join("\n") === expected, wrong).toBe(false);
+    }
+  });
+
+  it("uses at most one checking mechanism per practice and only for in-browser JavaScript", () => {
+    expect(checked.filter((topic) => topic.autoCheck || topic.language !== "javascript").map((topic) => topic.id)).toEqual([]);
+    for (const topic of checked) expect(learningSteps.find((step) => step.id === `${topic.id}-practice`)?.outputCheck).toEqual(topic.outputCheck);
+  });
+});
+
 describe("snippet runner", () => {
   it("keeps output when an awaited promise never settles", async () => {
     const result = await runSnippet("console.log(\"before\");\nawait new Promise(() => {});");

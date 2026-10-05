@@ -150,3 +150,11 @@ export async function runIsolatedTests(source: string, functionName: string, tes
     worker.postMessage({ source, functionName, tests });
   });
 }
+
+// Output-checked practice: the learner's script passes when its console output matches exactly.
+export async function checkSnippetOutput(source: string, expected: string): Promise<TestResult[]> {
+  const result = await runIsolatedSnippet(source);
+  const actual = result.output.join("\n");
+  const passed = !result.error && actual === expected;
+  return [{ name: "output ตรงกับที่โจทย์กำหนด", passed, expected, actual: actual || "(ไม่มี output)", ...(result.error ? { error: result.error } : {}) }];
+}

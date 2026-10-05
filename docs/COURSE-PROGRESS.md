@@ -15,30 +15,17 @@
 |---|---|---|---|---|
 | dev-program, dev-files, dev-terminal, dev-process, dev-errors, dev-editor, dev-git, dev-docs | rich-ต้องเติม | – | – | ✓ เดิม |
 
-## JavaScript Foundations
+## JavaScript Foundations — ชุด B2 เสร็จ (20 หัวข้อ, 100 steps)
 
-| Topic | Inventory | เขียน | เทคนิค | UI |
-|---|---|---|---|---|
-| js-runtime | บาง | – | – | – |
-| js-errors | ใหม่ | – | – | – |
-| js-values | บาง | – | – | – |
-| js-variables | บาง | – | – | – |
-| js-strings | ใหม่ | – | – | – |
-| js-numbers | ใหม่ | – | – | – |
-| js-conditions | ใหม่ | – | – | – |
-| js-functions | บาง (บทมาตรฐาน B1) | – | – | – |
-| js-scope | บาง | – | – | – |
-| js-loops | ใหม่ | – | – | – |
-| js-arrays | บาง | – | – | – |
-| js-objects | บาง | – | – | – |
-| js-references | ใหม่ | – | – | – |
-| js-callbacks | ใหม่ | – | – | – |
-| js-project-planner-1 | ใหม่ | – | – | – |
-| js-exceptions | ใหม่ | – | – | – |
-| js-modules-json | ใหม่ | – | – | – |
-| js-promises | ใหม่ | – | – | – |
-| js-async | บาง | – | – | – |
-| js-project-planner-2 | ใหม่ | – | – | – |
+ลำดับจริงในคอร์ส: js-runtime → js-values → js-variables → js-strings → js-numbers → js-conditions → js-functions → js-scope → js-loops → js-arrays → js-objects → js-errors → js-references → js-callbacks → js-project-planner-1 → js-exceptions → js-modules-json → js-promises → js-async → js-project-planner-2
+
+| สถานะ | รายละเอียด |
+|---|---|
+| เขียน | ทุกหัวข้อ `standard: "v3"` (8 หัวข้อเดิมเขียนใหม่ทั้งหมด ID เดิม + 12 หัวข้อใหม่) |
+| ตรวจเทคนิค | tests: ตัวอย่างทุกหัวข้อ + code ใน explain รันผ่าน snippet worker จริงและตรง expectedOutput; autoCheck 11 หัวข้อ (solution ผ่าน/starter และ wrongAnswers ไม่ผ่าน); outputCheck 5 หัวข้อ (values, variables, strings, numbers, conditions) · Codex audit รอบ 1 พบ 12 ข้อ แก้ครบ (ดูบันทึกชุดงาน) |
+| ตรวจเชื่อม UI | build ผ่าน; ยังไม่ได้ตรวจใน browser (รอตรวจ) |
+| หมายเหตุ ID | ไม่มี ID เปลี่ยน; ตำแหน่ง (position) ของ step ในคอร์สเปลี่ยนเพราะเพิ่มหัวข้อและย้าย js-errors ไปหลัง js-objects |
+| ตรวจเองในเครื่อง | js-modules-json (import/export ต้องรันหลายไฟล์), js-promises/js-async (runner ตรวจอัตโนมัติไม่ได้สำหรับ Promise จึงใช้ checklist + output) |
 
 ## TypeScript (`typescript`, เดิม writing ไม่มีหัวข้อ)
 
@@ -90,3 +77,5 @@ react, nextjs, postgres — คง planned; ปรับคำอธิบาย
 | ชุด | ผู้ทำ | ผล | หลักฐาน |
 |---|---|---|---|
 | B0 research | Codex (JS/Java/OOP, web tool) + Claude (TS/Node/Back-end, WebFetch + GitHub) | เสร็จ | `docs/COURSE-RESEARCH.md` |
+| B1 มาตรฐาน + js-functions | Claude เขียน; Codex review 2 รอบ (รอบ 1: 7 ข้อ เช่น Submit ข้าม tests, editor แก้ระหว่างรัน; รอบ 2: 4 ข้อใน snippet runner ใหม่) | เสร็จ แก้ครบ | commit `01f6048` |
+| B2 JavaScript Foundations | Claude เขียน; Codex audit 1 รอบ: 12 ข้อ (prerequisite ใช้ก่อนสอน, Infinity ในราคา, ลำดับ microtask, สาเหตุ fetch reject, การตรวจ non-mutation, key "constructor", hint ที่เฉลยเร็ว ฯลฯ) | เสร็จ แก้ครบ — เพิ่ม outputCheck สำหรับโจทย์แบบสคริปต์ช่วงต้น | commit ชุด B2 |

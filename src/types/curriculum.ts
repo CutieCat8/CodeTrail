@@ -38,6 +38,13 @@ export type AutoCheck = {
   wrongAnswers?: string[];
 };
 
+// For script-style practice (before functions are taught): Run tests compares the console output.
+export type OutputCheck = {
+  expected: string;
+  // Plausible wrong scripts that must not produce the expected output.
+  wrongAnswers?: string[];
+};
+
 export type TopicSource = {
   id: string;
   courseId: string;
@@ -63,6 +70,7 @@ export type TopicSource = {
   // Topic IDs to review first; must exist and come earlier in the learning order.
   prerequisites?: string[];
   autoCheck?: AutoCheck;
+  outputCheck?: OutputCheck;
   lesson?: RichLesson;
 };
 
@@ -84,6 +92,7 @@ export type LearningStep = {
   sections?: StepSection[];
   language?: CodeLanguage;
   check?: AutoCheck;
+  outputCheck?: OutputCheck;
   vocabulary: Array<[term: string, meaning: string]>;
 };
 

@@ -156,7 +156,7 @@ export const nodeFoundationLessons: Record<string, RichLesson> = {
       {
         heading: "1) Node รู้ได้อย่างไรว่าไฟล์เป็น ESM",
         text: [
-          "นามสกุล .mjs = ES module เสมอ, .cjs = CommonJS เสมอ, .js ขึ้นกับ \"type\" ใน package.json ที่ใกล้ที่สุด (\"module\" = ESM, ไม่ตั้งหรือ \"commonjs\" = CommonJS)",
+          "นามสกุล .mjs = ES module เสมอ, .cjs = CommonJS เสมอ, .js ขึ้นกับ \"type\" ใน package.json ที่ใกล้ที่สุด: \"module\" = ESM, \"commonjs\" = CommonJS และถ้าไม่ตั้งเลย Node 22.7+ จะดูจาก syntax ในไฟล์ (มี import/export ก็ถือเป็น ESM) ซึ่งช้ากว่าเล็กน้อยและทำให้ผู้อ่านเดายาก จึงควรตั้ง \"type\" ให้ชัดเสมอ",
           "โปรเจกต์ใหม่แนะนำ \"type\": \"module\" แล้วใช้ .js ได้เลย",
         ],
       },
@@ -186,15 +186,15 @@ export const nodeFoundationLessons: Record<string, RichLesson> = {
     ],
     pitfalls: [
       "import โดยไม่ใส่นามสกุล: ERR_MODULE_NOT_FOUND",
-      "ใช้ import ในไฟล์ .js ที่ไม่มี \"type\": \"module\": SyntaxError ว่าใช้ import นอก module ไม่ได้",
+      "ตั้ง \"type\": \"commonjs\" (หรือใช้ Node เวอร์ชันเก่า) แล้วเขียน import ในไฟล์ .js: SyntaxError ว่าใช้ import นอก module ไม่ได้ — ตั้ง \"type\" ให้ตรงกับแบบที่เขียน",
       "ใช้ path ที่ขึ้นกับโฟลเดอร์ที่รันคำสั่ง แทน import.meta.dirname: ไฟล์หาไม่เจอเมื่อรันจากโฟลเดอร์อื่น",
     ],
     checks: [
-      { question: "ไฟล์ util.js ในโปรเจกต์ที่ package.json ไม่มี \"type\" จะถูกมองเป็น module แบบไหน", answer: "CommonJS" },
+      { question: "ไฟล์ util.js ที่ใช้ require และอยู่ในโปรเจกต์ที่ package.json ไม่มี \"type\" จะถูกมองเป็น module แบบไหน", answer: "CommonJS (Node 22.7+ จะถือเป็น ESM ก็ต่อเมื่อเจอ syntax ของ ESM เช่น import/export) — เพราะคาดเดายากจึงควรตั้ง \"type\" ให้ชัด" },
       { question: "ทำไมควรเขียน node:fs แทน fs", answer: "บอกชัดว่าเป็นโมดูลในตัวของ Node ไม่สับสนกับ package ใน npm" },
     ],
     recap: [
-      ".mjs/\"type\": \"module\" = ESM; .cjs หรือไม่ตั้ง = CommonJS",
+      ".mjs = ESM, .cjs = CommonJS, .js ตาม \"type\" (ตั้งให้ชัดเสมอ)",
       "import ไฟล์ของเราต้องใส่นามสกุล; โมดูลในตัวใช้ node:",
       "import.meta.dirname สำหรับ path ข้างไฟล์โค้ด",
     ],
@@ -216,7 +216,7 @@ export const nodeFoundationLessons: Record<string, RichLesson> = {
     reflection: [
       "ถ้า Planner มีทั้ง CLI และ API ไฟล์ไหนควรเป็น logic ที่ใช้ร่วม และไฟล์ไหนเป็นส่วนเชื่อม input/output",
     ],
-    extension: "เขียน planner.cjs แบบ CommonJS ที่ export function เดียวกันด้วย module.exports แล้วลอง import จาก main.mjs ด้วย import planner from \"./planner.cjs\" สังเกตว่าต้องใช้ default import",
+    extension: "เขียน planner.cjs แบบ CommonJS ที่ export function เดียวกันด้วย module.exports แล้วลอง import จาก main.mjs ด้วย import planner from \"./planner.cjs\" สังเกตว่า default import ใช้ได้แน่นอนกับ CommonJS (named import ใช้ได้บางกรณีเมื่อ Node ตรวจพบชื่อ export)",
   },
   "node-npm": {
     hook: "เพื่อนส่งโปรเจกต์มาใน zip ขนาด 300 MB เพราะติด node_modules มาด้วย พอแตกไฟล์บนเครื่องซีกลับรันไม่ได้อยู่ดี เพราะ native package ถูก build มาสำหรับเครื่องอื่น npm มีวิธีมาตรฐานที่ทำให้ทุกเครื่องสร้าง environment เดียวกันได้จากไฟล์ไม่กี่ KB",
@@ -338,14 +338,14 @@ export const nodeFoundationLessons: Record<string, RichLesson> = {
       "ครอบ JSON.parse ด้วย try/catch แยก แล้ว throw new Error(\"ไฟล์ \" + file + \" ไม่ใช่ JSON ที่ถูกต้อง\")",
     ],
     acceptance: [
-      localRun,
-      "ตรวจเอง: ไฟล์ที่มีอยู่คืน array ที่อ่านได้",
-      "ตรวจเอง: ไฟล์ที่ไม่มีคืน []",
-      "ตรวจเอง: ไฟล์ที่เป็น JSON เสีย throw error ที่มีชื่อไฟล์",
+      "ตรวจเองในเครื่อง: บทนี้ใช้ API ของ Node ที่ไม่มีใน browser จึงกด Run บนเว็บไม่ได้",
+      "ตรวจเอง: ไฟล์ที่มี array คืน array ที่อ่านได้ และไฟล์ที่ไม่มีคืน []",
+      "ตรวจเอง: JSON เสีย throw error ที่มีชื่อไฟล์ และ JSON ที่ไม่ใช่ array ({} หรือ null) throw error อีกข้อความ",
     ],
     solutionNotes: [
       "แยก try สองชั้นทำให้ข้อความผิดพลาดบอกได้ตรงว่าพังที่ขั้นไหน",
-      "ทางเลือก: ตรวจ Array.isArray(data) เพิ่มอีกขั้น (จะทำใน M4)",
+      "ตรวจ Array.isArray นอก try ของ JSON.parse เพื่อไม่ให้ error เรื่องรูปร่างถูกเข้าใจผิดว่าเป็น JSON เสีย",
+      "การตรวจทีละรายการ (เช่นมี title ไหม) ทำใน M4 ก่อนส่งให้ logic",
     ],
     reflection: [
       "ในงานที่เคยทำ มีจุดไหนที่ catch error ทุกชนิดแล้วทำต่อเหมือนไม่มีอะไรเกิดขึ้น",
@@ -366,7 +366,7 @@ export const nodeFoundationLessons: Record<string, RichLesson> = {
         ["กริ่งจากครัว", "callback/Promise ที่พร้อมให้ event loop หยิบมาทำ"],
         ["พับผ้าเช็ดปากเองนาน ๆ", "ลูปคำนวณหนักหรือ readFileSync ที่บล็อก thread หลัก"],
       ],
-      limits: "พนักงานจริงเลือกเองได้ว่าจะไปโต๊ะไหนก่อน แต่ event loop ทำตามลำดับ phase ที่กำหนด และ “ครัว” ของ Node (ระบบปฏิบัติการ/thread pool) ทำได้เฉพาะงาน I/O ไม่ได้ช่วยคำนวณ JavaScript ให้",
+      limits: "พนักงานจริงเลือกเองได้ว่าจะไปโต๊ะไหนก่อน แต่ event loop ทำตามลำดับ phase ที่กำหนด และ “ครัว” ของ Node (ระบบปฏิบัติการ/thread pool) ทำงานที่ Node เตรียมไว้ เช่น I/O, crypto และ zlib แต่ไม่ได้ช่วยรันโค้ด JavaScript ที่เราเขียนเอง งานคำนวณของเราต้องใช้ worker_threads",
     },
     explain: [
       {
@@ -436,7 +436,7 @@ export const nodeFoundationLessons: Record<string, RichLesson> = {
     extension: "ใช้ performance.now() วัดว่า handler แต่ละแบบใช้เวลาตอบ /fast เท่าไรเมื่อมี /slow ค้างอยู่ แล้วบันทึกเป็นตาราง",
   },
   "node-events-streams": {
-    hook: "ไฟล์ log โหวตของกลุ่มเพื่อนใหญ่ขึ้นทุกวัน วันหนึ่ง script ที่ใช้ readFile อ่านทั้งไฟล์เข้าหน่วยความจำก็พังเพราะไฟล์ใหญ่เกิน การอ่านทีละบรรทัดด้วย stream ใช้หน่วยความจำเท่าเดิมไม่ว่าไฟล์จะใหญ่แค่ไหน",
+    hook: "ไฟล์ log โหวตของกลุ่มเพื่อนใหญ่ขึ้นทุกวัน วันหนึ่ง script ที่ใช้ readFile อ่านทั้งไฟล์เข้าหน่วยความจำก็พังเพราะไฟล์ใหญ่เกิน การอ่านทีละบรรทัดด้วย stream ทำให้หน่วยความจำไม่โตตามขนาดไฟล์",
     explain: [
       {
         heading: "1) EventEmitter: ส่งสัญญาณและฟัง",
@@ -449,7 +449,7 @@ export const nodeFoundationLessons: Record<string, RichLesson> = {
         heading: "2) stream: ข้อมูลมาทีละ chunk",
         text: [
           "readable stream ส่ง chunk ของข้อมูลมาเรื่อย ๆ (เช่นไฟล์ทีละ 64 KB) แทนการให้ทั้งก้อน request ของ http server และ process.stdin ก็เป็น stream",
-          "ข้อดี: เริ่มประมวลผลได้ก่อนข้อมูลมาครบ และใช้หน่วยความจำคงที่",
+          "ข้อดี: เริ่มประมวลผลได้ก่อนข้อมูลมาครบ และหน่วยความจำไม่โตตามขนาดไฟล์ (ยังขึ้นกับ buffer, บรรทัดที่ยาวที่สุด และข้อมูลที่เราเลือกเก็บไว้)",
         ],
       },
       {
@@ -475,7 +475,7 @@ export const nodeFoundationLessons: Record<string, RichLesson> = {
     ],
     checks: [
       { question: "ในตัวอย่างสั้น ทำไม emit ครั้งแรกไม่พิมพ์อะไร", answer: "เพราะยังไม่มี listener ในตอนที่ emit event ไม่ถูกเก็บไว้รอ" },
-      { question: "ทำไมนับบรรทัดด้วย stream ใช้หน่วยความจำคงที่", answer: "เพราะประมวลผลทีละ chunk/บรรทัดแล้วทิ้ง เก็บแค่ตัวนับ ไม่เก็บเนื้อหาทั้งไฟล์" },
+      { question: "ทำไมนับบรรทัดด้วย stream ไม่ต้องใช้หน่วยความจำเท่าขนาดไฟล์", answer: "เพราะประมวลผลทีละ chunk/บรรทัดแล้วทิ้ง เก็บแค่ตัวนับ — หน่วยความจำขึ้นกับบรรทัดที่ยาวที่สุดและสิ่งที่สะสมไว้ ไม่ใช่ขนาดไฟล์ทั้งหมด" },
     ],
     recap: [
       "on ลงทะเบียน emit เรียกทันทีแบบ synchronous",
@@ -518,7 +518,7 @@ export const nodeFoundationLessons: Record<string, RichLesson> = {
         ["เอกสารแนบ", "body"],
         ["ตราประทับสถานะ", "status code (200, 404, 400, 500)"],
       ],
-      limits: "เคาน์เตอร์จริงจำเราได้จากคิวก่อนหน้า แต่ HTTP เป็น stateless: server ไม่จำ request ก่อน ๆ เอง ถ้าต้องรู้ว่าเป็นใครต้องส่งข้อมูลยืนยันมาทุกครั้ง (cookie/token ในคอร์ส Back-end)",
+      limits: "เคาน์เตอร์จริงจำเราได้จากคิวก่อนหน้า แต่ HTTP เป็น stateless: แต่ละ request ต้องมีข้อมูลครบในตัวเอง ตัวโปรโตคอลไม่ได้ผูก request เข้าด้วยกัน server ยังเก็บข้อมูลในฐานข้อมูลหรือ session ได้ แต่ต้องให้ client ส่งตัวระบุมาทุกครั้ง (cookie/token ในคอร์ส Back-end)",
     },
     explain: [
       {
@@ -552,7 +552,7 @@ export const nodeFoundationLessons: Record<string, RichLesson> = {
     ],
     pitfalls: [
       "ลืม res.end: client ค้าง",
-      "เรียก writeHead/end ซ้ำ: ERR_HTTP_HEADERS_SENT ใส่ return หลังตอบ",
+      "ตอบซ้ำ: writeHead หลังส่ง header แล้วได้ ERR_HTTP_HEADERS_SENT ส่วนการ write หลัง end ได้ ERR_STREAM_WRITE_AFTER_END ใส่ return หลังตอบเสมอ",
       "ส่ง JSON โดยไม่ตั้ง Content-Type: client บางตัวไม่ parse",
       "ตอบ 200 พร้อม { error } เมื่อผิด: client แยกสำเร็จ/ล้มเหลวจาก status ไม่ได้",
     ],
@@ -600,7 +600,7 @@ export const nodeFoundationLessons: Record<string, RichLesson> = {
         heading: "2) node:test และ node:assert/strict",
         text: [
           "import test from \"node:test\" แล้ว test(\"ชื่อที่บอกพฤติกรรม\", () => {...}) รองรับ async ด้วย async () => {...}",
-          "assert.equal (===), assert.deepEqual (เทียบเนื้อหา), assert.throws(fn, { message }), await assert.rejects(promise, { message })",
+          "assert.equal ใน node:assert/strict เทียบด้วย Object.is (เหมือน === เกือบทุกกรณี ต่างตรงที่ NaN เท่ากับ NaN และ 0 ไม่เท่ากับ -0), assert.deepEqual เทียบเนื้อหา, assert.throws(fn, { message }), await assert.rejects(promise, { message })",
           "node --test ค้นไฟล์ test (เช่น *.test.mjs) รันทั้งหมดแล้วสรุปผล exit code ไม่ใช่ 0 ถ้ามี test ล้ม จึงใช้ใน CI ได้",
         ],
       },
@@ -620,7 +620,7 @@ export const nodeFoundationLessons: Record<string, RichLesson> = {
     pitfalls: [
       "ใช้ equal กับ object: เทียบ identity ใช้ deepEqual",
       "ใช้ assert.throws กับ async function: ใช้ await assert.rejects",
-      "test ที่ไม่มี assert: ผ่านเสมอโดยไม่ได้ตรวจอะไร",
+      "test ที่ไม่มี assert: อาจผ่านโดยไม่ได้ตรวจผลที่ตั้งใจ (ล้มได้แค่ตอน throw หรือค้าง) ทุก test ควรยืนยันผลลัพธ์อย่างน้อยหนึ่งข้อ",
       "test ที่พึ่งลำดับหรือข้อมูลจาก test อื่น: ล้มแบบสุ่ม ทำให้แต่ละ test เตรียมข้อมูลเอง",
     ],
     checks: [
@@ -686,7 +686,7 @@ export const nodeFoundationLessons: Record<string, RichLesson> = {
     ],
     pitfalls: [
       "พิมพ์และ process.exit อยู่ใน logic: ทดสอบยากและ output อาจถูกตัด",
-      "ไม่ตรวจว่าข้อมูลเป็น array: summarize พังด้วย error ที่ผู้ใช้อ่านไม่เข้าใจ",
+      "ตรวจแค่ว่าเป็น array: รายการอย่าง null หรือไม่มี title ทำให้ logic พังด้วย TypeError ตรวจทุกรายการก่อนส่งต่อ",
       "พิมพ์ undefined เมื่อไม่มี stdout: พิมพ์เฉพาะเมื่อมีค่า",
     ],
     checks: [
@@ -705,9 +705,9 @@ export const nodeFoundationLessons: Record<string, RichLesson> = {
       "ใน cli.test.mjs เตรียมไฟล์ด้วย mkdtemp แล้วทดสอบ: summary สำเร็จ, week สำเร็จพร้อมรายการผิด, ไฟล์ไม่มี, JSON เสีย, คำสั่งผิด",
     ],
     acceptance: [
-      localRun,
+      "ตรวจเองในเครื่อง: บทนี้ใช้ API ของ Node ที่ไม่มีใน browser จึงกด Run บนเว็บไม่ได้",
       "ตรวจเอง: node cli.mjs summary data.json และ node cli.mjs week data.json แสดงผลถูก",
-      "ตรวจเอง: กรณีผิดทุกแบบแสดงข้อความที่อ่านเข้าใจและ exit code ตามที่กำหนด",
+      "ตรวจเอง: ไฟล์ไม่มี, JSON เสีย, ไม่ใช่ array, รายการผิดรูปแบบ และคำสั่งผิด แสดงข้อความที่อ่านเข้าใจและ exit code ตามที่กำหนด โดยไม่มี TypeError",
       "ตรวจเอง: npm test (node --test) ผ่านอย่างน้อย 5 กรณี",
     ],
     solutionNotes: [

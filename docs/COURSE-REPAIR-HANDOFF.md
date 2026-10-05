@@ -1,3 +1,23 @@
+# สถานะล่าสุด (Claude รับช่วง 2026-10-05)
+
+> ส่วนนี้ใหม่กว่าเนื้อหาด้านล่าง อ่านก่อน
+
+- Claude รับช่วงจาก Codex ที่ 2691362 (ตรวจแล้ว: branch ถูก, tree สะอาด, Codex CLI PID 236304 ไม่ได้เปิดไฟล์ใน repo, preview PID 258961 ยังรัน)
+- commit identity ของ Claude: `Claude <claude@local.invalid>` ผ่าน env ต่อคำสั่ง ไม่แก้ git config (แบบเดียวกับ Codex)
+- Independent review ของ R1, R2-JS, R2-Java: **กำลังทำ** โดย Claude reviewer แบบ read-only สองชุด ผลจะบันทึกใน docs/verification/REVIEW-R1-R2/
+- R3/R4 กำลังเขียนใน worktree แยก (เจ้าของไฟล์ไม่ทับกัน ตามสัญญา [R3-WRITER-BRIEF](R3-WRITER-BRIEF.md)):
+  | worktree | branch | ขอบเขต |
+  |---|---|---|
+  | ../sfq-r3-typescript | r3/typescript | TypeScript: narrowing/generics แยกบท, checkpoints ทุกบท, M3 |
+  | ../sfq-r3-node | r3/node | Node: prerequisites, checkpoints, M4, assessment CLI ใหม่ |
+  | ../sfq-r3-backend | r3/backend | Back-end: SQL tables→CRUD→constraints→relationships→JOIN→aggregation, auth แยก, เฉลย routes ครบ, M5–M7 |
+  | ../sfq-r3-oop | r3/oop | Java OOP: references ก่อน identity/override, file I/O + JUnit setup ก่อน capstone, checkpoints, Library M1–M3/RPG |
+  | ../sfq-r4-labs | r4/labs | 22 labs: solutionNotes/verify/reflection เฉพาะ lab, scripts/verify-labs.ts |
+- ถ้า session นี้หยุดกลางทาง: ดู `git -C ../sfq-r3-<x> log --oneline -3` และ `docs/verification/R3-<x>/checks.md` ใน worktree นั้น; branch ที่ commit แล้วให้ merge เข้า feat/curriculum-learning-repair ทีละ branch (`git merge --no-ff r3/<x>`) แล้วรัน tsc/lint/vitest; branch ที่ยังไม่ commit ให้ตรวจ `git -C ../sfq-r3-<x> status` ก่อน ห้ามลบ worktree ที่มีงานค้าง
+- เครื่องมือตรวจ: JDK/JUnit ที่ /tmp/sea-quest-java-tools, Express/PGlite ที่ /tmp/lesson-verify (สร้างใหม่: `mkdir -p /tmp/lesson-verify && cd /tmp/lesson-verify && npm init -y && npm pkg set type=module && npm install express@5.2.1 @electric-sql/pglite@0.5.8 pg`)
+
+---
+
 # ส่งต่อ curriculum repair ให้ Claude session ใหม่
 
 อัปเดต 2026-10-05 หลังผู้ใช้สั่งหยุดเริ่มชุดใหม่ เพราะโควตาเหลือประมาณ 9%

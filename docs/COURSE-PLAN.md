@@ -37,6 +37,13 @@
 
 ### การตรวจที่ใช้
 
+เครื่องมือตรวจที่สร้างในรอบนี้ (รันนอกแอป ไม่เพิ่ม dependency ใน package.json):
+
+- `npx vitest run` — มาตรฐาน v3, ID/prerequisite, ตัวอย่าง JavaScript/Node/TypeScript รันจริง, autoCheck/outputCheck, การผูก lab กับหัวข้อ
+- `VERIFY_DIR=<โฟลเดอร์ที่ติดตั้ง express@5 @electric-sql/pglite> npx vite-node --config vitest.config.ts scripts/verify-lesson-deps.ts` — ตัวอย่างที่ต้องใช้ Express/SQL
+- `JAVA_HOME=<JDK 21> JUNIT_JAR=<junit-platform-console-standalone 6.x> npx vite-node --config vitest.config.ts scripts/verify-java-lessons.ts` — ตัวอย่าง, starter, เฉลย (solutionCheck/fixture/JUnit) และ bugCheck ของทุกหัวข้อ Java
+
+
 - `tests/curriculum-quality.test.ts`: โครงสร้างครบตามมาตรฐานสำหรับหัวข้อที่ประกาศ `lesson`, prerequisite มีจริงและมาก่อน, ID ไม่ซ้ำ, ตัวอย่าง JS ให้ผลตรงกับ `expectedOutput`, autoCheck: starter ไม่ผ่าน/solution ผ่าน/คำตอบผิดที่ระบุไม่ผ่าน
 - TypeScript: ตัวอย่างและ solution ต้อง compile ผ่านด้วย `typescript` ใน repo (strict)
 - Java: ตรวจด้วย JDK 21 เมื่อมีในเครื่อง; ถ้าไม่มีให้ระบุใน progress ว่ายังไม่ได้ compile จริง และให้ Codex review
@@ -139,14 +146,14 @@ Express ตาม v5 (Node ≥ 18): async error ส่งต่ออัตโ�
 
 | ชุด | งาน | สถานะ |
 |---|---|---|
-| B0 | research, plan, progress, handoff | ทำในรอบนี้ |
-| B1 | ขยาย type/generator/UI (prerequisite links, checks, acceptance, hints 3 ระดับ, autoCheck ใน micro-step) + บทมาตรฐาน `js-functions` + quality tests | ทำในรอบนี้ |
-| B2 | JavaScript Foundations ครบ | ถัดไป |
-| B3 | TypeScript + โลกใหม่ | |
-| B4 | Node.js Fundamentals | |
-| B5 | Back-end Development | |
-| B6 | Java Foundations | |
-| B7 | Java OOP + Library/RPG projects | |
-| B8 | Labs 22 บท, Developer Foundations ตามมาตรฐาน, คอร์ส planned | |
+| B0 | research, plan, progress, handoff | เสร็จ |
+| B1 | ขยาย type/generator/UI (prerequisite links, checks, acceptance, hints 3 ระดับ, autoCheck ใน micro-step) + บทมาตรฐาน `js-functions` + quality tests | เสร็จ |
+| B2 | JavaScript Foundations ครบ | เสร็จ |
+| B3 | TypeScript + โลกใหม่ | เสร็จ |
+| B4 | Node.js Fundamentals | เสร็จ |
+| B5 | Back-end Development | เสร็จ (ตรวจด้วย Express 5 + PGlite + pg ผ่าน socket) |
+| B6 | Java Foundations | เสร็จ (ตรวจด้วย JDK 21) |
+| B7 | Java OOP + Library/RPG projects | เสร็จ (ตรวจด้วย JDK 21 + JUnit 6.1.3) |
+| B8 | Labs 22 บท, Developer Foundations ตามมาตรฐาน, คอร์ส planned | เสร็จ (lab ผูกกับคอร์สแต่ยังเป็นรูปแบบเดิม) |
 
 ทุกชุด: เขียน → checks ที่เกี่ยวข้อง → Codex review หนึ่งรอบ → แก้ตามหลักฐาน → commit → อัปเดต progress

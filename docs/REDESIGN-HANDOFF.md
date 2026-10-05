@@ -4,7 +4,7 @@
 Branch: `feat/curriculum-expansion` (แตกจาก `fix/import-validation` ที่ `57e1cd2` ← `fix/runner-comparator` `480ad3f` ← `main` `f9a7613`; ทุก commit อยู่ในสำเนา Linux `~/work/sea-fullstack-quest` เท่านั้น ยังไม่ push/merge)  
 Remote: `origin` → `https://github.com/CutieCat8/CodeTrail.git`  
 ฐาน implementation ที่ push แล้ว: `f9a7613` บน `main`
-สถานะรอบล่าสุด: **ยกระดับเนื้อหาหลักสูตรทั้งระบบ** — สถานะ/แผน/หลักฐานอยู่ใน `docs/COURSE-PROGRESS.md`, `docs/COURSE-PLAN.md`, `docs/COURSE-RESEARCH.md` (ไฟล์นี้ไม่ทำสถานะรายบทซ้ำ) งานระบบที่ค้างย้ายไป “Backlog ระบบ” ด้านล่าง  
+สถานะรอบล่าสุด: **ยกระดับเนื้อหาหลักสูตรทั้งระบบ — ชุด B0–B8 เสร็จ** (commit ล่าสุดของรอบดูด้วย `git log --oneline f9a7613..`) ยังไม่ได้ตรวจหน้าเว็บใน browser ทั้งหมด — สถานะ/แผน/หลักฐานอยู่ใน `docs/COURSE-PROGRESS.md`, `docs/COURSE-PLAN.md`, `docs/COURSE-RESEARCH.md` (ไฟล์นี้ไม่ทำสถานะรายบทซ้ำ) งานระบบที่ค้างย้ายไป “Backlog ระบบ” ด้านล่าง  
 สถานะรอบ Import: แก้ Import validation และความปลอดภัยของข้อมูลตอนโหลด/บันทึกแล้ว (`57e1cd2`); automated checks และ Codex review ผ่าน; ยังไม่ได้ตรวจในเบราว์เซอร์ (รอตรวจ) (ดู “Defect fix: Import validation”)  
 สถานะรอบก่อน: แก้ตัวเปรียบเทียบผลของ auto runner (`d51e7ca`, `480ad3f`); ผลตรวจ Chrome ที่ผู้ใช้ส่งต่อมายืนยัน auto lessons 3 บท (ไม่ใช่ final acceptance); defect XP หายเมื่อส่งคำตอบผิดหลังผ่าน ยังรอตรวจยืนยัน  
 ก่อนหน้านั้น: Roadmap แบบ skill expedition map เขียนและ push แล้ว; รอผู้ใช้ตรวจภาพจริงใน browser

@@ -113,7 +113,9 @@ function summary(output: string, exitedZero: boolean) {
   return { clean: exitedZero && problems.every((n) => n === 0), successful: count("tests successful"), detail: output };
 }
 
-const topics = topicSources.filter((topic) => topic.language === "java" && topic.standard === "v3");
+const selectedIds = process.env.JAVA_TOPIC_IDS?.split(",");
+const topics = topicSources.filter((topic) => topic.language === "java" && topic.standard === "v3" && (!selectedIds || selectedIds.includes(topic.id)));
+if (selectedIds && topics.length !== selectedIds.length) throw new Error("JAVA_TOPIC_IDS contains missing or non-Java topic IDs");
 let failures = 0;
 const report = (ok: boolean, label: string, detail?: string) => {
   if (!ok) failures += 1;
@@ -131,7 +133,13 @@ for (const topic of topics) {
       report(result.clean && result.successful > 0, `${topic.id} · example JUnit tests pass`, result.detail.slice(-1500));
     }
     for (const block of topic.lesson?.explain ?? []) {
-      if (block.code && block.output !== undefined) expectOutput(`${topic.id} · ${block.heading}`, execute(block.code), block.output);
+      if (block.code && block.output !== undefined) {
+        if (block.language && block.language !== "java") {
+          console.log(`manual ${topic.id} · ${block.heading} (${block.language} setup, not a Java example)`);
+        } else {
+          expectOutput(`${topic.id} · ${block.heading}`, execute(block.code), block.output);
+        }
+      }
     }
     const starter = compile(topic.starter);
     report(starter.ok, `${topic.id} · starter compiles`, starter.ok ? undefined : starter.message);

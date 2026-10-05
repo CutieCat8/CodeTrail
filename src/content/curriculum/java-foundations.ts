@@ -1,5 +1,8 @@
 import type { TopicSource } from "@/types/curriculum";
 
+import { javaBridgeTopics } from "./java-bridges";
+import { javaCheckpoints } from "./java-checkpoints";
+
 const courseId = "java-foundations";
 const v = (a: string, b: string): [string, string] => [a, b];
 // Java code is written with String.raw so escapes such as \n stay exactly as the learner types them.
@@ -7,7 +10,7 @@ const java = String.raw;
 
 // Order is the learning order. Topic IDs are stored in learner progress: never rename them.
 // Examples and solutions are compiled and run with JDK 21 by scripts/verify-java-lessons.ts (outside the app).
-export const javaFoundationTopics: TopicSource[] = [
+const originalTopics: TopicSource[] = [
 {
   id: "java-jdk",
   courseId,
@@ -18,7 +21,7 @@ export const javaFoundationTopics: TopicSource[] = [
   explanation: "JDK (Java Development Kit) มีเครื่องมือพัฒนา เช่น javac (compiler) และ java (launcher) javac อ่านไฟล์ .java ตรวจ syntax และชนิดข้อมูล แล้วสร้างไฟล์ .class ที่เก็บ bytecode คำสั่ง java เริ่ม JVM (Java Virtual Machine) ซึ่งโหลด .class แล้วเรียก method main ตั้งแต่ JDK 11 สั่ง java Hello.java ได้เลยสำหรับโปรแกรมไฟล์เดียว (compile ในหน่วยความจำแล้วรัน ไม่สร้าง .class) บทเรียนนี้ใช้ JDK 21 (LTS) ตรวจด้วย java --version และ javac --version ซึ่งต้องเป็น 21 ทั้งคู่",
   language: "java",
   standard: "v3",
-  prerequisites: ["dev-terminal", "dev-editor", "dev-errors"],
+  prerequisites: ["dev-files", "dev-terminal"],
   example: java`// File: QuestStart.java
 public class QuestStart {
     public static void main(String[] args) {
@@ -114,7 +117,7 @@ public class Start {
   explanation: "System.out.println(x) พิมพ์แล้วขึ้นบรรทัดใหม่ print(x) พิมพ์โดยไม่ขึ้นบรรทัด printf(format, values...) แทนที่ specifier ใน format ตามลำดับ: %s ข้อความ (ใช้ได้กับทุกค่า), %d จำนวนเต็ม, %.2f ทศนิยม 2 ตำแหน่ง (ปัดเศษ), %n ขึ้นบรรทัดใหม่ตามระบบ ความกว้าง: %-12s ชิดซ้ายกว้าง 12 ตัวอักษร, %5d ชิดขวากว้าง 5 printf ไม่ขึ้นบรรทัดเองต้องใส่ %n ถ้าชนิดไม่ตรง specifier (เช่น %d กับ 2.5) จะเกิด IllegalFormatConversionException ตอนรัน String.format(...) คืนข้อความแทนการพิมพ์",
   language: "java",
   standard: "v3",
-  prerequisites: ["java-main"],
+  prerequisites: ["java-declarations"],
   example: java`public class Main {
     public static void main(String[] args) {
         System.out.print("Loading");
@@ -335,15 +338,11 @@ public class Start {
         double balance = 0.0;
         balance = balance + 0.1;
         balance = balance + 0.2;
-        if (balance == 0.3) {
-            System.out.println("ยอดถูกต้อง");
-        } else {
-            System.out.println("ยอดไม่ตรง: " + balance);
-        }
+        System.out.println("ยอดไม่ตรง: " + balance);
     }
 }`,
   bugCheck: {kind: "logic", output: "ยอดไม่ตรง: 0.30000000000000004"},
-  bugExplanation: "พิมพ์ ยอดไม่ตรง: 0.30000000000000004 เพราะ double แทน 0.1 และ 0.2 ได้ไม่พอดี การเทียบ == กับทศนิยมจึงเชื่อไม่ได้ สำหรับเงินให้เก็บเป็นจำนวนเต็มของหน่วยเล็กสุด (10 + 20 สตางค์ == 30) หรือใช้ BigDecimal ส่วนค่าทางวิทยาศาสตร์ให้เทียบว่าห่างกันน้อยกว่าค่าที่ยอมรับได้ Math.abs(a - b) < 1e-9",
+  bugExplanation: "คาดยอด0.3 แต่ actual ยอดไม่ตรง: 0.30000000000000004 เพราะ double แทน0.1และ0.2ในฐานสองไม่พอดี แก้สำหรับเงินโดยเก็บจำนวนเต็มหน่วยสตางค์ เช่น long totalSatang = 10 + 20; แล้วพิมพ์ totalSatang / 100.0 ได้0.3; อย่าแค่ปัดข้อความแล้วอ้างว่าค่าภายในแม่นยำ",
   vocabulary: [v("primitive type", "ชนิดพื้นฐาน 8 ชนิดที่เก็บค่าโดยตรง"), v("int / long", "จำนวนเต็ม 32 / 64 bit"), v("double", "ทศนิยมฐานสอง 64 bit มีความคลาดเคลื่อน"), v("overflow", "ค่าเกินช่วงแล้ววนไปอีกฝั่งโดยไม่มี error"), v("char", "ตัวอักษรหนึ่งหน่วยใน ' '"), v("BigDecimal", "ชนิดทศนิยมฐานสิบที่แม่นยำ เหมาะกับเงิน")],
 },
 {
@@ -353,7 +352,7 @@ public class Start {
   title: "String: methods, equals และ immutability",
   objective: "ใช้ methods ที่พบบ่อยของ String (length, strip, toUpperCase, contains, substring, indexOf, split, isBlank) เทียบข้อความด้วย equals/equalsIgnoreCase และอธิบายว่า String เปลี่ยนค่าไม่ได้",
   why: "input จากผู้ใช้ทุกชิ้นเข้ามาเป็นข้อความ การเทียบ String ด้วย == เป็น bug คลาสสิกที่บางครั้งดูเหมือนทำงานได้ และการลืมว่า method ของ String คืนค่าใหม่ทำให้การแก้ข้อความหายไปเงียบ ๆ",
-  explanation: "String เป็น object ไม่ใช่ primitive method อย่าง strip/toUpperCase ไม่แก้ตัวเดิม (immutable) แต่คืนผลออกมา (อาจเป็น object เดิมถ้าไม่มีอะไรเปลี่ยน): name.strip(); เฉย ๆ ไม่มีผล ต้องเขียน name = name.strip(); เทียบเนื้อหาด้วย a.equals(b) หรือ equalsIgnoreCase เพราะ == เทียบว่าเป็น object เดียวกันไหม (literal ที่เหมือนกันอาจถูกใช้ร่วมกันจนทำให้ == ดูเหมือนถูกในบางกรณี แต่ข้อความจาก input หรือการต่อข้อความตอนรันมักเป็นคนละ object) index เริ่มที่ 0, substring(begin, end) ไม่รวม end, indexOf คืน -1 เมื่อไม่พบ, split(\",\") คืน String[] ซึ่งเป็น array ของข้อความ อ่านช่องแรกด้วย parts[0] ช่องถัดไป parts[1] และจำนวนช่องด้วย parts.length (รายละเอียดของ array อยู่ในบท java-arrays) strip() ตัดช่องว่างแบบ Unicode (Java 11+) isBlank() ว่างหรือมีแต่ช่องว่าง",
+  explanation: "String เป็น object ไม่ใช่ primitive method อย่าง strip/toUpperCase ไม่แก้ตัวเดิม (immutable) แต่คืนผลออกมา (อาจเป็น object เดิมถ้าไม่มีอะไรเปลี่ยน): name.strip(); เฉย ๆ ไม่มีผล ต้องเขียน name = name.strip(); เทียบเนื้อหาด้วย a.equals(b) หรือ equalsIgnoreCase เพราะ == เทียบว่าเป็น object เดียวกันไหม (literal ที่เหมือนกันอาจถูกใช้ร่วมกันจนทำให้ == ดูเหมือนถูกในบางกรณี แต่ข้อความจาก input หรือการต่อข้อความตอนรันมักเป็นคนละ object) index เริ่มที่ 0, substring(begin, end) ไม่รวม end, indexOf คืน -1 เมื่อไม่พบ, strip() ตัดช่องว่างแบบ Unicode (Java 11+) isBlank() ว่างหรือมีแต่ช่องว่าง",
   language: "java",
   standard: "v3",
   prerequisites: ["java-primitives"],
@@ -368,16 +367,15 @@ public class Start {
         System.out.println(title.substring(0, 5) + "|" + title.indexOf("Code") + "|" + title.indexOf("Java"));
         String typed = new String("clean code");
         System.out.println((typed == "clean code") + " " + typed.equals("clean code") + " " + typed.equalsIgnoreCase(title));
-        String[] parts = "B001,Clean Code,Robert Martin".split(",");
-        System.out.println(parts.length + " " + parts[1]);
+        System.out.println("a,b,c".indexOf(","));
         System.out.println("   ".isBlank() + " " + "".isEmpty());
     }
 }`,
-  expectedOutput: "[  Clean Code  ]\n[Clean Code] 10\nCLEAN CODE true\nClean|6|-1\nfalse true true\n3 Clean Code\ntrue true",
+  expectedOutput: "[  Clean Code  ]\n[Clean Code] 10\nCLEAN CODE true\nClean|6|-1\nfalse true true\n1\ntrue true",
   solutionCheck: { output: "command=borrow id=B001\nvalid=true" },
   tracePrompt: "String s = \"Library\"; s.toLowerCase(); String t = s.substring(3); พิมพ์ s + \" \" + t + \" \" + t.charAt(0) ได้อะไร",
   traceAnswer: "s.toLowerCase(); คืนค่าใหม่ที่ไม่มีใครเก็บ s จึงยังเป็น Library substring(3) ตัดตั้งแต่ index 3 ได้ rary และ charAt(0) ของ t คือ r ผลคือ Library rary r",
-  practicePrompt: "มีบรรทัดคำสั่ง String line = \"  BORROW  b001 \" ให้ตัดช่องว่างรอบนอก แยกเป็นคำสั่งและรหัสด้วย split(\"\\\\s+\") (ช่องว่างหนึ่งตัวขึ้นไป) แปลงคำสั่งเป็นตัวพิมพ์เล็กและรหัสเป็นตัวพิมพ์ใหญ่ แล้วพิมพ์ command=borrow id=B001 และพิมพ์ valid=true ถ้าคำสั่งเท่ากับ borrow (ใช้ equals)",
+  practicePrompt: "มีบรรทัดคำสั่ง String line = \"  BORROW  b001 \" ให้ตัดช่องว่างรอบนอก ใช้indexOfหาช่องว่างแรกหลังstrip แล้วsubstringแยกคำสั่งและรหัส ตัดช่องว่างรอบรหัสด้วยstrip (โจทย์รับสองส่วนนี้แน่นอน) แปลงคำสั่งเป็นตัวพิมพ์เล็กและรหัสเป็นตัวพิมพ์ใหญ่ แล้วพิมพ์ command=borrow id=B001 และพิมพ์ valid=true ถ้าคำสั่งเท่ากับ borrow (ใช้ equals)",
   starter: java`public class Main {
     public static void main(String[] args) {
         String line = "  BORROW  b001 ";
@@ -387,28 +385,24 @@ public class Start {
   solution: java`public class Main {
     public static void main(String[] args) {
         String line = "  BORROW  b001 ";
-        String[] words = line.strip().split("\\s+");
-        String command = words[0].toLowerCase();
-        String id = words[1].toUpperCase();
+        String cleaned = line.strip();
+        int space = cleaned.indexOf(" ");
+        String command = cleaned.substring(0, space).toLowerCase();
+        String id = cleaned.substring(space + 1).strip().toUpperCase();
         System.out.println("command=" + command + " id=" + id);
         System.out.println("valid=" + command.equals("borrow"));
     }
 }`,
   buggy: java`public class Main {
     public static void main(String[] args) {
-        String typed = new String("help");
-        String command = typed;
+        String command = "help";
         command.toUpperCase();
-        if (command == "HELP") {
-            System.out.println("แสดงคำสั่ง");
-        } else {
-            System.out.println("ไม่รู้จักคำสั่ง " + command);
-        }
+        System.out.println(command.equals("HELP"));
     }
 }`,
-  bugCheck: {kind: "logic", output: "ไม่รู้จักคำสั่ง help"},
-  bugExplanation: "พิมพ์ ไม่รู้จักคำสั่ง help มีสองปัญหา: command.toUpperCase(); ไม่ได้เก็บผลจึงยังเป็นตัวเล็ก และ == เทียบว่าเป็น object เดียวกัน ไม่ใช่เนื้อหา แก้เป็น if (command.equalsIgnoreCase(\"help\")) หรือ command = command.toUpperCase(); แล้ว command.equals(\"HELP\")",
-  vocabulary: [v("immutable", "สร้างแล้วเปลี่ยนค่าไม่ได้ method คืนค่าใหม่"), v("equals", "เทียบเนื้อหาของ object"), v("==", "กับ object คือเทียบว่าเป็นตัวเดียวกัน"), v("index", "ตำแหน่งเริ่มที่ 0"), v("substring", "ตัดข้อความจาก begin ถึงก่อน end"), v("split", "แยกข้อความเป็น array ตาม pattern")],
+  bugCheck: {kind: "logic", output: "false"},
+  bugExplanation: "คาด true แต่ actual false เพราะ command.toUpperCase() คืนข้อความใหม่แต่ไม่ได้เก็บ จึงยังเป็น help แก้ด้วย String upper = command.toUpperCase(); แล้ว upper.equals(\"HELP\") ได้true หรือใช้ equalsIgnoreCase หากต้องการเทียบโดยไม่สนตัวพิมพ์",
+  vocabulary: [v("immutable", "สร้างแล้วเปลี่ยนค่าไม่ได้ method คืนค่าใหม่"), v("equals", "เทียบเนื้อหาของ object"), v("==", "กับ object คือเทียบว่าเป็นตัวเดียวกัน"), v("index", "ตำแหน่งเริ่มที่ 0"), v("substring", "ตัดข้อความจาก begin ถึงก่อน end"), v("indexOf", "หาตำแหน่งข้อความแรก หรือ -1 เมื่อไม่พบ")],
 },
 {
   id: "java-casting",
@@ -625,7 +619,7 @@ public class Main {
   explanation: "for (int day = 1; day <= 7; day++) { ... } มีสามส่วน: เริ่มต้น; เงื่อนไขที่ตรวจก่อนทุกรอบ; สิ่งที่ทำหลังทุกรอบ ตัวแปร day มีอยู่เฉพาะใน loop while (เงื่อนไข) { ... } ใช้เมื่อไม่รู้ล่วงหน้าว่ากี่รอบ ต้องมีบางอย่างใน loop ที่ทำให้เงื่อนไขเป็นเท็จในที่สุด do { ... } while (...); ทำอย่างน้อยหนึ่งรอบ break ออกจาก loop ทันที continue ข้ามไปรอบถัดไป ตัวสะสม: ประกาศนอก loop (int total = 0;) แล้วเพิ่มใน loop ขอบเขต: < n ทำ n รอบเมื่อเริ่มที่ 0 ส่วน <= n ทำ n รอบเมื่อเริ่มที่ 1",
   language: "java",
   standard: "v3",
-  prerequisites: ["java-branch"],
+  prerequisites: ["java-loop-sum"],
   example: java`public class Main {
     public static void main(String[] args) {
         int total = 0;
@@ -817,7 +811,7 @@ public class Main {
   explanation: "static int fineFor(int lateDays) { return lateDays * 5; } ประกอบด้วย ชนิดที่คืน (int หรือ void ถ้าไม่คืน), ชื่อ (camelCase เป็นคำกริยา/คำนามที่สื่อผล), parameter พร้อมชนิด ทุกเส้นทางของ method ที่ไม่ใช่ void ต้อง return ค่า (ไม่งั้น compile error “missing return statement”) ตัวแปรที่ประกาศใน method มีอยู่เฉพาะใน method นั้น (scope) method อื่นมองไม่เห็น Java ส่งค่าแบบ pass-by-value: method ได้สำเนาของค่า การกำหนดค่าใหม่ให้ parameter ไม่กระทบตัวแปรของผู้เรียก overloading: method ชื่อเดียวกันได้ถ้าชนิด/จำนวน parameter ต่างกัน ในบทนี้ทุก method เป็น static เพราะยังไม่ได้สร้าง object",
   language: "java",
   standard: "v3",
-  prerequisites: ["java-switch"],
+  prerequisites: ["java-method-basics"],
   example: java`public class Main {
     static int fineFor(int lateDays) {
         if (lateDays <= 0) {
@@ -925,7 +919,7 @@ public class Main {
   explanation: "int[] ratings = {4, 5, 3}; หรือ new int[5] (ทุกช่องเริ่มเป็น 0; String[] เริ่มเป็น null; boolean[] เริ่มเป็น false) ขนาดคงที่หลังสร้าง index เริ่มที่ 0 ถึง length - 1 (length ไม่มีวงเล็บ ต่างจาก String.length()) อ่าน index นอกช่วงได้ ArrayIndexOutOfBoundsException ตอนรัน for (int r : ratings) อ่านทุกช่องโดยไม่ต้องใช้ index (แต่แก้ค่าใน array ผ่านตัวแปร r ไม่ได้) Arrays.toString(a) แสดงเนื้อหา (println(a) ตรง ๆ ได้ข้อความแบบ [I@1b6d3586) ตัวแปร array เก็บ reference: int[] b = a; ทำให้สองชื่อชี้ array เดียวกัน คัดลอกจริงด้วย Arrays.copyOf(a, a.length) หรือ a.clone() method ที่รับ array แก้ข้อมูลในนั้นได้ (ส่งสำเนาของ reference ไม่ใช่สำเนาของข้อมูล)",
   language: "java",
   standard: "v3",
-  prerequisites: ["java-methods"],
+  prerequisites: ["java-array-copy", "java-casting"],
   example: java`import java.util.Arrays;
 
 public class Main {
@@ -1689,3 +1683,10 @@ public class Main {
   vocabulary: [v("CLI", "โปรแกรมที่ใช้งานผ่านข้อความใน terminal"), v("parallel lists", "หลาย list ที่ index เดียวกันหมายถึงสิ่งเดียวกัน"), v("id", "ตัวระบุถาวรของข้อมูล ไม่ใช่ตำแหน่งใน list"), v("input redirection", "java ... < input.txt ส่งไฟล์เป็น input"), v("expected output", "ผลลัพธ์ที่ต้องได้ ใช้เทียบด้วย diff"), v("milestone", "ระยะของโปรเจกต์ที่ส่งมอบได้")],
 },
 ];
+
+const order = ["java-jdk", "java-main", "java-declarations", "java-output", "java-expressions", "java-variables", "java-primitives", "java-string", "java-casting", "java-scanner", "java-branch", "java-for-basics", "java-loop-sum", "java-loops", "java-switch", "java-method-basics", "java-methods", "java-array-basics", "java-array-minimum", "java-array-copy", "java-arrays", "java-arraylist", "java-exceptions-basic", "java-multi-file", "java-project-library-0"];
+const byId = new Map([...originalTopics, ...javaBridgeTopics].map(topic => [topic.id, topic]));
+export const javaFoundationTopics: TopicSource[] = order.map(id => {
+  const topic = byId.get(id)!;
+  return javaCheckpoints[id] ? { ...topic, checkpoint: javaCheckpoints[id] } : topic;
+});

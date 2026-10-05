@@ -12,7 +12,7 @@
 | ชุด | เจ้าของไฟล์ | ส่งมอบ | สถานะ |
 |---|---|---|---|
 | R1 เครื่องมือ | Codex: developer-foundations topics/lessons, prerequisites ของ ts-why; docs | workspace/save/terminal ก่อนรัน, Node/npm ขั้นขั้นต่ำไม่วน prerequisite, Git setup | implemented; pending independent review |
-| R2 ภาษาเริ่มต้น | Codex: JavaScript และ Java Foundations topics/lessons | ลำดับ syntax, loop/function/array ฝึกแยก, checkpoint และ assessment | JavaScript implemented; Java Foundations next; independent review pending |
+| R2 ภาษาเริ่มต้น | Codex: JavaScript และ Java Foundations topics/lessons | ลำดับ syntax, loop/function/array ฝึกแยก, checkpoint และ assessment | JavaScript + Java Foundations implemented; independent review pending |
 | R3 ต่อยอด | Codex: TypeScript/Node/Back-end/Java OOP topics/lessons | แยกแนวคิดหนาแน่น, SQL พื้นฐาน, file I/O/JUnit, acceptance ตรงเฉลย | planned |
 | R4 ประกอบทักษะ | Codex: projects, lessons.ts | milestones ลดตัวช่วย, 22 labs ครบ contract และตรวจซ้ำได้ | planned |
 | R5 ตรวจส่งมอบ | Codex: UI ที่จำเป็น, verification/docs | browser routes/interaction/focus/mobile/TypeScript illustration, checks, local production preview | planned |
@@ -43,3 +43,6 @@ Import/XP/streak/AI assistant เป็น backlog; React/Next.js/PostgreSQL เ
 คง IDs เดิมทั้ง20บท/100steps; บทใหม่ไม่แทนชื่อเดิม เปลี่ยน prerequisite พร้อมลำดับจริง
 การประเมินเป็น manual: เก็บคำตอบ/โค้ด/ผลทดลองแล้วเปิด rubric/model answer หลังส่ง ไม่ให้คะแนนจากข้อความไม่ว่าง; เปิด documentation ได้ วัดการประยุกต์และอธิบาย ไม่วัดจำ syntax
 Independent review จาก Claude: pending; Codex เขียน ตรวจกลไกและทบทวนการสอนเองเท่านั้น
+
+R2-Java: Codexเพิ่มdeclarations/for/sum/method/array/minimum/copyก่อนบทประกอบ คง18IDsเดิม เพิ่มcheckpointเฉพาะเรื่องและequipmentCLIassessmentพร้อมเฉลย/fixtures
+หยุดเริ่มR3ตามคำสั่งผู้ใช้เรื่องโควตา; งานส่งต่อและreviewอยู่COURSE-REPAIR-HANDOFF.md

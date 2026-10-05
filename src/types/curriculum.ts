@@ -8,7 +8,7 @@ export type RichLesson = {
   hook: string;
   // Analogies are for hard ideas only: map each part to the real concept and say where the comparison breaks.
   analogy?: { title: string; text: string[]; mapping?: Array<[familiar: string, concept: string]>; limits?: string };
-  explain: Array<{ heading: string; text: string[]; code?: string; output?: string }>;
+  explain: Array<{ heading: string; text: string[]; code?: string; output?: string; language?: CodeLanguage }>;
   walkthrough: string[];
   pitfalls: string[];
   recap: string[];

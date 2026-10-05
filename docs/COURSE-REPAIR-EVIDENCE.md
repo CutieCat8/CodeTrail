@@ -129,3 +129,33 @@ Tests โครงสร้างเดิมบังคับexplainอย่�
 เปิดอ่านเอกสารทางการ MDN [Grammar/types](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Grammar_and_types), [Loops](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Loops_and_iteration), [replaceAll](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replaceAll) เพื่อตรวจกลไก declaration/ขอบลูป/string replacement; โจทย์และข้อความเขียนใหม่ ไม่อ้างอ่านคอร์สแพลตฟอร์มเต็ม
 ยังไม่มี learner trial หรือ independent review ผลเทคนิคไม่ยืนยันความสามารถผู้เริ่มต้น ยังไม่ปิดอีกห้าคอร์ส/projects/22labs หรือfinal browserรวม
 ถัดไป R2-Java: declaration/castก่อนใช้, array/ArrayList/minimum/copyก่อนwithoutLowest, checkpoint/assessmentใหม่ แล้วR3→R4→R5ตามแผน ไม่ต้องขออนุญาตซ้ำ
+
+## R2-Java — ปิดชุด Java Foundations ก่อนส่งต่อ (2026-10-05)
+
+ฐาน8ca15ac; ผู้เขียน/ผู้ตรวจเอง Codex; independent review **pending** ไม่ได้เรียก Claude ตรวจ
+ผู้ใช้สั่งหยุดเริ่มชุดใหม่เพราะโควตาเหลือประมาณ9%; ปิดเฉพาะJavaและเตรียมhandoff ไม่เริ่มR3
+
+| ทักษะ/ช่องว่าง | บทและกิจกรรม | ประเมิน / หลักฐาน |
+|---|---|---|
+| declarationก่อนใช้ | java-declarationsก่อนoutput/expressions; อ่านชนิด/ชื่อ/ค่าและเติมส่วนเดียว | พัสดุใหม่; compile/read output; ชื่อเดิม18บทอยู่ครบ |
+| loopพื้นฐานก่อนโจทย์หนาแน่น | java-for-basics → java-loop-sum → java-loops | นับถอยหลัง/ระยะเดิน/เวลางาน; zero/one/many rounds |
+| methodก่อนประกอบหลายmethod | java-method-basics → java-methods | ค่าซอง/ตั๋วในบริบทใหม่; returnกับprintlnและpass-by-value |
+| array/minimum/copyก่อนwithoutLowest | array-basics → array-minimum → array-copy → java-arrays | เซนเซอร์/minimumซ้ำ/ค่าติดลบ/ว่าง/หนึ่งตัว/ต้นฉบับไม่เปลี่ยน; mutantที่มีความหมายถูกปฏิเสธ |
+| syntaxไม่ข้ามลำดับ | primitives bugไม่ใช้ifก่อนbranch; Stringใช้indexOf/substringแทนarray/regexก่อนสอน; castยังอยู่บทcastingก่อนใช้ต่อ | เฉลย/acceptance/expected outputแก้พร้อมกัน; compilerตรวจได้ |
+| ทางเริ่มJavaเป็นอิสระ | java-jdk prerequisite files/terminal และeditor/setupอยู่ในบทเอง ไม่บังคับNode/npm | Java21จริงในเครื่อง; OS installer/PATH recipeยังไม่ได้ลองทุกOS |
+| checkpointและท้ายคอร์ส | checkpointเฉพาะเรื่องทั้ง25บท feedbackหลังส่ง; CLIอุปกรณ์ใหม่เลือกวิธีเอง | เฉลยเต็มEquipmentMainในfeedbackตรงไฟล์ที่compile; normal/error/state/EOF/quit fixtures |
+
+### ผลตรวจจริง
+
+- JDK: Temurin21.0.12.1+1, javac21.0.12.1; นำเครื่องมือจากcacheนอกrepoมาวางpathกลาง /tmp/sea-quest-java-tools ไม่เขียนในrepoต้นฉบับ ไม่อ้างดาวน์โหลดใหม่จากofficial
+- `scripts/verify-java-lessons.ts` ล่าสุดเลือก25Java Foundations topics: **0 failing checks**; example/explainที่เป็นJava, starter, solution/output/fixtures และbugCheck ผ่าน [compiler log](verification/R2-Java/compiler-checks.log)
+- ตัวตรวจรอบแรก46Java topicsพบ1ปัญหา:เอาBashติดตั้งJDKไปcompileเป็นJava; เพิ่มoptionallanguageในrichblockและบันทึกshellsetupเป็นmanualอย่างชัดเจน ไม่อ้างว่าshellsetupผ่านcompiler แล้วตรวจ25บทล่าสุดใหม่ผ่าน JavaOOPยังไม่ถือว่าซ่อมR3แล้ว
+- `scripts/verify-java-repair.ts`: correctผ่าน, wrongalgorithmเลือกminimumตัวท้าย/นับ0/copyผิดindexไม่ผ่าน และตรวจsourceไม่เปลี่ยน; Equipmentnormal/errors/emptyEOF/argument/quitผ่าน, ผิดstateถูกปฏิเสธ [contract log](verification/R2-Java/contract-checks.log)
+- lint, --noEmit และVitest415testsผ่าน; productionbuildWebpackผ่าน Next16.3.6 ขั้นปิดส่งต่อเก็บlogล่าสุดเพิ่มเมื่อจบ
+- Browser125Java stepsเปิดได้; hints, prerequisite/focus, gatedเต็มเฉลย, oldIDsave/reload, 1440/390pxไม่ล้นและTabออกจากคำตอบผ่าน ไม่มีpageerror [report](verification/R2-Java/browser-report.json) / [script](verification/R2-Java/browser-script.cjs.txt) / [manifest](verification/R2-Java/browser-manifest.ts.txt)
+- เปิดroutesไม่เท่ากับอ่านครบทุกบท; Javaเว็บไซต์ไม่มีcompiler การส่ง/checklistเป็นself-report ไม่ยืนยันถูก; ไม่มีlearner trial
+
+### แหล่ง/ข้อจำกัด/รับช่วง
+
+ลองเปิดdev.java variables/arrays/primitive-types แต่เครื่องมือคืน0lines จึงไม่อ้างอ่านเนื้อหาเต็ม ใช้ [Oracle Arrays](https://docs.oracle.com/javase/tutorial/java/nutsandbolts/arrays.html), [Variables](https://docs.oracle.com/javase/tutorial/java/nutsandbolts/variables.html) อ่านได้จริง (tutorialJDK8 ใช้เฉพาะพื้นฐานที่ตรวจJDK21ซ้ำ) และ [JLS21 conversions](https://docs.oracle.com/javase/specs/jls/se21/html/jls-5.html)
+R1,R2-JS,R2-Javaทั้งหมดรอindependentreview; R3/R4/R5finalยังค้าง ตาม [COURSE-REPAIR-HANDOFF.md](COURSE-REPAIR-HANDOFF.md)

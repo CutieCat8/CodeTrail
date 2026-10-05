@@ -95,3 +95,7 @@
 ### R2-JS source access
 
 Codex เปิด MDN Grammar/types, Loops and iteration และ String.replaceAll จริงใน2026-10-05; รายละเอียดการใช้และข้อจำกัดใน COURSE-REPAIR-EVIDENCE.md ส่วนR2-JS ไม่มีการอ้างว่าอ่านบทแพลตฟอร์มเต็มใหม่
+
+### R2-Java source access
+
+Dev.javaสามหน้าvariables/arrays/primitive-typesคืน0lines ไม่อ้างอ่านเต็ม; OracleJavaTutorials arrays/variablesอ่านได้ (JDK8 จำกัดใช้กลไกพื้นฐาน) และJLS21Chapter5conversionsอ่านได้; ตรวจตัวอย่างใหม่ด้วยTemurin21จริง รายละเอียดในCOURSE-REPAIR-EVIDENCEส่วนR2-Java

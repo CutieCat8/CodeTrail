@@ -1,0 +1,3 @@
+import {writeFileSync} from 'node:fs';
+import {learningSteps} from '/home/cnux/work/sea-fullstack-quest/src/content/curriculum/index';
+writeFileSync('/tmp/sea-quest-browser/java-manifest.json',JSON.stringify(learningSteps.filter(s=>s.courseId==='java-foundations').map(s=>({id:s.id,title:s.title}))));

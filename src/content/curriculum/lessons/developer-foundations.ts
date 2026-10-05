@@ -239,7 +239,7 @@ ls`, output: "คำสั่งตรวจตำแหน่งแสดง pa
       limits: "พนักงานจริงเล่าปัญหาได้ยาว แต่ exit code เป็นตัวเลขตัวเดียว รายละเอียดต้องดูจาก stderr/log และโปรแกรมอาจพิมพ์ข้อความปกติแต่จบด้วย exit code ที่ไม่ใช่ 0 ได้",
     },
     explain: [
-      { heading: "0) รันกิจกรรมและอ่านรหัสทันที", text: ["บันทึก example หรือ starter เป็น process-lab.js ใน workspace แล้วใช้ node process-lab.js เห็น start ก่อนโปรแกรมจบ; process เป็น object ที่ Node เตรียมไว้ ส่วน .exitCode คือช่องเก็บรหัสที่จะคืนตอนจบ ไม่ต้องสร้าง function", "PowerShell: หลัง node process-lab.js พิมพ์ $LASTEXITCODE; Bash/WSL: หลัง node process-lab.js พิมพ์ echo $? ทันที ก่อนรันคำสั่งอื่น คาด 1 จาก starter; เปลี่ยนเป็น 0, save, รันใหม่ คาด output ยังเป็น start แต่รหัสเปลี่ยนเป็น 0", "ตัวอย่าง port/server ด้านล่างเป็นภาพอธิบาย ไม่ต้องสร้าง server.js ในบทนี้ คอร์ส Node สอนโปรแกรมที่รอ request ภายหลัง"] },
+      { heading: "0) รันกิจกรรมและอ่านรหัสทันที", text: ["บันทึก example หรือ starter เป็น process-lab.js ใน workspace แล้วใช้ node process-lab.js เห็น saved (หรือ start ถ้าใช้ starter) ก่อนโปรแกรมจบ; process เป็น object ที่ Node เตรียมไว้ ส่วน .exitCode คือช่องเก็บรหัสที่จะคืนตอนจบ ไม่ต้องสร้าง function", "PowerShell: หลัง node process-lab.js พิมพ์ $LASTEXITCODE; Bash/WSL: หลัง node process-lab.js พิมพ์ echo $? ทันที ก่อนรันคำสั่งอื่น คาด 0 จาก example และ 1 จาก starter; เปลี่ยนเป็น 0, save, รันใหม่ คาด output เดิมแต่รหัสเปลี่ยนเป็น 0", "ตัวอย่าง port/server ด้านล่างเป็นภาพอธิบาย ไม่ต้องสร้าง server.js ในบทนี้ คอร์ส Node สอนโปรแกรมที่รอ request ภายหลัง"] },
 
       {
         heading: "1) Process = โปรแกรมที่กำลังรันอยู่จริง",
@@ -272,7 +272,7 @@ ls`, output: "คำสั่งตรวจตำแหน่งแสดง pa
         ],
       },
     ],
-    walkthrough: ["console.log แสดง start ไป stdout", "ตัวอย่างตั้ง process.exitCode = 0 ส่วน starter ตั้ง 1; ทั้งคู่ตั้งรหัสแต่ไม่ตัดโปรแกรมทันที", "เมื่อทำงานจบ terminal คืน prompt; ตัวอย่างคืน 0 ส่วน starter คืน 1 แม้ไม่มี error message"],
+    walkthrough: ["console.log แสดงข้อความไป stdout", "ตัวอย่างพิมพ์ saved แล้วตั้ง process.exitCode = 0; ส่วน starter ตั้ง 1 ทั้งคู่เป็นการตั้งรหัสที่จะคืนตอนจบ ไม่ได้ตัดโปรแกรมทันที", "เมื่อโปรแกรมจบ terminal คืน prompt; ตัวอย่างคืน 0 ส่วน starter คืน 1 โดยไม่มี error message ทั้งสองกรณี"],
     pitfalls: [
       "คิดว่า terminal ที่ไม่คืน prompt คือเครื่องค้าง ถ้าเป็น server นั่นคือสถานะปกติ",
       "เห็น EADDRINUSE แล้วติดตั้งโปรแกรมใหม่ สาเหตุจริงคือมี process เก่าจอง port อยู่ ให้หยุดตัวเก่า หรือเปลี่ยน port",
@@ -286,7 +286,7 @@ ls`, output: "คำสั่งตรวจตำแหน่งแสดง pa
     traceHint: "ถามตัวเองสองข้อ: (1) โปรแกรมนี้มีคำสั่งให้ “รอไปเรื่อย ๆ” ไหม (2) มีอะไรที่ทำให้มันจบเอง ไหม ถ้าไม่มีข้อ (2) มันก็ยังทำงานต่อ",
     practiceHints: [
       "process.exitCode คือค่าเลขสรุปที่จะถูกส่งกลับให้ระบบตอนจบ",
-      "ในตัวอย่างตั้งเป็น 1 ซึ่งแปลว่า “ล้มเหลว” แม้จะแสดงคำว่า start ได้ตามปกติ",
+      "ใน starter ตั้งเป็น 1 ซึ่งแปลว่า “ล้มเหลว” แม้จะแสดงคำว่า start ได้ตามปกติ",
       "ถ้าอยากให้สำเร็จ ให้เปลี่ยนเป็น 0 แล้วรันอีกครั้ง",
     ],
     checks: [{"question": "โปรแกรมพิมพ์ start ครบแต่ exit code เป็น 1 ถือว่าสำเร็จไหม", "answer": "ไม่ เครื่องมืออย่าง CI ดู exit code ไม่ใช่ข้อความ 1 แปลว่าล้มเหลว"}, {"question": "ทำไม terminal ไม่คืนหน้าพิมพ์หลังสั่ง npm run dev", "answer": "server เป็น process ที่รันค้างรอ request จนกว่าจะหยุดด้วย Ctrl+C"}],

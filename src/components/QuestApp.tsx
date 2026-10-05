@@ -210,7 +210,7 @@ function CurriculumView({ data, openStep }: { data: AppData; openStep: (id: stri
   const expandedUnit = selectedUnits.includes(openUnit) ? openUnit : selectedUnits[0];
   const selectedDone = selectedSteps.filter((step) => data.stepProgress[step.id]?.completed).length;
   const nextStep = selectedSteps.find((step) => !data.stepProgress[step.id]?.completed) ?? selectedSteps[0];
-  const artFor = (courseId: string): Parameters<typeof WorldLandmark>[0]["world"] => courseId === "developer-foundations" ? "camp" : courseId === "java-foundations" ? "java" : courseId === "java-oop" ? "oop" : courseId === "javascript-foundations" || courseId === "typescript" || courseId === "react" || courseId === "nextjs" ? "frontend" : courseId === "postgres" ? "data" : "backend";
+  const artFor = (courseId: string): Parameters<typeof WorldLandmark>[0]["world"] => courseId === "developer-foundations" ? "camp" : courseId === "java-foundations" ? "java" : courseId === "java-oop" ? "oop" : courseId === "typescript" ? "typescript" : courseId === "javascript-foundations" || courseId === "react" || courseId === "nextjs" ? "frontend" : courseId === "postgres" ? "data" : "backend";
   const readyCourses = visible.filter((course) => learningSteps.some((step) => step.courseId === course.id));
   const plannedCourses = visible.filter((course) => !learningSteps.some((step) => step.courseId === course.id));
   return <div className="page curriculum-page curriculum-v2">

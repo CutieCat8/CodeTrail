@@ -27,9 +27,16 @@
 | หมายเหตุ ID | ไม่มี ID เปลี่ยน; ตำแหน่ง (position) ของ step ในคอร์สเปลี่ยนเพราะเพิ่มหัวข้อและย้าย js-errors ไปหลัง js-objects |
 | ตรวจเองในเครื่อง | js-modules-json (import/export ต้องรันหลายไฟล์), js-promises/js-async (runner ตรวจอัตโนมัติไม่ได้สำหรับ Promise จึงใช้ checklist + output) |
 
-## TypeScript (`typescript`, เดิม writing ไม่มีหัวข้อ)
+## TypeScript Foundations → Intermediate — ชุด B3 เขียนแล้ว (14 หัวข้อ, 70 steps) · โลก “Type Observatory”
 
-ts-why, ts-basic-types, ts-functions, ts-object-types, ts-arrays-tuples, ts-unions-literals, ts-narrowing, ts-null-safety, ts-generics, ts-utility-types, ts-classes, ts-config, ts-async-types, ts-project-planner — ทั้งหมด **ใหม่** ยังไม่เขียน
+ลำดับ: ts-why → ts-basic-types → ts-functions → ts-object-types → ts-arrays-tuples → ts-unions-literals → ts-narrowing → ts-null-safety → ts-generics → ts-utility-types → ts-classes → ts-config → ts-async-types → ts-project-planner (Planner M3)
+
+| สถานะ | รายละเอียด |
+|---|---|
+| เขียน | ทุกหัวข้อ `standard: "v3"`, คอร์ส `typescript` เปลี่ยนเป็น live |
+| ตรวจเทคนิค | tests: example, solution และ code ใน explain ทุกหัวข้อ type-check ผ่านด้วย TypeScript 5.9.2 (strict); example ที่ transpile แล้วรันผ่าน snippet worker ตรง expectedOutput; ขั้นแก้บั๊กที่อ้างว่า “tsc แจ้ง/ผ่าน” ตรงกับ diagnostics จริง · Codex review: ดูบันทึกชุดงาน |
+| ตรวจเชื่อม UI | ภาพโลกใหม่ `public/art/typescript-observatory.svg` (pixel art 32×32 วาดด้วย script) ผูกกับคอร์สในหน้า Curriculum; build ผ่าน; ยังไม่ได้ตรวจใน browser |
+| ข้อจำกัด | เว็บรัน TypeScript ไม่ได้ (runner เป็น JavaScript) practice ทุกบทตรวจในเครื่องด้วย `npx tsc --noEmit` ตาม checklist; เนื้อหาหลีกเลี่ยง enum/parameter properties เพราะ Node type stripping ไม่รองรับ |
 
 ## Node.js Fundamentals (`node-foundations`)
 

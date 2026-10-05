@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import ts from "typescript";
 import { curriculumCourses, learningSteps, topicSources } from "@/content/curriculum";
 import { buildSnippetWorkerSource, buildTestWorkerSource } from "@/lib/runner";
 import type { TestResult, TestSpec } from "@/types/domain";
@@ -193,5 +194,56 @@ describe("snippet runner", () => {
     const result = await posted;
     expect(result.output).toEqual(["before"]);
     expect(result.error).toMatch(/^TypeError: /);
+  });
+});
+
+// TypeScript lessons: examples and solutions must type-check under strict, and examples must print their expected output.
+const tsOptions: ts.CompilerOptions = { strict: true, target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext, moduleDetection: ts.ModuleDetectionKind.Force, lib: ["lib.es2022.d.ts", "lib.dom.d.ts"], noEmit: true, types: [] };
+const tsHost = ts.createCompilerHost(tsOptions);
+const libCache = new Map<string, ts.SourceFile | undefined>();
+const readLib = tsHost.getSourceFile.bind(tsHost);
+function typeErrors(source: string) {
+  const host: ts.CompilerHost = {
+    ...tsHost,
+    getSourceFile: (name, languageVersion, ...rest) => {
+      if (name === "lesson.ts") return ts.createSourceFile(name, source, languageVersion, true);
+      if (!libCache.has(name)) libCache.set(name, readLib(name, languageVersion, ...rest));
+      return libCache.get(name);
+    },
+  };
+  const program = ts.createProgram(["lesson.ts"], tsOptions, host);
+  return ts.getPreEmitDiagnostics(program).map((d) => ts.flattenDiagnosticMessageText(d.messageText, "\n"));
+}
+const toJs = (source: string) => ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext, moduleDetection: ts.ModuleDetectionKind.Force } }).outputText.replace(/^export \{\};\s*$/m, "");
+
+describe("TypeScript lessons", () => {
+  const tsTopics = topicSources.filter((topic) => topic.language === "typescript");
+
+  it("ships the TypeScript course", () => {
+    expect(tsTopics.length).toBeGreaterThanOrEqual(12);
+  });
+
+  it.each(tsTopics.map((topic) => [topic.id, topic] as const))("%s example and solution type-check under strict", (_id, topic) => {
+    expect(typeErrors(topic.example)).toEqual([]);
+    expect(typeErrors(topic.solution)).toEqual([]);
+    for (const block of topic.lesson?.explain ?? []) if (block.code) expect(typeErrors(block.code), block.heading).toEqual([]);
+  });
+
+  it.each(tsTopics.map((topic) => [topic.id, topic] as const))("%s debug step matches what tsc really reports", (_id, topic) => {
+    const errors = typeErrors(topic.buggy);
+    if (/^tsc แจ้ง/.test(topic.bugExplanation)) expect(errors.length, "explanation says tsc reports an error").toBeGreaterThan(0);
+    if (/^tsc (ผ่าน|ไม่เตือน|ตรวจผ่าน)/.test(topic.bugExplanation)) expect(errors, "explanation says tsc passes").toEqual([]);
+  });
+
+  it.each(tsTopics.filter((topic) => topic.expectedOutput !== undefined).map((topic) => [topic.id, topic] as const))("%s example prints its expected output", async (_id, topic) => {
+    const result = await runSnippet(toJs(topic.example));
+    expect(result.error).toBeUndefined();
+    expect(result.output.join("\n")).toBe(topic.expectedOutput);
+  });
+
+  it.each(tsTopics.flatMap((topic) => (topic.lesson?.explain ?? []).filter((block) => block.code && block.output !== undefined).map((block) => [`${topic.id}: ${block.heading}`, block] as const)))("%s prints its expected output", async (_label, block) => {
+    const result = await runSnippet(toJs(block.code!));
+    expect(result.error).toBeUndefined();
+    expect(result.output.join("\n")).toBe(block.output);
   });
 });

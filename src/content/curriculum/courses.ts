@@ -6,7 +6,7 @@ export const curriculumCourses: CurriculumCourse[] = [
   { id: "java-oop", title: "Java OOP Lab", description: "คิดจากปัญหาและความรับผิดชอบ แล้วจึงออกแบบ object ที่รักษาสถานะได้", track: "java", status: "live", targetSteps: 96 },
   { id: "javascript-foundations", title: "JavaScript Foundations", description: "ภาษาและการแก้ปัญหา: values, conditions, functions, loops, arrays/objects, references, callbacks, errors และ async พร้อม Activity Planner M1–M2", track: "web", status: "live", targetSteps: 100 },
   { id: "node-foundations", title: "Node & HTTP Foundations", description: "เข้าใจ Node runtime, modules, npm, HTTP และ middleware ก่อนสร้าง REST API", track: "web", status: "live", targetSteps: 120 },
-  { id: "typescript", title: "TypeScript Workshop", description: "กำลังแตกบทเดิมเป็น types, unions, narrowing, generics และ async ทีละแนวคิด", track: "web", status: "writing", targetSteps: 72 },
+  { id: "typescript", title: "TypeScript Foundations → Intermediate", description: "Type Observatory: types, functions, object types, unions, narrowing, null safety, generics, utility types, classes, tsconfig และข้อมูลจาก API พร้อม Activity Planner M3", track: "web", status: "live", targetSteps: 70 },
   { id: "react", title: "React Foundations", description: "วางแผนไว้: components, render, props, state, forms และ accessible UI", track: "web", status: "planned", targetSteps: 84 },
   { id: "nextjs", title: "Next.js App Router", description: "วางแผนไว้: Server/Client Components, data, cache และ route states", track: "web", status: "planned", targetSteps: 60 },
   { id: "postgres", title: "PostgreSQL & Prisma", description: "วางแผนไว้: relational thinking, SQL, constraints, joins, transactions และ migrations", track: "web", status: "planned", targetSteps: 84 },

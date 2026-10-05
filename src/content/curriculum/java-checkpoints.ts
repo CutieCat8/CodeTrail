@@ -1,41 +1,95 @@
 import type { TopicSource } from "@/types/curriculum";
 
+const OPEN = "ประเมินบริบทใหม่ — เปิด documentation ได้ แต่ไม่เปิด rubric หรือเฉลยก่อนส่ง";
+const SUBMIT = "แนบโค้ด คำสั่ง ค่าที่ทำนาย และ output หรือ error จริง การส่งเป็นบันทึกความพยายาม ยังต้องเทียบเกณฑ์ด้วยตนเอง";
+const prompt = (...lines: string[]) => [OPEN, ...lines, SUBMIT].join("\n");
+
 export const javaCheckpoints: Record<string, NonNullable<TopicSource["checkpoint"]>> = {
   "java-jdk": {
-    "prompt": "ประเมินบริบทใหม่ — เปิด documentation ได้ ไม่เปิดrubric/เฉลยก่อนส่ง: รับไฟล์ PackStart.java ที่มีpublic class PackStart แสดงReady เขียนขั้นตอนตรวจว่าJDKพร้อม compileและrunแยกกัน ถ้าcompileผ่านแต่runหาclassไม่พบจะเก็บหลักฐานอะไรและตั้งสมมติฐานอย่างไร?\nแนบโค้ด/คำสั่ง/ค่าทำนายและoutputหรือerrorจริง การส่งเป็นบันทึกความพยายาม ยังต้องเทียบเกณฑ์ด้วยตนเอง",
-    "rubric": [
-      "ตรวจjava/javac21ทั้งสอง",
-      "javacไฟล์แล้วjavaชื่อclassไม่ใส่นามสกุล",
-      "แยกPATH/cwd/classไฟล์และขั้นcompile/run ไม่เปลี่ยนsourceโดยเดา"
+    prompt: prompt(
+      "รับไฟล์ PackStart.java ที่มี public class PackStart และพิมพ์ Ready เขียนขั้นตอนตรวจว่า JDK พร้อม แล้ว compile และ run แยกกัน",
+      "ถ้า compile ผ่านแต่ run แล้วหา class ไม่พบ จะเก็บหลักฐานอะไร และตั้งสมมติฐานอย่างไร?",
+    ),
+    rubric: [
+      "ตรวจทั้ง java และ javac ว่าเป็นเวอร์ชัน 21",
+      "javac ไฟล์ .java แล้ว java ตามชื่อ class โดยไม่ใส่นามสกุล (หรือใช้ java PackStart.java ที่บทนี้สอน)",
+      "แยก PATH, working directory, ไฟล์ .class และขั้น compile / run ออกจากกัน ไม่แก้ source โดยเดา",
     ],
-    "modelAnswer": "java --version; javac --version; javac -encoding UTF-8 PackStart.java; java PackStart (รันทีละคำสั่ง ไม่ใช่บรรทัดเดียว); ผลReady ตรวจPackStart.classในโฟลเดอร์ปัจจุบันและตัวพิมพ์ชื่อ ถ้าPATHผิดGet-CommandในPowerShellหรือcommand -vในBash; หากไฟล์classอยู่outต้องjava -cp out PackStart"
+    modelAnswer: `java --version
+javac --version
+javac -encoding UTF-8 PackStart.java
+java PackStart
+
+รันทีละคำสั่ง ไม่รวมเป็นบรรทัดเดียว ผลที่ควรเห็นคือ Ready
+ถ้า compile ผ่านแต่ run หา class ไม่พบ ให้ตรวจว่ามีไฟล์ PackStart.class ในโฟลเดอร์ปัจจุบันหรือไม่ และพิมพ์ชื่อ class ตรงตัวพิมพ์เล็กใหญ่ (ไม่ใส่ .class)
+ถ้าคำสั่ง java หรือ javac ไม่พบ ให้ตรวจ PATH: PowerShell ใช้ Get-Command java ส่วน Bash ใช้ command -v java`,
   },
   "java-main": {
-    "prompt": "ประเมินบริบทใหม่ — เปิด documentation ได้ ไม่เปิดrubric/เฉลยก่อนส่ง: จากไฟล์ว่างสร้าง Main.java แสดง Start / Packing / Done ทีละบรรทัด เขียนว่าคำสั่งไหนเริ่มก่อนและทำไมpublic classต้องตรงชื่อไฟล์ ทดสอบเอา;หนึ่งตัวออกแล้วบันทึกerrorก่อนแก้กลับ\nแนบโค้ด/คำสั่ง/ค่าทำนายและoutputหรือerrorจริง การส่งเป็นบันทึกความพยายาม ยังต้องเทียบเกณฑ์ด้วยตนเอง",
-    "rubric": [
-      "outputสามบรรทัดตามลำดับ",
-      "โครงclass/mainถูกและตรงไฟล์",
-      "เก็บcompileerrorจากการทดลองและยืนยันรันหลังแก้"
+    prompt: prompt(
+      "จากไฟล์ว่างสร้าง Main.java ที่แสดง Start / Packing / Done ทีละบรรทัด เขียนว่าคำสั่งไหนทำงานก่อน และทำไม public class ต้องตรงกับชื่อไฟล์",
+      "ทดลองลบเครื่องหมาย ; ออกหนึ่งตัว บันทึก error แล้วใส่กลับ",
+    ),
+    rubric: [
+      "output สามบรรทัดตามลำดับ",
+      "โครง class และ main ถูกต้อง ชื่อ class ตรงกับชื่อไฟล์",
+      "เก็บ compile error จากการทดลอง และยืนยันว่ารันได้หลังแก้",
     ],
-    "modelAnswer": "public class Main {public static void main(String[] args){System.out.println(\"Start\");System.out.println(\"Packing\");System.out.println(\"Done\");}} compileด้วยjavac Main.java แล้วjava Main; เอา;ออกได้compileerrorก่อนเริ่มโปรแกรม กลับใส่แล้วcompile/runผ่าน"
+    modelAnswer: `public class Main {
+    public static void main(String[] args) {
+        System.out.println("Start");
+        System.out.println("Packing");
+        System.out.println("Done");
+    }
+}
+
+compile ด้วย javac Main.java แล้วรันด้วย java Main คำสั่งแรกใน main คือ Start ก่อน แล้วไล่ลงไปตามลำดับ
+ถ้าลบ ; ออก javac จะแจ้ง compile error และยังไม่เริ่มโปรแกรม เมื่อใส่กลับก็ compile และรันผ่าน`,
   },
   "java-output": {
-    "prompt": "ประเมินบริบทใหม่ — เปิด documentation ได้ ไม่เปิดrubric/เฉลยก่อนส่ง: สร้างใบราคา Headphone ราคา199.5 ใช้สองคอลัมน์ชื่อกว้าง12ชิดซ้ายและราคากว้าง8ชิดขวาทศนิยม2ตำแหน่ง ปิดด้วยบรรทัด End อธิบายผลprintกับprintlnและทดลองชนิดไม่ตรง%dกับdouble\nแนบโค้ด/คำสั่ง/ค่าทำนายและoutputหรือerrorจริง การส่งเป็นบันทึกความพยายาม ยังต้องเทียบเกณฑ์ด้วยตนเอง",
-    "rubric": [
-      "แถวHeadphoneพร้อม199.50และช่องว่างตามformat",
-      "Endอยู่บรรทัดใหม่",
-      "ชนิดไม่ตรงเป็นruntimeformaterrorและแก้specifierตรงชนิด"
+    prompt: prompt(
+      "สร้างใบราคา Headphone ราคา 199.5 ใช้สองคอลัมน์: ชื่อกว้าง 12 ชิดซ้าย และราคากว้าง 8 ชิดขวา ทศนิยม 2 ตำแหน่ง ปิดด้วยบรรทัด End",
+      "อธิบายความต่างของ print กับ println และทดลองใช้ %d กับค่า double ที่ไม่ตรงชนิด",
+    ),
+    rubric: [
+      "แถว Headphone พร้อม 199.50 และช่องว่างตาม format",
+      "End อยู่บรรทัดใหม่",
+      "ชนิดไม่ตรงเป็น runtime format error และแก้ specifier ให้ตรงชนิด",
     ],
-    "modelAnswer": "ภายในmain: System.out.printf(\"%-12s%8.2f%n\",\"Headphone\",199.5); System.out.println(\"End\"); ผล\"Headphone     199.50\"แล้วEnd; %nขึ้นบรรทัด printfเองไม่ขึ้นจนใส่%n; %dกับ199.5เกิดIllegalFormatConversionException"
+    modelAnswer: `public class Main {
+    public static void main(String[] args) {
+        System.out.printf("%-12s%8.2f%n", "Headphone", 199.5);
+        System.out.println("End");
+    }
+}
+
+ผลที่ได้คือแถว "Headphone     199.50" แล้ว End ในบรรทัดถัดไป
+%n ขึ้นบรรทัดใหม่ printf ไม่ขึ้นบรรทัดให้เองจนกว่าจะใส่ %n
+ถ้าใช้ %d กับ 199.5 จะเกิด IllegalFormatConversionException เพราะ %d ใช้กับจำนวนเต็ม ให้เปลี่ยนเป็น %f หรือ %.2f`,
   },
   "java-expressions": {
-    "prompt": "ประเมินบริบทใหม่ — เปิด documentation ได้ ไม่เปิดrubric/เฉลยก่อนส่ง: มีเวลารวม135นาที แสดงชั่วโมงเต็มกับนาทีที่เหลือโดยไม่พิมพ์คำตอบเอง เปลี่ยนเป็น0,59,60และอธิบาย/กับ% รวมกรณี 1/2*4.0 ทำไมไม่เป็น2.0\nแนบโค้ด/คำสั่ง/ค่าทำนายและoutputหรือerrorจริง การส่งเป็นบันทึกความพยายาม ยังต้องเทียบเกณฑ์ด้วยตนเอง",
-    "rubric": [
-      "ผล2ชั่วโมง15นาที;0/0,0/59,1/0ตามกรณี",
-      "ใช้ค่าตัวแปรและอธิบายintegerdivision",
-      "1/2*4.0ได้0.0 เพราะหารintก่อน"
+    prompt: prompt(
+      "ห้องซ้อมดนตรีมี 4 ช่องเวลาต่อรอบ ลูกค้าได้หมายเลขคิวเริ่มที่ 0 แสดงว่าคิวหมายเลข queue อยู่รอบที่เท่าไร (รอบแรกเป็นรอบที่ 1) และช่องที่เท่าไร (ช่องเริ่มที่ 0) โดยไม่พิมพ์คำตอบเอง",
+      "ทดลอง queue เป็น 0, 3, 4 และ 9 อธิบายว่า / กับ % ทำหน้าที่ต่างกันอย่างไร และทำนายผลของ 7 / 2 * 2.0 ก่อนรัน",
+    ),
+    rubric: [
+      "ได้ round 1 slot 0, round 1 slot 3, round 2 slot 0 และ round 3 slot 1 ตามลำดับสำหรับ queue 0, 3, 4, 9",
+      "ใช้ตัวแปร queue และคำนวณด้วย / กับ % ไม่เขียนผลลัพธ์ตรง ๆ",
+      "7 / 2 * 2.0 ได้ 6.0 เพราะ 7 / 2 เป็นการหารจำนวนเต็มได้ 3 ก่อนแล้วจึงคูณ",
     ],
-    "modelAnswer": "int minutes=135; System.out.println(minutes/60+\" ชั่วโมง \"+minutes%60+\" นาที\"); /ได้จำนวนชั่วโมงเต็ม %ได้เศษนาที 1/2คำนวณintได้0แล้วคูณ4.0ได้0.0"
+    modelAnswer: `public class Main {
+    public static void main(String[] args) {
+        int queue = 9;
+        int round = queue / 4 + 1;
+        int slot = queue % 4;
+        System.out.println("round " + round + " slot " + slot);
+        System.out.println(7 / 2 * 2.0);
+    }
+}
+
+queue = 9 ได้ round 3 slot 1 และบรรทัดสุดท้ายได้ 6.0
+ค่าอื่นที่ทดลองได้ผลตามลำดับ: queue 0 → round 1 slot 0, queue 3 → round 1 slot 3, queue 4 → round 2 slot 0
+/ กับจำนวนเต็มได้ผลหารที่ตัดเศษ (จำนวนรอบเต็ม) ส่วน % ได้เศษที่เหลือ (ตำแหน่งในรอบ)
+7 / 2 คำนวณเป็น int ได้ 3 ก่อน แล้วค่อยคูณ 2.0 จึงได้ 6.0 ไม่ใช่ 7.0`,
   },
   "java-variables": {
     "prompt": "ประเมินบริบทใหม่ — เปิด documentation ได้ ไม่เปิดrubric/เฉลยก่อนส่ง: เครดิต600 ซื้อครั้งแรก120 ครั้งสอง80 แสดงค่าหลังซื้อแต่ละครั้ง ราคาคงที่ในโปรแกรมนี้ เลือกfinal/ตัวแปรให้เหมาะและอธิบายการเปลี่ยนค่าด้วยassignmentพร้อมผลทดลอง\nแนบโค้ด/คำสั่ง/ค่าทำนายและoutputหรือerrorจริง การส่งเป็นบันทึกความพยายาม ยังต้องเทียบเกณฑ์ด้วยตนเอง",

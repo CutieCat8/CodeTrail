@@ -1990,7 +1990,7 @@ class Member {
   title: "★ Library CLI M2: ยืมโดยสมาชิก วันครบกำหนด และค่าปรับ",
   objective: "ต่อยอด M1 ให้สมาชิกยืมหนังสือผ่าน Library ที่ประสาน Book, Member และ Loan ตามกติกา (โควตา, วันครบกำหนด, ค่าปรับ) โดยข้อมูลสองฝ่ายสอดคล้องกันเสมอ และทดสอบครบทุกข้อความด้วยไฟล์ fixture",
   why: "M1 ยังไม่รู้ว่าใครยืม ระบบจริงต้องตอบได้ว่าเล่มนี้อยู่กับใคร ครบกำหนดเมื่อไร และค้างค่าปรับเท่าไร งานนี้ใช้ composition และ collaboration จากสองบทก่อนกับโจทย์ที่ใหญ่ขึ้น",
-  explanation: "ข้อกำหนด M2: เริ่มที่วันที่ 1, ยืมได้ 14 วัน (ครบกำหนด = วันที่ยืม + 14), สมาชิกยืมพร้อมกันได้ไม่เกิน 2 เล่ม, ค่าปรับวันละ 5 บาทสูงสุด 100 บาท คำสั่ง (ข้อความต้องตรง): add <title> → added book #<id> | title required; member <name> → added member #<id> | name required; day <n> → today is day <n> | day must be a number | day cannot go back; borrow <bookId> <memberId> → borrowed #<b> by #<m>, due day <d> | usage: borrow <bookId> <memberId> (จำนวน argument ไม่ครบหรือไม่ใช่ตัวเลข) | no such book | no such member | already borrowed | loan limit reached (ตรวจตามลำดับนี้); return <bookId> → returned #<b>, late <n> days, fine <f> | usage: return <bookId> | no such book | not borrowed; loans <memberId> → แต่ละบรรทัด #<b> <title> due day <d> ตามลำดับที่ยืม | (no loans) | no such member | usage: loans <memberId>; list → #<id> <title> [available] หรือ [borrowed by #<m> <name>] | (no books); quit → bye; บรรทัดว่างข้าม; อื่น ๆ → unknown command: <คำสั่ง> การออกแบบ: Library เป็น coordinator (ถือรายการ, วันปัจจุบัน, ออก id) และ throw IllegalArgumentException/IllegalStateException ที่ข้อความตรงข้อกำหนด, Loan หนึ่งตัวถูกอ้างจากทั้ง Book และ Member, Main แปลง input เป็นการเรียก Library และ exception เป็นข้อความ",
+  explanation: "ข้อกำหนด M2: เริ่มที่วันที่ 1, ยืมได้ 14 วัน (ครบกำหนด = วันที่ยืม + 14), สมาชิกยืมพร้อมกันได้ไม่เกิน 2 เล่ม, ค่าปรับวันละ 5 บาทสูงสุด 100 บาท คำสั่ง (ข้อความต้องตรง): add <title> → added book #<id> | title required; member <name> → added member #<id> | name required; day <n> → today is day <n> | day must be a number | day cannot go back | day out of range (มากกว่า 1000000); borrow <bookId> <memberId> → borrowed #<b> by #<m>, due day <d> | usage: borrow <bookId> <memberId> (จำนวน argument ไม่ครบหรือไม่ใช่ตัวเลข) | no such book | no such member | already borrowed | loan limit reached (ตรวจตามลำดับนี้); return <bookId> → returned #<b>, late <n> days, fine <f> | usage: return <bookId> | no such book | not borrowed; loans <memberId> → แต่ละบรรทัด #<b> <title> due day <d> ตามลำดับที่ยืม | (no loans) | no such member | usage: loans <memberId>; list → #<id> <title> [available] หรือ [borrowed by #<m> <name>] | (no books); quit → bye; บรรทัดว่างข้าม; อื่น ๆ → unknown command: <คำสั่ง> การออกแบบ: Library เป็น coordinator (ถือรายการ, วันปัจจุบัน, ออก id) และ throw IllegalArgumentException/IllegalStateException ที่ข้อความตรงข้อกำหนด, Loan หนึ่งตัวถูกอ้างจากทั้ง Book และ Member, Main อยู่ใน package library.cli จึงเรียกได้แค่ public method ของ Library — attach/detach ของ Book เป็น package-private ใน library คนนอก package จึงข้ามผู้ประสานไม่ได้ (ใช้สิ่งที่เรียนในบท java-multi-file) ค่าปรับคำนวณด้วย long ก่อนจำกัดเพดานเพื่อไม่ให้ overflow",
   language: "java",
   standard: "v3",
   prerequisites: ["oop-collaboration", "oop-project-library-1"],
@@ -2008,7 +2008,7 @@ class Member {
   expectedOutput: "คืนวันที่ 10: late 0 days, fine 0\nคืนวันที่ 15: late 0 days, fine 0\nคืนวันที่ 20: late 5 days, fine 25\nคืนวันที่ 60: late 45 days, fine 100",
   tracePrompt: "ตามข้อกำหนด borrow 3 9 เมื่อหนังสือ #3 ถูกยืมอยู่และไม่มีสมาชิก #9 ต้องตอบอะไร และทำไมลำดับการตรวจต้องถูกกำหนดไว้ในข้อกำหนด",
   traceAnswer: "ต้องตอบ no such member เพราะลำดับคือ book มีไหม → member มีไหม → book ว่างไหม → โควตา หนังสือ #3 มีอยู่จึงผ่านข้อแรก แล้วไปตกที่ข้อสอง ถ้าไม่กำหนดลำดับ แต่ละ implementation จะตอบต่างกันสำหรับ input ที่ผิดหลายข้อพร้อมกัน และไฟล์ expected-output ใช้ตรวจไม่ได้",
-  practicePrompt: "สร้าง Library CLI M2 ตามข้อกำหนดในคำอธิบาย ใน package library (Book, Member, Loan, Library, Main) ใช้ Loan เป็นตัวเชื่อมเดียวระหว่าง Book กับ Member ห้ามใช้ static field ที่เปลี่ยนค่าได้ เขียน test-input.txt / expected-output.txt ที่ครอบคลุมทุกข้อความ แล้วรันเทียบด้วย java -cp out library.Main < test-input.txt",
+  practicePrompt: "สร้าง Library CLI M2 ตามข้อกำหนดในคำอธิบาย: Book, Member, Loan, Library ใน package library และ Main ใน package library.cli (method ที่เปลี่ยน state ของ Book/Member เป็น package-private) ใช้ Loan เป็นตัวเชื่อมเดียวระหว่าง Book กับ Member ห้ามใช้ static field ที่เปลี่ยนค่าได้ เขียน test-input.txt / expected-output.txt ที่ครอบคลุมทุกข้อความ แล้วรันเทียบด้วย java -cp out library.cli.Main < test-input.txt",
   starter: java`// File: library/Loan.java
 package library;
 
@@ -2034,12 +2034,12 @@ public class Library {
     // books, members, today, nextBookId, nextMemberId
     // addBook, addMember, setDay, borrow, giveBack, loansOf, listBooks
 }
-// File: library/Main.java
-package library;
+// File: library/cli/Main.java
+package library.cli;
 
 public class Main {
     public static void main(String[] args) {
-        // อ่านคำสั่ง แปลง argument เรียก Library และพิมพ์ผล
+        // อ่านคำสั่ง แปลง argument เรียก public method ของ library.Library และพิมพ์ผล
     }
 }`,
   solution: java`// File: library/Loan.java
@@ -2064,7 +2064,7 @@ public class Loan {
         return member;
     }
 
-    int dueDay() {
+    public int dueDay() {
         return dueDay;
     }
 
@@ -2088,7 +2088,7 @@ public class Book {
         this.title = title.strip();
     }
 
-    int id() {
+    public int id() {
         return id;
     }
 
@@ -2143,7 +2143,7 @@ public class Member {
         this.name = name.strip();
     }
 
-    int id() {
+    public int id() {
         return id;
     }
 
@@ -2180,6 +2180,7 @@ public class Library {
     static final int LOAN_DAYS = 14;
     static final int FINE_PER_DAY = 5;
     static final int MAX_FINE = 100;
+    static final int MAX_DAY = 1_000_000;
 
     private final ArrayList<Book> books = new ArrayList<>();
     private final ArrayList<Member> members = new ArrayList<>();
@@ -2187,28 +2188,31 @@ public class Library {
     private int nextMemberId = 1;
     private int today = 1;
 
-    Book addBook(String title) {
+    public Book addBook(String title) {
         Book book = new Book(nextBookId, title);
         nextBookId++;
         books.add(book);
         return book;
     }
 
-    Member addMember(String name) {
+    public Member addMember(String name) {
         Member member = new Member(nextMemberId, name);
         nextMemberId++;
         members.add(member);
         return member;
     }
 
-    void setDay(int day) {
+    public void setDay(int day) {
         if (day < today) {
             throw new IllegalArgumentException("day cannot go back");
+        }
+        if (day > MAX_DAY) {
+            throw new IllegalArgumentException("day out of range");
         }
         today = day;
     }
 
-    Loan borrow(int bookId, int memberId) {
+    public Loan borrow(int bookId, int memberId) {
         Book book = findBook(bookId);
         Member member = findMember(memberId);
         if (!book.isAvailable()) {
@@ -2224,7 +2228,7 @@ public class Library {
     }
 
     // Returns the fine in baht.
-    int giveBack(int bookId) {
+    public int giveBack(int bookId) {
         Book book = findBook(bookId);
         if (book.isAvailable()) {
             throw new IllegalStateException("not borrowed");
@@ -2232,15 +2236,16 @@ public class Library {
         Loan loan = book.currentLoan();
         book.detach();
         loan.member().removeLoan(loan);
-        return Math.min(loan.lateDays(today) * FINE_PER_DAY, MAX_FINE);
+        // long arithmetic first, so a large number of late days cannot overflow before the cap applies.
+        return (int) Math.min((long) loan.lateDays(today) * FINE_PER_DAY, MAX_FINE);
     }
 
-    int lateDays(int bookId) {
+    public int lateDays(int bookId) {
         Book book = findBook(bookId);
         return book.isAvailable() ? 0 : book.currentLoan().lateDays(today);
     }
 
-    String loansOf(int memberId) {
+    public String loansOf(int memberId) {
         Member member = findMember(memberId);
         ArrayList<String> lines = new ArrayList<>();
         for (Loan loan : member.loans()) {
@@ -2249,7 +2254,7 @@ public class Library {
         return lines.isEmpty() ? "(no loans)" : String.join("\n", lines);
     }
 
-    String listBooks() {
+    public String listBooks() {
         ArrayList<String> lines = new ArrayList<>();
         for (Book book : books) {
             lines.add(book.toString());
@@ -2275,10 +2280,12 @@ public class Library {
         throw new IllegalArgumentException("no such member");
     }
 }
-// File: library/Main.java
-package library;
+// File: library/cli/Main.java
+package library.cli;
 
 import java.util.Scanner;
+import library.Library;
+import library.Loan;
 
 public class Main {
     private final Library library = new Library();
@@ -2387,6 +2394,7 @@ loans
 day 20
 day 5
 day soon
+day 2000000000
 return 1
 return 1
 return 7
@@ -2421,6 +2429,7 @@ usage: loans <memberId>
 today is day 20
 day cannot go back
 day must be a number
+day out of range
 returned #1, late 5 days, fine 25
 not borrowed
 no such book
@@ -2484,7 +2493,7 @@ class Member {
   title: "interface: สัญญาที่หลาย class ทำได้ต่างกัน",
   objective: "ประกาศ interface ที่บอกว่า “ทำอะไรได้” โดยไม่บอกว่าทำอย่างไร เขียน class หลายตัวที่ implements interface เดียวกัน ส่ง implementation เข้า object อื่นผ่าน constructor (dependency injection) และรู้ว่า interface ที่มี method เดียวเขียนด้วย lambda ได้",
   why: "ห้องสมุดคิดค่าปรับนักเรียนต่างจากบุคคลทั่วไป และช่วงสัปดาห์หนังสืออาจงดค่าปรับ ถ้าใส่ if ตามประเภทไว้ใน Library ทุกกติกาใหม่ต้องแก้ Library interface ทำให้เพิ่มกติกาใหม่ได้โดยไม่แตะโค้ดที่ใช้งานมันอยู่",
-  explanation: "interface FinePolicy { int fineFor(int lateDays); } ประกาศ method ที่ไม่มีตัว (abstract) class StandardFine implements FinePolicy ต้องเขียนทุก method ใน interface (ไม่งั้น compile error) และใส่ public เพราะ method ใน interface เป็น public เสมอ ตัวแปรชนิด interface (FinePolicy policy = new StudentFine();) เก็บ object ของ class ใดก็ได้ที่ implements และเรียกได้เฉพาะ method ของ interface object ที่ต้องใช้กติกา (Checkout) รับ FinePolicy ใน constructor แทนการ new เอง — ผู้สร้างเลือก implementation ได้และ test ส่งกติกาง่าย ๆ เข้าไปได้ interface ที่มี abstract method เดียว (functional interface) สร้างด้วย lambda ได้: FinePolicy waived = lateDays -> 0; interface มี default method (มีตัวได้) และ static method ได้ แต่ไม่มี instance field (มีได้แค่ค่าคงที่)",
+  explanation: "interface FinePolicy { int fineFor(int lateDays); } ประกาศ method ที่ไม่มีตัว (abstract) class StandardFine implements FinePolicy ต้องเขียน abstract method ที่เหลือของ interface ให้ครบ (ไม่งั้น compile error — default method มีตัวมาให้แล้ว) และใส่ public เพราะ abstract method ใน interface เป็น public โดยปริยาย (interface มี private helper method ได้ แต่ใช้ได้เฉพาะภายใน interface) ตัวแปรชนิด interface (FinePolicy policy = new StudentFine();) เก็บ object ของ class ใดก็ได้ที่ implements และเรียกได้เฉพาะ method ของ interface object ที่ต้องใช้กติกา (Checkout) รับ FinePolicy ใน constructor แทนการ new เอง — ผู้สร้างเลือก implementation ได้และ test ส่งกติกาง่าย ๆ เข้าไปได้ interface ที่มี abstract method เดียว (functional interface) สร้างด้วย lambda ได้: FinePolicy waived = lateDays -> 0; interface มี default method (มีตัวได้) และ static method ได้ แต่ไม่มี instance field (มีได้แค่ค่าคงที่)",
   language: "java",
   standard: "v3",
   prerequisites: ["oop-project-library-2"],
@@ -3362,7 +3371,7 @@ abstract class Notice {
   title: "★ RPG Battle CLI: interfaces, composition และ polymorphism ในเกมต่อสู้",
   objective: "สร้างเกมต่อสู้แบบตาต่อตาที่ผลแน่นอน (ไม่สุ่ม) ซึ่งอาวุธเป็น interface ที่สลับได้ (composition), ผู้ต่อสู้มี abstract class ร่วม และการต่อสู้ทำงานผ่าน polymorphism — พร้อมไฟล์ fixture ที่ทดสอบทุกข้อความ",
   why: "เกมเป็นโจทย์ที่เห็นผลของการออกแบบชัดที่สุด: เพิ่มอาวุธใหม่ควรเพิ่มแค่ class เดียว ไม่ต้องแก้ Battle และการที่ผลไม่สุ่มทำให้ทดสอบด้วยไฟล์ input/expected ได้เหมือน Library CLI",
-  explanation: "ข้อกำหนด (ข้อความต้องตรง): hero <name> <weapon> → hero <name> with <weapon> (hp 30) | unknown weapon: <weapon> | usage: hero <name> <weapon>; monster <name> <hp> <attack> → monster <name> (hp <hp>, attack <attack>) | usage: monster <name> <hp> <attack> (hp/attack ต้องเป็นจำนวนเต็มบวก); fight → ถ้ายังไม่มีทั้งสองฝ่าย: need a hero and a monster ไม่งั้นพิมพ์ทีละรอบ: round <n>: <hero> hits <monster> for <d> (<monster> hp <เหลือ>) แล้วถ้ามอนสเตอร์ยังอยู่: <monster> hits <hero> for <attack> (<hero> hp <เหลือ>) จนฝ่ายหนึ่ง hp เป็น 0 แล้วพิมพ์ <ผู้ชนะ> wins หลังจบ ฝ่ายที่แพ้ถูกนำออก (ผู้ชนะเก็บ hp ที่เหลือไว้สู้ต่อ) ถ้าครบ 50 รอบยังไม่จบพิมพ์ draw; quit → bye อาวุธ: sword ทำ 7 ทุกรอบ, bow ทำ 10 ในรอบแรก (ยิงก่อน) แล้ว 5 ในรอบต่อไป, staff ทำ 4 + เลขรอบ (5, 6, 7, ...) การออกแบบ: interface Weapon { String name(); int damage(int round); }, abstract class Fighter (ชื่อ, hp, takeDamage, isAlive, abstract attackDamage(round)), Hero มี Weapon (composition), Monster มีค่าโจมตีคงที่, Battle จัดลำดับรอบโดยรู้จักแค่ Fighter",
+  explanation: "ข้อกำหนด (ข้อความต้องตรง): hero <name> <weapon> → hero <name> with <weapon> (hp 30) | unknown weapon: <weapon> | usage: hero <name> <weapon>; monster <name> <hp> <attack> → monster <name> (hp <hp>, attack <attack>) | usage: monster <name> <hp> <attack> (hp/attack ต้องเป็นจำนวนเต็มบวก); fight → ถ้ายังไม่มีทั้งสองฝ่าย: need a hero and a monster ไม่งั้นพิมพ์ทีละรอบ: round <n>: <hero> hits <monster> for <d> (<monster> hp <เหลือ>) แล้วถ้ามอนสเตอร์ยังอยู่: <monster> hits <hero> for <attack> (<hero> hp <เหลือ>) จนฝ่ายหนึ่ง hp เป็น 0 แล้วพิมพ์ <ผู้ชนะ> wins หลังจบ ฝ่ายที่แพ้ถูกนำออก (ผู้ชนะเก็บ hp ที่เหลือไว้สู้ต่อ) (โค้ดมีเพดาน 50 รอบที่พิมพ์ draw เป็นตัวกันไว้สำหรับกติกาในอนาคต แต่ตามข้อกำหนดนี้เกิดไม่ได้ เพราะมอนสเตอร์ตีอย่างน้อย 1 ทุกรอบและฮีโร่มี hp 30 การต่อสู้จึงจบภายใน 30 รอบ); quit → bye อาวุธ: sword ทำ 7 ทุกรอบ, bow ทำ 10 ในรอบแรก (ยิงก่อน) แล้ว 5 ในรอบต่อไป, staff ทำ 4 + เลขรอบ (5, 6, 7, ...) การออกแบบ: interface Weapon { String name(); int damage(int round); }, abstract class Fighter (ชื่อ, hp, takeDamage, isAlive, abstract attackDamage(round)), Hero มี Weapon (composition), Monster มีค่าโจมตีคงที่, Battle จัดลำดับรอบโดยรู้จักแค่ Fighter",
   language: "java",
   standard: "v3",
   prerequisites: ["oop-abstract", "oop-interfaces", "oop-composition"],
@@ -3844,7 +3853,7 @@ class Fighter {
   title: "collections: List, Set, Map และการเรียงด้วย Comparator",
   objective: "เลือกโครงสร้างตามคำถามที่ต้องตอบ: List เมื่อสนลำดับและยอมซ้ำ, Set เมื่อห้ามซ้ำ, Map เมื่อต้องค้นด้วย key ใช้ HashMap/LinkedHashMap/TreeMap ตามลำดับที่ต้องการ นับด้วย merge/getOrDefault และเรียงด้วย Comparator.comparing พร้อม thenComparing",
   why: "Library M2 ค้นหนังสือด้วย loop ทุกครั้งและนับสถิติด้วย if ซ้อน เมื่อหนังสือมีหลายหมื่นเล่มหรือคำถามซับซ้อนขึ้น (ใครยืมบ่อยที่สุด, หมวดไหนไม่ซ้ำกี่หมวด) โครงสร้างที่ถูกทำให้โค้ดสั้นลงและเร็วขึ้น",
-  explanation: "ประกาศด้วย interface: List<Book>, Set<String>, Map<Integer, Book> แล้วเลือก implementation: ArrayList (ลำดับตามที่ใส่), HashSet/HashMap (เร็ว ไม่รับประกันลำดับ), LinkedHashSet/LinkedHashMap (คงลำดับที่ใส่), TreeSet/TreeMap (เรียงตาม key) Set และ key ของ Map ใช้ equals/hashCode (Hash...) หรือ compareTo (Tree...) จึงต้องมีให้ถูก (บท identity) Map: put, get (null ถ้าไม่มี), getOrDefault, containsKey, merge(key, 1, Integer::sum) นับเพิ่ม, entrySet() วนคู่ key–value Comparator.comparing(Book::title) สร้างตัวเปรียบเทียบจาก getter (Book::title คือ method reference = book -> book.title()), .reversed() กลับลำดับ, .thenComparing(...) ใช้เมื่อเท่ากัน list.sort(comparator) เรียงในที่ ส่วน List.copyOf/Map.copyOf ทำสำเนาที่แก้ไม่ได้ (ไม่รับ null) ตัวอย่างใช้ record Book(int id, String title, String category) {} ซึ่งเป็น class สั้นสำหรับข้อมูลที่เปลี่ยนไม่ได้: Java สร้าง constructor, accessor (book.title()), equals/hashCode (เทียบทุก component) และ toString ให้เอง",
+  explanation: "ประกาศด้วย interface: List<Book>, Set<String>, Map<Integer, Book> แล้วเลือก implementation: ArrayList (ลำดับตามที่ใส่), HashSet/HashMap (เร็ว ไม่รับประกันลำดับ), LinkedHashSet/LinkedHashMap (คงลำดับที่ใส่), TreeSet/TreeMap (เรียงตาม key) Set และ key ของ Map ใช้ equals/hashCode (Hash...) หรือ compareTo (Tree...) จึงต้องมีให้ถูก (บท identity) Map: put, get (null ถ้าไม่มี), getOrDefault, containsKey, merge(key, 1, Integer::sum) นับเพิ่ม, entrySet() วนคู่ key–value Comparator.comparing(Book::title) สร้างตัวเปรียบเทียบจาก getter (Book::title คือ method reference = book -> book.title()), .reversed() กลับลำดับ, .thenComparing(...) ใช้เมื่อเท่ากัน list.sort(comparator) เรียงในที่ ส่วน List.copyOf/Map.copyOf ทำสำเนาที่แก้ไม่ได้ (ไม่รับ null) ตัวอย่างใช้ record Book(int id, String title, String category) {} ซึ่งเป็น class สั้นสำหรับข้อมูลแบบค่า: component ทุกตัวเป็น final และ Java สร้าง constructor, accessor (book.title()), equals/hashCode (เทียบทุก component) และ toString ให้เอง — แต่ไม่เปลี่ยนได้แค่ชั้นเดียว (shallow) ถ้า component เป็น List ที่แก้ได้ ข้างใน list ยังถูกแก้ได้ ต้องคัดลอก (List.copyOf) ใน constructor",
   language: "java",
   standard: "v3",
   prerequisites: ["oop-identity", "oop-project-library-2"],
@@ -4429,6 +4438,7 @@ read Java 21 x
 read nopages
 read Refactoring 0
 read Java 21 120
+top
 read Effective Java 300
 top
 total
@@ -4447,6 +4457,7 @@ usage: read <title> <pages>
 usage: read <title> <pages>
 pages must be positive
 logged 120 pages of Java 21
+top: Clean Code (120)
 logged 300 pages of Effective Java
 top: Effective Java (300)
 total 540 pages
@@ -4776,7 +4787,7 @@ class CalculatorTest {
   title: "★ Library CLI M3 (capstone): บันทึก/โหลดไฟล์ และ test ด้วย JUnit",
   objective: "ต่อยอด M2 ให้บันทึกและโหลดข้อมูลทั้งหมด (วัน, หนังสือ, สมาชิก, การยืม) เป็นไฟล์ข้อความด้วย java.nio.file รายงานไฟล์เสียพร้อมเลขบรรทัด และมี JUnit test ที่ใช้ @TempDir ครอบคลุมการบันทึก/โหลด กรณีผิด และคำสั่ง save/load ของ CLI โดย golden master ของ M2 ยังผ่าน",
   why: "ระบบที่ปิดแล้วข้อมูลหายใช้งานจริงไม่ได้ การอ่านไฟล์ที่ผู้ใช้หรือโปรแกรมอื่นแก้ได้ต้องรับมือกับข้อมูลเสียอย่างชัดเจน และ capstone นี้รวมทุกอย่างของคอร์ส: object ที่รักษากติกา, exception ของโดเมน, collection, refactor อย่างปลอดภัย และ test",
-  explanation: "รูปแบบไฟล์ (UTF-8 บรรทัดละหนึ่งรายการ คั่นด้วย tab): day<TAB><n> / book<TAB><id><TAB><title> / member<TAB><id><TAB><name> / loan<TAB><bookId><TAB><memberId><TAB><dueDay> ชื่อหนังสือและสมาชิกห้ามมี tab (ตรวจใน constructor) การออกแบบ: Library.snapshot() คืน List<String> ของบรรทัด (Library ไม่รู้จักไฟล์) และ Library.restore(List<String>) สร้าง Library ใหม่จากบรรทัด โดยใช้กติกาเดิมของ Book/Member/Loan และหลังโหลด id ถัดไปต้องต่อจากค่ามากที่สุด บรรทัดที่ผิดรูปแบบหรืออ้างถึงสิ่งที่ไม่มีให้ throw LibraryDataException (unchecked) ข้อความ line <n>: <เหตุผล> LibraryStore เป็นส่วนเดียวที่แตะไฟล์: save ด้วย Files.write, load ด้วย Files.readAllLines (ไฟล์ไม่มีอยู่ = ห้องสมุดว่าง) ทั้งคู่ประกาศ throws IOException (checked) CLI เพิ่ม save <path> → saved to <path> และ load <path> → loaded from <path> หรือ cannot load: <ข้อความ> โดยคำสั่งเดิมของ M2 ตอบเหมือนเดิมทุกตัวอักษร (golden master เดิมต้องผ่าน) test ใช้ @TempDir Path dir ที่ JUnit สร้างและลบให้ จึงไม่เขียนไฟล์ทิ้งไว้ในเครื่อง",
+  explanation: "รูปแบบไฟล์ (UTF-8 บรรทัดละหนึ่งรายการ คั่นด้วย tab): day<TAB><n> / book<TAB><id><TAB><title> / member<TAB><id><TAB><name> / loan<TAB><bookId><TAB><memberId><TAB><dueDay> ชื่อหนังสือและสมาชิกห้ามมี tab (ตรวจใน constructor) การออกแบบ: Library.snapshot() คืน List<String> ของบรรทัด (Library ไม่รู้จักไฟล์) และ Library.restore(List<String>) สร้าง Library ใหม่จากบรรทัด โดยใช้กติกาเดิมของ Book/Member/Loan และหลังโหลด id ถัดไปต้องต่อจากค่ามากที่สุด บรรทัดที่ผิดรูปแบบหรืออ้างถึงสิ่งที่ไม่มีให้ throw LibraryDataException (unchecked) ข้อความ line <n>: <เหตุผล> LibraryStore เป็นส่วนเดียวที่แตะไฟล์: save ด้วย Files.write, load ด้วย Files.readAllLines (ไฟล์ไม่มีอยู่ = ห้องสมุดว่าง) ทั้งคู่ประกาศ throws IOException (checked) CLI (library.cli.Main) เพิ่ม save <path> → saved to <path> และ load <path> → loaded from <path> หรือ cannot load: <ข้อความ> (โหลดไม่สำเร็จแล้วห้องสมุดเดิมต้องไม่เปลี่ยน), usage: save <path> / usage: load <path> เมื่อไม่มี path; loan ถูกบันทึกตามลำดับที่สมาชิกแต่ละคนยืม และ restore ปฏิเสธค่าที่การใช้งานปกติสร้างไม่ได้ (วัน/id/วันครบกำหนดที่ไม่เป็นบวก, วันเกิน 1000000, id ซ้ำ) โดยคำสั่งเดิมของ M2 ตอบเหมือนเดิมทุกตัวอักษร (golden master เดิมต้องผ่าน) test ใช้ @TempDir Path dir ที่ JUnit สร้างและลบให้ จึงไม่เขียนไฟล์ทิ้งไว้ในเครื่อง",
   language: "java",
   standard: "v3",
   prerequisites: ["oop-junit", "oop-project-library-2", "oop-exceptions"],
@@ -4811,7 +4822,7 @@ class NotesStoreTest {
 }`,
   tracePrompt: "ทำไม Library.snapshot() คืน List<String> แทนการเขียนไฟล์เอง และถ้าวันหนึ่งต้องบันทึกลงฐานข้อมูลแทนไฟล์ ต้องแก้ class ไหน",
   traceAnswer: "เพื่อให้ Library ไม่ผูกกับไฟล์: test ตรวจ snapshot/restore ได้โดยไม่แตะดิสก์ และกติกาการตีความข้อมูลอยู่ที่เดียว ถ้าย้ายไปฐานข้อมูล แก้หรือเพิ่มแค่ส่วนที่เทียบเท่า LibraryStore (เช่น DatabaseStore) ส่วน Library, Book, Member, Loan ไม่ต้องเปลี่ยน",
-  practicePrompt: "สร้าง Library CLI M3 ตามข้อกำหนดในคำอธิบาย: เริ่มจากโค้ด M2 ที่ golden master ผ่าน, เพิ่ม snapshot/restore ใน Library, LibraryDataException, LibraryStore และคำสั่ง save/load ใน Main แล้วเขียน JUnit test อย่างน้อย 7 ตัว: บันทึกแล้วโหลดได้ครบ (วัน, หนังสือ, สมาชิก, การยืม), id ต่อจากเดิมหลังโหลด, ไฟล์ไม่มีอยู่ได้ห้องสมุดว่าง, บรรทัดเสียแจ้งเลขบรรทัด, การยืมที่อ้างหนังสือที่ไม่มีถูกปฏิเสธ, ชื่อที่มี tab ถูกปฏิเสธ และคำสั่ง save/load ของ CLI ทำงานกับไฟล์ใน @TempDir สุดท้ายรัน golden master ของ M2 ซ้ำให้ผ่าน",
+  practicePrompt: "สร้าง Library CLI M3 ตามข้อกำหนดในคำอธิบาย: เริ่มจากโค้ด M2 ที่ golden master ผ่าน, เพิ่ม snapshot/restore ใน Library, LibraryDataException, LibraryStore และคำสั่ง save/load ใน Main แล้วเขียน JUnit test อย่างน้อย 11 ตัว: บันทึกแล้วโหลดได้ครบ (วัน, หนังสือ, สมาชิก, การยืม), id ต่อจากเดิมหลังโหลด, ไฟล์ไม่มีอยู่ได้ห้องสมุดว่าง, บรรทัดเสียแจ้งเลขบรรทัด, การยืมที่อ้างหนังสือที่ไม่มีถูกปฏิเสธ, ชื่อที่มี tab ถูกปฏิเสธ, ลำดับการยืมของสมาชิกคงเดิมหลังโหลด, ค่าที่ใช้งานปกติสร้างไม่ได้ถูกปฏิเสธ, วันมากไม่ทำให้ค่าปรับ overflow, CLI แจ้ง cannot load และคงห้องสมุดเดิม และคำสั่ง save/load ของ CLI ทำงานกับไฟล์ใน @TempDir สุดท้ายรัน golden master ของ M2 ซ้ำให้ผ่าน",
   starter: java`// File: library/LibraryDataException.java
 package library;
 
@@ -4827,7 +4838,7 @@ public class LibraryStore {
     // static void save(Library library, Path file) throws IOException
     // static Library load(Path file) throws IOException
 }
-// คัดลอก Book, Member, Loan, Library และ Main จาก M2 มาไว้ใน package เดียวกัน
+// คัดลอก Book, Member, Loan, Library (package library) และ Main (package library.cli) จาก M2
 // แล้วเพิ่ม snapshot/restore และคำสั่ง save/load`,
   solution: java`// File: library/Loan.java
 package library;
@@ -4851,7 +4862,7 @@ public class Loan {
         return member;
     }
 
-    int dueDay() {
+    public int dueDay() {
         return dueDay;
     }
 
@@ -4878,7 +4889,7 @@ public class Book {
         this.title = title.strip();
     }
 
-    int id() {
+    public int id() {
         return id;
     }
 
@@ -4936,7 +4947,7 @@ public class Member {
         this.name = name.strip();
     }
 
-    int id() {
+    public int id() {
         return id;
     }
 
@@ -4978,6 +4989,7 @@ public class Library {
     static final int LOAN_DAYS = 14;
     static final int FINE_PER_DAY = 5;
     static final int MAX_FINE = 100;
+    static final int MAX_DAY = 1_000_000;
 
     private final ArrayList<Book> books = new ArrayList<>();
     private final ArrayList<Member> members = new ArrayList<>();
@@ -4985,28 +4997,31 @@ public class Library {
     private int nextMemberId = 1;
     private int today = 1;
 
-    Book addBook(String title) {
+    public Book addBook(String title) {
         Book book = new Book(nextBookId, title);
         nextBookId++;
         books.add(book);
         return book;
     }
 
-    Member addMember(String name) {
+    public Member addMember(String name) {
         Member member = new Member(nextMemberId, name);
         nextMemberId++;
         members.add(member);
         return member;
     }
 
-    void setDay(int day) {
+    public void setDay(int day) {
         if (day < today) {
             throw new IllegalArgumentException("day cannot go back");
+        }
+        if (day > MAX_DAY) {
+            throw new IllegalArgumentException("day out of range");
         }
         today = day;
     }
 
-    Loan borrow(int bookId, int memberId) {
+    public Loan borrow(int bookId, int memberId) {
         Book book = findBook(bookId);
         Member member = findMember(memberId);
         if (!book.isAvailable()) {
@@ -5022,7 +5037,7 @@ public class Library {
     }
 
     // Returns the fine in baht.
-    int giveBack(int bookId) {
+    public int giveBack(int bookId) {
         Book book = findBook(bookId);
         if (book.isAvailable()) {
             throw new IllegalStateException("not borrowed");
@@ -5030,15 +5045,16 @@ public class Library {
         Loan loan = book.currentLoan();
         book.detach();
         loan.member().removeLoan(loan);
-        return Math.min(loan.lateDays(today) * FINE_PER_DAY, MAX_FINE);
+        // long arithmetic first, so a large number of late days cannot overflow before the cap applies.
+        return (int) Math.min((long) loan.lateDays(today) * FINE_PER_DAY, MAX_FINE);
     }
 
-    int lateDays(int bookId) {
+    public int lateDays(int bookId) {
         Book book = findBook(bookId);
         return book.isAvailable() ? 0 : book.currentLoan().lateDays(today);
     }
 
-    String loansOf(int memberId) {
+    public String loansOf(int memberId) {
         Member member = findMember(memberId);
         ArrayList<String> lines = new ArrayList<>();
         for (Loan loan : member.loans()) {
@@ -5047,7 +5063,7 @@ public class Library {
         return lines.isEmpty() ? "(no loans)" : String.join("\n", lines);
     }
 
-    String listBooks() {
+    public String listBooks() {
         ArrayList<String> lines = new ArrayList<>();
         for (Book book : books) {
             lines.add(book.toString());
@@ -5056,7 +5072,7 @@ public class Library {
     }
 
     // One line per record, tab-separated: day, book, member, loan. Library itself never touches files.
-    List<String> snapshot() {
+    public List<String> snapshot() {
         List<String> lines = new ArrayList<>();
         lines.add("day\t" + today);
         for (Book book : books) {
@@ -5065,16 +5081,16 @@ public class Library {
         for (Member member : members) {
             lines.add("member\t" + member.id() + "\t" + member.name());
         }
-        for (Book book : books) {
-            if (!book.isAvailable()) {
-                Loan loan = book.currentLoan();
-                lines.add("loan\t" + book.id() + "\t" + loan.member().id() + "\t" + loan.dueDay());
+        // Loans are written member by member in borrowing order, so loansOf() reads the same after a reload.
+        for (Member member : members) {
+            for (Loan loan : member.loans()) {
+                lines.add("loan\t" + loan.book().id() + "\t" + member.id() + "\t" + loan.dueDay());
             }
         }
         return lines;
     }
 
-    static Library restore(List<String> lines) {
+    public static Library restore(List<String> lines) {
         Library library = new Library();
         for (int i = 0; i < lines.size(); i++) {
             try {
@@ -5095,11 +5111,15 @@ public class Library {
         switch (fields[0]) {
             case "day" -> {
                 expectFields(fields, 2);
-                today = Integer.parseInt(fields[1]);
+                int day = positive(fields[1], "day");
+                if (day > MAX_DAY) {
+                    throw new IllegalArgumentException("day out of range");
+                }
+                today = day;
             }
             case "book" -> {
                 expectFields(fields, 3);
-                int id = Integer.parseInt(fields[1]);
+                int id = positive(fields[1], "book id");
                 if (hasBook(id)) {
                     throw new IllegalArgumentException("duplicate book #" + id);
                 }
@@ -5108,7 +5128,10 @@ public class Library {
             }
             case "member" -> {
                 expectFields(fields, 3);
-                int id = Integer.parseInt(fields[1]);
+                int id = positive(fields[1], "member id");
+                if (hasMember(id)) {
+                    throw new IllegalArgumentException("duplicate member #" + id);
+                }
                 members.add(new Member(id, fields[2]));
                 nextMemberId = Math.max(nextMemberId, id + 1);
             }
@@ -5116,12 +5139,29 @@ public class Library {
                 expectFields(fields, 4);
                 Book book = findBook(Integer.parseInt(fields[1]));
                 Member member = findMember(Integer.parseInt(fields[2]));
-                Loan loan = new Loan(book, member, Integer.parseInt(fields[3]));
+                Loan loan = new Loan(book, member, positive(fields[3], "due day"));
                 book.attach(loan);
                 member.addLoan(loan);
             }
             default -> throw new IllegalArgumentException("unknown record " + fields[0]);
         }
+    }
+
+    private static int positive(String text, String what) {
+        int value = Integer.parseInt(text);
+        if (value <= 0) {
+            throw new IllegalArgumentException(what + " must be positive");
+        }
+        return value;
+    }
+
+    private boolean hasMember(int id) {
+        for (Member member : members) {
+            if (member.id() == id) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static void expectFields(String[] fields, int count) {
@@ -5178,28 +5218,32 @@ public final class LibraryStore {
     private LibraryStore() {
     }
 
-    static void save(Library library, Path file) throws IOException {
+    public static void save(Library library, Path file) throws IOException {
         Files.write(file, library.snapshot(), StandardCharsets.UTF_8);
     }
 
-    static Library load(Path file) throws IOException {
+    public static Library load(Path file) throws IOException {
         if (!Files.exists(file)) {
             return new Library();
         }
         return Library.restore(Files.readAllLines(file, StandardCharsets.UTF_8));
     }
 }
-// File: library/Main.java
-package library;
+// File: library/cli/Main.java
+package library.cli;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Scanner;
+import library.Library;
+import library.LibraryDataException;
+import library.LibraryStore;
+import library.Loan;
 
 public class Main {
     private Library library = new Library();
 
-    String handle(String line) {
+    public String handle(String line) {
         String[] words = line.split("\\s+");
         String command = words[0].toLowerCase();
         String rest = line.contains(" ") ? line.substring(line.indexOf(' ') + 1).strip() : "";
@@ -5319,6 +5363,7 @@ import java.nio.file.Path;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import library.cli.Main;
 
 class LibraryStoreTest {
     @TempDir
@@ -5382,6 +5427,59 @@ class LibraryStoreTest {
     }
 
     @Test
+    void loansKeepEachMembersBorrowingOrderAfterLoad() throws IOException {
+        Library original = new Library();
+        original.addBook("A");
+        original.addBook("B");
+        original.addMember("Sea");
+        original.borrow(2, 1);
+        original.borrow(1, 1);
+        Path file = dir.resolve("order.txt");
+        LibraryStore.save(original, file);
+        assertEquals("#2 B due day 15\n#1 A due day 15", LibraryStore.load(file).loansOf(1));
+    }
+
+    @Test
+    void recordsThatNormalUseCannotCreateAreRejected() {
+        List<List<String>> files = List.of(
+            List.of("day\t-8"),
+            List.of("day\t1", "book\t0\tA"),
+            List.of("day\t1", "member\t1\tSea", "member\t1\tTon"),
+            List.of("day\t1", "book\t1\tA", "member\t1\tSea", "loan\t1\t1\t-30"),
+            List.of("day\t2000000000"));
+        List<String> messages = List.of(
+            "line 1: day must be positive",
+            "line 2: book id must be positive",
+            "line 3: duplicate member #1",
+            "line 4: due day must be positive",
+            "line 1: day out of range");
+        for (int i = 0; i < files.size(); i++) {
+            List<String> lines = files.get(i);
+            LibraryDataException error = assertThrows(LibraryDataException.class, () -> Library.restore(lines));
+            assertEquals(messages.get(i), error.getMessage());
+        }
+    }
+
+    @Test
+    void hugeDaysDoNotOverflowTheFine() {
+        Library library = sample();
+        library.setDay(1_000_000);
+        assertEquals(100, library.giveBack(2));
+    }
+
+    @Test
+    void cliReportsABrokenFileAndKeepsTheCurrentLibrary() throws IOException {
+        Main cli = new Main();
+        cli.handle("add Clean Code");
+        Path broken = dir.resolve("broken.txt");
+        Files.write(broken, List.of("day\t1", "book\tx\tA"), StandardCharsets.UTF_8);
+        assertEquals("cannot load: line 2: For input string: \"x\"", cli.handle("load " + broken));
+        assertEquals("#1 Clean Code [available]", cli.handle("list"));
+        assertEquals("usage: load <path>", cli.handle("load"));
+        assertEquals("usage: save <path>", cli.handle("save"));
+    }
+
+    @Test
     void cliSavesAndLoadsThroughFiles() {
         Main first = new Main();
         first.handle("add Clean Code");
@@ -5417,6 +5515,7 @@ loans
 day 20
 day 5
 day soon
+day 2000000000
 return 1
 return 1
 return 7
@@ -5451,6 +5550,7 @@ usage: loans <memberId>
 today is day 20
 day cannot go back
 day must be a number
+day out of range
 returned #1, late 5 days, fine 25
 not borrowed
 no such book
@@ -5464,7 +5564,7 @@ borrowed #3 by #1, due day 34
 unknown command: dance
 bye
 `,
-  solutionCheck: { junitTests: 7 },
+  solutionCheck: { junitTests: 11 },
   bugCheck: { kind: "logic", output: "added book #1" },
   buggy: java`import java.util.ArrayList;
 import java.util.List;

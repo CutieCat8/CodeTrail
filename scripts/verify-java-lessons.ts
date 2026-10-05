@@ -9,7 +9,7 @@
 //   - starter compiles; solution compiles and, with solutionCheck, prints exactly solutionCheck.output
 //   - a solution that contains test-input.txt and expected-output.txt prints the expected file for that input
 //   - sources that import org.junit compile against JUNIT_JAR; solutionCheck.junitTests runs the JUnit
-//     console launcher and requires exactly that many successful tests and no failures
+//     console launcher and requires a clean run (exit 0, nothing failed/aborted/skipped) with exactly that many tests
 //   - buggy behaves as bugCheck says: compile error containing the message, runtime error containing the
 //     message, or a program that runs and prints the stated wrong output
 //
@@ -91,24 +91,26 @@ function execute(source: string, stdin = ""): RunResult {
 
 const show = (result: RunResult) => (result.kind === "ok" ? result.text : `${result.kind.toUpperCase()}: ${result.text}`);
 
-// Runs every JUnit test in the compiled sources; returns counts parsed from the launcher summary.
+// Runs every JUnit test in the compiled sources. A run is clean only when the launcher exits 0 and no test or
+// container failed, aborted or was skipped (a failing @BeforeAll/@AfterAll fails a container, not a test).
 function runJunit(source: string) {
   const compiled = compile(source);
-  if (!compiled.ok) return { successful: NaN, failed: NaN, detail: "COMPILE ERROR: " + compiled.message };
+  if (!compiled.ok) return { clean: false, successful: NaN, detail: "COMPILE ERROR: " + compiled.message };
   try {
     const output = execFileSync(java, ["-jar", junitJar!, "execute", "--class-path", path.join(compiled.dir, "out"), "--scan-class-path", "--disable-banner", "--details=summary"], { encoding: "utf8", timeout: 60000, stdio: "pipe" });
-    return summary(output);
+    return summary(output, true);
   } catch (error) {
-    // The launcher exits with 1 when a test fails; its stdout still has the summary.
-    return summary(String((error as { stdout?: string }).stdout ?? error));
+    // The launcher exits non-zero when anything failed; its stdout still has the summary.
+    return summary(String((error as { stdout?: string }).stdout ?? error), false);
   } finally {
     rmSync(compiled.dir, { recursive: true, force: true });
   }
 }
 
-function summary(output: string) {
+function summary(output: string, exitedZero: boolean) {
   const count = (label: string) => Number(new RegExp(`(\\d+) ${label}`).exec(output)?.[1] ?? NaN);
-  return { successful: count("tests successful"), failed: count("tests failed"), detail: output };
+  const problems = ["tests failed", "tests aborted", "tests skipped", "containers failed", "containers aborted"].map(count);
+  return { clean: exitedZero && problems.every((n) => n === 0), successful: count("tests successful"), detail: output };
 }
 
 const topics = topicSources.filter((topic) => topic.language === "java" && topic.standard === "v3");
@@ -126,7 +128,7 @@ for (const topic of topics) {
     if (topic.expectedOutput !== undefined) expectOutput(`${topic.id} · example`, execute(topic.example, topic.stdin), topic.expectedOutput);
     if (topic.expectedOutput === undefined && usesJunit(topic.example)) {
       const result = runJunit(topic.example);
-      report(result.successful > 0 && result.failed === 0, `${topic.id} · example JUnit tests pass`, result.detail.slice(-1500));
+      report(result.clean && result.successful > 0, `${topic.id} · example JUnit tests pass`, result.detail.slice(-1500));
     }
     for (const block of topic.lesson?.explain ?? []) {
       if (block.code && block.output !== undefined) expectOutput(`${topic.id} · ${block.heading}`, execute(block.code), block.output);
@@ -142,7 +144,7 @@ for (const topic of topics) {
     if (input && expected) expectOutput(`${topic.id} · solution matches expected-output.txt`, execute(topic.solution, input.code), expected.code.replace(/\n$/, ""));
     if (topic.solutionCheck?.junitTests !== undefined) {
       const result = runJunit(topic.solution);
-      const ok = result.successful === topic.solutionCheck.junitTests && result.failed === 0;
+      const ok = result.clean && result.successful === topic.solutionCheck.junitTests;
       report(ok, `${topic.id} · solution passes ${topic.solutionCheck.junitTests} JUnit tests`, result.detail.slice(-1500));
     }
     if (!topic.solutionCheck && !(input && expected)) {

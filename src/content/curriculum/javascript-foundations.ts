@@ -28,7 +28,7 @@ const originalTopics: TopicSource[] = [
   starter: "function makeTea() {\n  console.log(\"2) ต้มน้ำ\");\n  pour();\n  console.log(\"4) ยกเสิร์ฟ\");\n}\n\nfunction pour() {\n  console.log(\"3) เทน้ำลงแก้ว\");\n  // เรียก addSugar ที่นี่\n}\n\n// ประกาศ addSugar ที่นี่\n\nconsole.log(\"1) รับออร์เดอร์\");\nmakeTea();\nconsole.log(\"5) ปิดบิล\");",
   solution: "function makeTea() {\n  console.log(\"2) ต้มน้ำ\");\n  pour();\n  console.log(\"4) ยกเสิร์ฟ\");\n}\n\nfunction pour() {\n  console.log(\"3) เทน้ำลงแก้ว\");\n  addSugar();\n}\n\nfunction addSugar() {\n  console.log(\"3.5) ใส่น้ำตาล\");\n}\n\nconsole.log(\"1) รับออร์เดอร์\");\nmakeTea();\nconsole.log(\"5) ปิดบิล\");",
   buggy: "function serve() {\n  console.log(\"เสิร์ฟ\");\n  serve();\n}\n\nserve();",
-  bugExplanation: "serve เรียกตัวเองโดยไม่มีเงื่อนไขหยุด แต่ละการเรียกวาง frame ใหม่บน call stack จน stack เต็มและเกิด RangeError: Maximum call stack size exceeded แก้โดยลบการเรียกซ้ำ หรือถ้าตั้งใจให้ทำซ้ำ ต้องมีเงื่อนไขหยุด เช่นรับจำนวนรอบเป็น parameter แล้ว if (rounds === 0) return;",
+  bugExplanation: "function เรียกตัวเองได้ (เรียกว่า recursion ไม่ต้องใช้ในคอร์สนี้) serve เรียกตัวเองโดยไม่มีเงื่อนไขหยุด แต่ละการเรียกวาง frame ใหม่บน call stack จน stack เต็มและเกิด RangeError: Maximum call stack size exceeded แก้โดยลบการเรียกซ้ำ หรือถ้าตั้งใจให้ทำซ้ำ ต้องมีเงื่อนไขหยุด เช่นรับจำนวนรอบเป็น parameter แล้ว if (rounds === 0) return;",
   vocabulary: [v("engine", "ส่วนที่อ่านและรันโค้ด JavaScript เช่น V8"), v("runtime", "สภาพแวดล้อมที่ engine ทำงานอยู่ เช่น browser หรือ Node พร้อม API เสริม"), v("call stack", "กองบันทึกว่ากำลังอยู่ใน function ไหน เรียกใหม่วางทับ จบแล้วถอดออก"), v("synchronous", "ทำทีละงาน งานถัดไปรอจนงานก่อนเสร็จ"), v("hoisting", "การที่ function declaration ถูกเตรียมไว้ก่อนรันโค้ดในขอบเขตนั้น")],
 },
 {
@@ -46,7 +46,7 @@ const originalTopics: TopicSource[] = [
   expectedOutput: "string number\n251\n24\nobject\nboolean",
   tracePrompt: "ทำนายแต่ละบรรทัดก่อนรัน แล้วอธิบายว่าทำไม \"25\" + 1 กับ \"25\" - 1 ได้ผลคนละแบบ",
   traceAnswer: "string number / 251 / 24 / object / boolean — + เมื่อมี string ฝั่งหนึ่งต่อข้อความ ส่วน - แปลงข้อความเป็นตัวเลขแล้วลบ การแปลงอัตโนมัติเรียก type coercion; typeof null เป็นข้อยกเว้นที่ต้องระวัง",
-  practicePrompt: "ค่าทั้งสามด้านล่างมาจากฟอร์มทั้งหมด แปลง quantity และ price เป็นตัวเลขด้วย Number() แล้วพิมพ์ 2 บรรทัด: บรรทัดแรก typeof ของ quantity หลังแปลง บรรทัดที่สองราคารวม (quantity × price) ตามด้วย \" บาท\" — ห้ามพิมพ์ตัวเลขคำตอบเอง",
+  practicePrompt: "ค่าทั้งสองด้านล่างมาจากฟอร์มทั้งหมด แปลง quantity และ price เป็นตัวเลขด้วย Number() แล้วพิมพ์ 2 บรรทัด: บรรทัดแรก typeof ของ quantity หลังแปลง บรรทัดที่สองราคารวม (quantity × price) ตามด้วย \" บาท\" — ห้ามพิมพ์ตัวเลขคำตอบเอง",
   starter: "const quantity = \"3\";\nconst price = \"45\";\n\n// แปลงเป็นตัวเลข แล้วพิมพ์ typeof และราคารวม\nconsole.log(typeof quantity);\nconsole.log(quantity * price + \" บาท\");",
   solution: "const quantity = \"3\";\nconst price = \"45\";\n\nconst count = Number(quantity);\nconst each = Number(price);\nconsole.log(typeof count);\nconsole.log(count * each + \" บาท\");",
   outputCheck: {
@@ -142,8 +142,8 @@ const originalTopics: TopicSource[] = [
       "for (const t of [\" 59.5 \", \"120 บาท\", \"Infinity\"]) { const n = Number(t); console.log(n, !Number.isNaN(n)); }",
     ],
   },
-  buggy: "const input = \"abc\";\nconst price = Number(input);\nif (price === NaN) {\n  console.log(\"ราคาไม่ถูกต้อง\");\n} else {\n  console.log(\"ราคา\", price);\n}",
-  bugExplanation: "พิมพ์ “ราคา NaN” เพราะ NaN ไม่เท่ากับอะไรเลยแม้แต่ NaN ด้วยกัน เงื่อนไข price === NaN จึงเป็น false เสมอ แก้เป็น if (Number.isNaN(price))",
+  buggy: "const input = \"abc\";\nconst price = Number(input);\nconsole.log(\"ราคาผิดไหม:\", price === NaN);",
+  bugExplanation: "คาดว่าจะเห็น ราคาผิดไหม: true แต่ได้ false (=== คือการเทียบว่าเท่ากันหรือไม่ จะเรียนละเอียดในบท conditions) เพราะ NaN ไม่เท่ากับอะไรเลยแม้แต่ NaN ด้วยกัน price === NaN จึงเป็น false เสมอ แก้เป็น console.log(\"ราคาผิดไหม:\", Number.isNaN(price)); แล้วรันซ้ำจะได้ true",
   vocabulary: [v("number", "ชนิดข้อมูลตัวเลขทั้งจำนวนเต็มและทศนิยม"), v("% (remainder)", "เศษจากการหาร"), v("NaN", "ค่า Not a Number ได้จากการแปลง/คำนวณที่ไม่สำเร็จ"), v("Number.isNaN", "ตรวจว่าค่าเป็น NaN จริงหรือไม่"), v("floating point", "วิธีเก็บทศนิยมแบบฐานสองที่ทำให้บางค่าคลาดเล็กน้อย")],
 },
 {
@@ -162,7 +162,7 @@ const originalTopics: TopicSource[] = [
   tracePrompt: "ก่อนรัน: ถ้าเปลี่ยนเป็น age = 10 และ isStudent = true จะได้ราคาไหน และถ้าสลับให้เช็ก isStudent ก่อน age < 12 ผลจะเปลี่ยนอย่างไร",
   traceAnswer: "ได้ 50 เพราะ if/else if ตรวจจากบนลงล่างและหยุดที่กิ่งแรกที่จริง age < 12 จริงก่อน ถ้าสลับให้เช็ก isStudent ก่อน เด็กนักเรียนจะได้ 80 ซึ่งแพงกว่าราคาเด็ก — ลำดับเงื่อนไขคือส่วนหนึ่งของกฎ ส่วนบรรทัด joined < capacity เป็น false เมื่อเท่ากันพอดี (เต็มแล้ว)",
   practicePrompt: "กิจกรรมด้านล่างรับ 9 คนและต้องอายุ 18 ขึ้นไป เขียนเงื่อนไขสำหรับสมาชิกสามคน (ซี ต้น ฝน) แล้วพิมพ์บรรทัดละคนว่า “ชื่อ: เข้าร่วมได้” หรือ “ชื่อ: เข้าร่วมไม่ได้” โดยเข้าร่วมได้เมื่อยังมีที่นั่ง อายุถึง และไม่ถูกแบน — สังเกตว่าต้องเขียนเงื่อนไขซ้ำสามครั้ง (บทถัดไปจะแก้ด้วย function)",
-  starter: "const capacity = 9;\nconst joined = 8;\nconst minAge = 18;\n\nconst seaAge = 18;\nconst seaBanned = false;\nconst tonAge = 17;\nconst tonBanned = false;\nconst fonAge = 25;\nconst fonBanned = true;\n\n// แทน false ด้วยเงื่อนไขจริงของแต่ละคน\nconst seaCanJoin = false;\nconsole.log(\"ซี: \" + (seaCanJoin ? \"เข้าร่วมได้\" : \"เข้าร่วมไม่ได้\"));",
+  starter: "const capacity = 9;\nconst joined = 8;\nconst minAge = 18;\n\nconst seaAge = 18;\nconst seaBanned = false;\nconst tonAge = 17;\nconst tonBanned = false;\nconst fonAge = 25;\nconst fonBanned = true;\n\n// แทน false ด้วยเงื่อนไขจริงของแต่ละคน\nconst seaCanJoin = false;\n// เงื่อนไข ? ค่าเมื่อจริง : ค่าเมื่อเท็จ (ternary) เลือกหนึ่งในสองข้อความ ดูหัวข้อ 3 ของบทนี้\nconsole.log(\"ซี: \" + (seaCanJoin ? \"เข้าร่วมได้\" : \"เข้าร่วมไม่ได้\"));",
   solution: "const capacity = 9;\nconst joined = 8;\nconst minAge = 18;\n\nconst seaAge = 18;\nconst seaBanned = false;\nconst tonAge = 17;\nconst tonBanned = false;\nconst fonAge = 25;\nconst fonBanned = true;\n\nconst hasSeat = joined < capacity;\nconst seaCanJoin = hasSeat && seaAge >= minAge && !seaBanned;\nconst tonCanJoin = hasSeat && tonAge >= minAge && !tonBanned;\nconst fonCanJoin = hasSeat && fonAge >= minAge && !fonBanned;\n\nconsole.log(\"ซี: \" + (seaCanJoin ? \"เข้าร่วมได้\" : \"เข้าร่วมไม่ได้\"));\nconsole.log(\"ต้น: \" + (tonCanJoin ? \"เข้าร่วมได้\" : \"เข้าร่วมไม่ได้\"));\nconsole.log(\"ฝน: \" + (fonCanJoin ? \"เข้าร่วมได้\" : \"เข้าร่วมไม่ได้\"));",
   outputCheck: {
     expected: "ซี: เข้าร่วมได้\nต้น: เข้าร่วมไม่ได้\nฝน: เข้าร่วมไม่ได้",
@@ -336,7 +336,7 @@ const originalTopics: TopicSource[] = [
   tracePrompt: "ทำนายผลของ updated และ activity.joined ก่อนรัน แล้วอธิบายว่าถ้าสลับเป็น { joined: 99, ...activity } จะได้ joined เท่าไร",
   traceAnswer: "updated มี joined 5 และ field ใหม่ place ส่วน activity.joined ยัง 4 เพราะ spread สร้าง object ใหม่ ถ้าสลับลำดับเป็น { joined: 99, ...activity } จะได้ joined 4 เพราะ field ที่มาทีหลัง (จาก activity) ทับค่าที่มาก่อน",
   practicePrompt: "เขียน reschedule(activity, newDate) ที่คืน object ใหม่ซึ่ง date เป็นค่าใหม่ เพิ่ม field updated: true คง field อื่นไว้ทั้งหมด และต้องไม่แก้ activity ที่รับเข้ามา (อย่าแก้ checkReschedule ที่ใช้ตรวจ)",
-  starter: "function reschedule(activity, newDate) {\n  // สร้าง object ใหม่ด้วย spread แล้วกำหนด date และ updated\n  activity.date = newDate;\n  return activity;\n}\n\n// ใช้ตรวจคำตอบ — อย่าแก้\nfunction checkReschedule(activity, newDate) {\n  const before = JSON.stringify(activity);\n  const updated = reschedule(activity, newDate);\n  return { updated, originalUnchanged: JSON.stringify(activity) === before };\n}",
+  starter: "function reschedule(activity, newDate) {\n  // สร้าง object ใหม่ด้วย spread แล้วกำหนด date และ updated\n  activity.date = newDate;\n  return activity;\n}\n\n// ใช้ตรวจคำตอบ — อย่าแก้ อ่านไม่ต้องเข้าใจ (JSON.stringify จะสอนในบท js-modules-json)\nfunction checkReschedule(activity, newDate) {\n  const before = JSON.stringify(activity);\n  const updated = reschedule(activity, newDate);\n  return { updated, originalUnchanged: JSON.stringify(activity) === before };\n}",
   solution: "function reschedule(activity, newDate) {\n  return { ...activity, date: newDate, updated: true };\n}\n\nfunction checkReschedule(activity, newDate) {\n  const before = JSON.stringify(activity);\n  const updated = reschedule(activity, newDate);\n  return { updated, originalUnchanged: JSON.stringify(activity) === before };\n}",
   autoCheck: {
     functionName: "checkReschedule",

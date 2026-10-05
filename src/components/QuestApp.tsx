@@ -5,7 +5,7 @@ import { Activity, Bot, Braces, Check, ChevronDown, ChevronLeft, ChevronRight, C
 import { lessons, lessonById, plannedJava } from "@/content/lessons";
 import { curriculumCourses, learningSteps, stepById } from "@/content/curriculum";
 import { accessReason, recommendation, stepRecommendation } from "@/lib/recommendation";
-import { emptyData, loadData, newProgress, normalizeAppData, saveData, xpTotal } from "@/lib/storage";
+import { canOverwriteStoredData, emptyData, importAppData, loadData, newProgress, saveData, serializeAppData, xpTotal } from "@/lib/storage";
 import { runIsolatedSnippet, runIsolatedTests } from "@/lib/runner";
 import type { AppData, JournalEntry, Lesson, LessonProgress, StudyMode } from "@/types/domain";
 import { PixelCat } from "./PixelCat";
@@ -81,17 +81,21 @@ const portfolioProjects = [
   { id:"booking-api", title:"Booking API", tag:"ขั้นสูง", world:"backend" as const, brief:"API จองที่ตรวจ authorization และใช้ transaction ป้องกันข้อมูลขัดแย้ง", stories:["ดู slot ที่ว่าง","จอง slot","ยกเลิกการจอง"], criteria:["ตรวจสิทธิ์ฝั่ง server","ป้องกัน double booking","rollback เมื่อขั้นตอนใดผิด"] },
 ] as const;
 
-function useQuestData() {
+export function useQuestData() {
   const [data, setData] = useState<AppData>(emptyData);
   const [ready, setReady] = useState(false);
   const [saveState, setSaveState] = useState<SaveState>("idle");
   const timer = useRef<number | null>(null);
-  useEffect(() => { queueMicrotask(() => { setData(loadData()); setReady(true); }); }, []);
+  // Rejected stored value that loadData copied aside; autosave may replace only that, valid
+  // data or an empty slot, so invalid data without a backup is never overwritten.
+  const backedUpRaw = useRef<string | null>(null);
+  useEffect(() => { queueMicrotask(() => { const loaded = loadData(); backedUpRaw.current = loaded.backedUpRaw; setData(loaded.data); setReady(true); }); }, []);
   useEffect(() => {
     if (!ready) return;
     queueMicrotask(() => setSaveState("saving"));
     if (timer.current) window.clearTimeout(timer.current);
     timer.current = window.setTimeout(() => {
+      if (!canOverwriteStoredData(backedUpRaw.current)) { setSaveState("error"); return; }
       try { saveData(data); setSaveState("saved"); }
       catch { setSaveState("error"); }
     }, 650);
@@ -373,8 +377,8 @@ function Projects({data,setData}:{data:AppData;setData:React.Dispatch<React.SetS
 
 function SettingsView({data,setData}:{data:AppData;setData:React.Dispatch<React.SetStateAction<AppData>>}) {
   const [message,setMessage]=useState(""); const fileRef=useRef<HTMLInputElement>(null);
-  const exportData=()=>{const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=`seas-quest-${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(url);setMessage("ส่งออกข้อมูลแล้ว");};
-  const importData=async(file?:File)=>{if(!file)return;try{const parsed:unknown=JSON.parse(await file.text());const normalized=normalizeAppData(parsed);if(!normalized)throw new Error("รูปแบบไม่ตรง schema v1");setData(normalized);setMessage("นำเข้าข้อมูลสำเร็จและคืน optional fields ที่จำเป็นแล้ว");}catch(e){setMessage(`นำเข้าไม่สำเร็จ: ${e instanceof Error?e.message:"ไฟล์ไม่ถูกต้อง"}`)}finally{if(fileRef.current)fileRef.current.value=""}};
+  const exportData=()=>{const blob=new Blob([serializeAppData(data)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=`seas-quest-${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(url);setMessage("ส่งออกข้อมูลแล้ว");};
+  const importData=async(file?:File)=>{if(!file)return;try{const result=importAppData(await file.text());if(!result.ok){setMessage(`นำเข้าไม่สำเร็จ: ${result.error} — ข้อมูลเดิมไม่ถูกเปลี่ยน`);return;}setData(result.data);setMessage("นำเข้าข้อมูลสำเร็จและบันทึกลงอุปกรณ์แล้ว");}catch{setMessage("นำเข้าไม่สำเร็จ: อ่านไฟล์ไม่ได้ — ข้อมูลเดิมไม่ถูกเปลี่ยน")}finally{if(fileRef.current)fileRef.current.value=""}};
   return <div className="page settings-page"><header className="settings-intro"><span className="eyebrow">LOCAL DATA CONTROL</span><h1>ตั้งค่าและสำรองข้อมูล</h1><p>ควบคุมรูปแบบการฝึกและข้อมูลที่เก็บอยู่ใน browser นี้ โดยไม่สื่อว่ามี cloud sync หรือ account backup</p></header><section className="settings-local-banner"><ShieldCheck/><div><h2>ข้อมูลอยู่ในอุปกรณ์นี้</h2><p>คำตอบ ความคืบหน้า Journal และ Project links อยู่ใน localStorage ของ browser/profile ปัจจุบัน ล้าง browser data แล้วข้อมูลอาจหาย</p></div><dl><div><dt>Lab progress</dt><dd>{Object.keys(data.progress).length}</dd></div><div><dt>Journal</dt><dd>{data.journal.length}</dd></div><div><dt>Projects</dt><dd>{Object.keys(data.projectProgress??{}).length}</dd></div></dl></section><div className="settings-grid-v2"><section className="settings-panel"><span className="settings-index">01</span><div><span className="eyebrow">TRAINING PREFERENCES</span><h2>รูปแบบการฝึก</h2><p>โหมดนี้ใช้จัดภารกิจแนะนำ ไม่ได้ล็อกซีออกจากอีกเส้นทาง</p><ModeSwitch data={data} setData={setData}/><label className="weekly-goal-setting"><span>เป้าหมายรายสัปดาห์ <b>{data.weeklyGoal} วัน</b></span><input type="range" min="1" max="14" value={data.weeklyGoal} onChange={event=>setData(current=>({...current,weeklyGoal:Number(event.target.value)}))}/></label></div></section><section className="settings-panel backup"><span className="settings-index">02</span><div><span className="eyebrow">BACKUP & TRANSFER</span><h2>สำรองและย้ายข้อมูล</h2><p>Export ก่อนล้าง browser หรือย้ายเครื่อง Import จะตรวจ schema ก่อนแทนข้อมูลปัจจุบัน</p><div className="button-row"><button className="primary" onClick={exportData}><Download/>Export JSON</button><button className="secondary" onClick={()=>fileRef.current?.click()}><Upload/>Import JSON</button><input ref={fileRef} hidden type="file" accept="application/json" aria-label="เลือกไฟล์ JSON เพื่อนำเข้า" onChange={event=>importData(event.target.files?.[0])}/></div>{message&&<p className={`status-message ${message.startsWith("นำเข้าไม่สำเร็จ")?"error":""}`} role="status" aria-live="polite">{message}</p>}</div></section></div><section className="settings-danger"><div><span className="eyebrow">DANGER ZONE</span><h2>เริ่มข้อมูลใหม่ใน browser นี้</h2><p>ลบคำตอบ ความคืบหน้า Journal, Roadmap marks และ Project links ทั้งหมด การกระทำนี้ย้อนกลับไม่ได้หากไม่มีไฟล์ Export</p></div><button onClick={()=>{if(confirm("ยืนยันล้างข้อมูล Sea’s Full-stack Quest ทั้งหมดใน browser นี้? การกระทำนี้ย้อนกลับไม่ได้")){setData(emptyData());setMessage("ล้างข้อมูลใน browser นี้แล้ว")}}}>ล้างข้อมูลทั้งหมด</button></section></div>;
 }
 

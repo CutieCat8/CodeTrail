@@ -9,7 +9,7 @@
 - ตรวจบนผลรวมครั้งเดียว: `npx tsc --noEmit` ผ่าน, `npm run lint` ผ่าน, vitest 8 ไฟล์ 416/416 (ต้องตั้ง `NO_COLOR=1 FORCE_COLOR=0`), `verify-java-lessons` 46 บท 0 fail, `verify-java-repair` PASS, `npm run build -- --webpack` ผ่าน
 - Browser (Playwright/Chromium, production build บน :3100, หยุด server แล้ว): เปิดบทเรียน JS, JS checkpoint มีปุ่ม Run และรันได้, ส่งคำตอบแล้วกด Hint / Solution เห็นเฉลย (pre-wrap), Java checkpoint ไม่มีปุ่ม Run แต่ส่งและเห็นเฉลยได้, practice มี Run tests, ไม่มี console/page error ไม่ได้ตรวจ mobile, a11y, หรือทุกบท
 - ไม่ push/deploy; r3/*, r4/labs ไม่ถูกรวม (ร่าง TypeScript/Node ไม่พร้อม); worktrees ทั้งหมดยังอยู่ (`../sfq-main` เป็น worktree ของ main สำหรับการรวมครั้งนี้)
-- Independent review: ไม่พบผลของ Gemini บนเครื่องตอนรวม จึงยึด Claude review ชุดแรก + self-check; JS/Java ที่แก้รอบนี้ยังไม่มี independent review หลังแก้
+- Independent review JS + Developer Foundations: **Gemini (อ่านอย่างเดียว) ให้ PASS** ที่ snapshot f7b3873 และยืนยันที่ 1ff38b0 (C1–C5, M1–M5, m5, m9, dev-git ปิดครบ; M6/m6/m8 ไม่บล็อก; tsc/eslint ผ่าน, vitest 350/350 บนชุดที่เกี่ยวข้อง) ผลอยู่ที่ `C:\Users\Asus\Desktop\REVIEW_JS_DEV_FOUNDATIONS_SUMMARY.md` (ไม่ได้คัดลอกเข้า repo) ส่วน Java ยังเป็น self-check ไม่มี independent review หลังแก้
 
 ### Backlog (ไม่บล็อกการใช้งาน)
 1. M6 test guard: walkthrough ไม่มี `traceAnswer.slice(0,40)`, pitfalls ไม่มี `bugExplanation.slice(0,40)`, code field ไม่มีบรรทัด > 120, glue Thai/Latin; test `curriculum-quality` ที่ล้มเมื่อไม่ตั้ง `FORCE_COLOR=0` ควรกำหนด env ใน runNode

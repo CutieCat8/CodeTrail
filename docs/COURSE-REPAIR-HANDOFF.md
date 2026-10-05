@@ -3,6 +3,20 @@
 อัปเดต 2026-10-06 โดย Claude (Opus 5.5) · ฉบับก่อนหน้าของ Codex ดูได้ที่ `git show 2691362:docs/COURSE-REPAIR-HANDOFF.md`
 **รอบปรับหลักสูตรยังไม่จบ** เอกสารนี้แยกสิ่งที่ยืนยันแล้วกับสิ่งที่ยังไม่ได้ตรวจ อย่าถือว่า WIP ผ่าน
 
+## 0. สถานะล่าสุด (2026-10-06, Sonnet 5.5): รวมรอบซ่อม R1/JS/Developer Foundations/Java เข้า main แล้ว
+
+- main = `ce0f92c` (merge feat/curriculum-learning-repair); feat ผสม r2/js-fix (41b6341) และ r2/java-fix (2eeaf63) แบบ `--no-ff` ไม่มี conflict (commit Run button 1ff38b0 บน js-fix เป็น patch เดียวกับ 40f7646 ที่มีใน feat อยู่แล้ว)
+- ตรวจบนผลรวมครั้งเดียว: `npx tsc --noEmit` ผ่าน, `npm run lint` ผ่าน, vitest 8 ไฟล์ 416/416 (ต้องตั้ง `NO_COLOR=1 FORCE_COLOR=0`), `verify-java-lessons` 46 บท 0 fail, `verify-java-repair` PASS, `npm run build -- --webpack` ผ่าน
+- Browser (Playwright/Chromium, production build บน :3100, หยุด server แล้ว): เปิดบทเรียน JS, JS checkpoint มีปุ่ม Run และรันได้, ส่งคำตอบแล้วกด Hint / Solution เห็นเฉลย (pre-wrap), Java checkpoint ไม่มีปุ่ม Run แต่ส่งและเห็นเฉลยได้, practice มี Run tests, ไม่มี console/page error ไม่ได้ตรวจ mobile, a11y, หรือทุกบท
+- ไม่ push/deploy; r3/*, r4/labs ไม่ถูกรวม (ร่าง TypeScript/Node ไม่พร้อม); worktrees ทั้งหมดยังอยู่ (`../sfq-main` เป็น worktree ของ main สำหรับการรวมครั้งนี้)
+- Independent review: ไม่พบผลของ Gemini บนเครื่องตอนรวม จึงยึด Claude review ชุดแรก + self-check; JS/Java ที่แก้รอบนี้ยังไม่มี independent review หลังแก้
+
+### Backlog (ไม่บล็อกการใช้งาน)
+1. M6 test guard: walkthrough ไม่มี `traceAnswer.slice(0,40)`, pitfalls ไม่มี `bugExplanation.slice(0,40)`, code field ไม่มีบรรทัด > 120, glue Thai/Latin; test `curriculum-quality` ที่ล้มเมื่อไม่ตั้ง `FORCE_COLOR=0` ควรกำหนด env ใน runNode
+2. JS: m6 (ชื่อไฟล์ใน editor `index.mjs` vs `process-lab.js`), m8, หมายเหตุ `JSON.stringify` ใน js-objects; checkpoint js-runtime และ js-modules-json รันเต็มไม่ได้ในสคริปต์ตรวจ (อ่านเทียบ rubric เอง)
+3. Java: checkpoint `java-project-library-0` ซ้ำโดเมน M0 (เปลี่ยนต้องแก้ `docs/verification/R2-Java/EquipmentMain.java` และ fixture); `copyExcept` ไม่มี skip guard (อยู่นอกสัญญา); minors ที่ checks.md ระบุ
+4. ยังไม่ทำ: R3 (TypeScript, Node, Back-end/SQL, Java OOP), R4 labs, R5 รวม; browser mobile/a11y ทั้งคอร์ส
+
 ## 1. สถานะ repo (ตรวจจริงตอนเขียน)
 
 - Repo หลัก `/home/cnux/work/sea-fullstack-quest` · branch `feat/curriculum-learning-repair` · HEAD ก่อน commit เอกสารนี้ `c524f16`

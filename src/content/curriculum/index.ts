@@ -5,10 +5,12 @@ import { javaOopTopics } from "./java-oop";
 import { javascriptFoundationTopics } from "./javascript-foundations";
 import { nodeFoundationTopics } from "./node-foundations";
 import { typescriptTopics } from "./typescript";
+import { backendTopics } from "./backend";
 import { developerFoundationLessons } from "./lessons/developer-foundations";
 import { javascriptFoundationLessons } from "./lessons/javascript-foundations";
 import { typescriptLessons } from "./lessons/typescript";
 import { nodeFoundationLessons } from "./lessons/node-foundations";
+import { backendLessons } from "./lessons/backend";
 import type { RichLesson, TopicSource } from "@/types/curriculum";
 
 const withLessons = (topics: TopicSource[], lessons: Record<string, RichLesson>): TopicSource[] =>
@@ -23,6 +25,7 @@ export const topicSources = [
   ...withLessons(javascriptFoundationTopics, javascriptFoundationLessons),
   ...withLessons(typescriptTopics, typescriptLessons),
   ...withLessons(nodeFoundationTopics, nodeFoundationLessons),
+  ...withLessons(backendTopics, backendLessons),
 ];
 
 export const learningSteps = expandTopics(topicSources);

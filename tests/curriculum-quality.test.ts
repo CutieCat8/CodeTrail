@@ -254,7 +254,7 @@ describe("TypeScript lessons", () => {
 
 // Node lessons use APIs the browser runner lacks, so examples run in a real Node process in a scratch directory.
 describe("Node lessons", () => {
-  const nodeTopics = topicSources.filter((topic) => topic.language === "node");
+  const nodeTopics = topicSources.filter((topic) => topic.language === "node" && !topic.requires?.length);
   const runNode = (source: string) => {
     const dir = mkdtempSync(path.join(tmpdir(), "node-lesson-"));
     try {

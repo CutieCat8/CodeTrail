@@ -65,6 +65,8 @@ export type TopicSource = {
   bugExplanation: string;
   vocabulary: Array<[term: string, meaning: string]>;
   language?: CodeLanguage;
+  // npm packages the example/solution needs when run locally (verified outside the repo; see docs/COURSE-PROGRESS.md).
+  requires?: string[];
   // Marks a topic rewritten to the lesson standard in docs/COURSE-PLAN.md; tests then require every part.
   standard?: "v3";
   // Topic IDs to review first; must exist and come earlier in the learning order.

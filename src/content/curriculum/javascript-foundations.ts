@@ -593,7 +593,7 @@ const originalTopics: TopicSource[] = [
   title: "async/await และ error path",
   objective: "เขียน async function ที่รอผลด้วย await จัดการทั้ง error จาก network และ response ที่ไม่สำเร็จ และไม่ลืม await",
   why: "การเชื่อม front-end กับ API ล้มเหลวได้หลายจุด fetch ไม่ throw เมื่อ server ตอบ 400/500 ถ้าไม่ตรวจ response.ok หน้าเว็บจะถือว่าสำเร็จทั้งที่ไม่ใช่",
-  explanation: "async function คืน Promise เสมอ ข้างในใช้ await เพื่อพัก “เฉพาะ function นี้” จน Promise จบ แล้วได้ค่าออกมาเหมือนโค้ดธรรมดา ถ้า Promise rejected บรรทัด await จะ throw จึงใช้ try/catch ได้ fetch reject เมื่อส่ง request ไม่สำเร็จ (เครือข่ายล่ม, URL ไม่ถูกต้อง, ถูกยกเลิก) ส่วน status 4xx/5xx ยัง resolve ตามปกติ ต้องตรวจ response.ok เอง ลืม await = ได้ Promise แทนค่า",
+  explanation: "ตัวอย่างใช้ .join(\", \") ต่อชื่อใน array เป็นข้อความเดียวคั่นด้วย \", \" เช่น [\"A\", \"B\"].join(\", \") ได้ \"A, B\" (เรียนเพิ่มได้ภายหลัง ไม่ใช่จุดประสงค์ของบทนี้) async function คืน Promise เสมอ ข้างในใช้ await เพื่อพัก “เฉพาะ function นี้” จน Promise จบ แล้วได้ค่าออกมาเหมือนโค้ดธรรมดา ถ้า Promise rejected บรรทัด await จะ throw จึงใช้ try/catch ได้ fetch reject เมื่อส่ง request ไม่สำเร็จ (เครือข่ายล่ม, URL ไม่ถูกต้อง, ถูกยกเลิก) ส่วน status 4xx/5xx ยัง resolve ตามปกติ ต้องตรวจ response.ok เอง ลืม await = ได้ Promise แทนค่า",
   language: "javascript",
   standard: "v3",
   prerequisites: ["js-promises"],

@@ -318,7 +318,8 @@ export const backendLessons: Record<string, RichLesson> = {
         heading: "3) error ที่คาดไว้ vs ไม่คาดคิด",
         text: [
           "error ที่ออกแบบไว้ (ไม่พบ, ข้อมูลผิด, ขัดแย้ง) สร้างเป็น HttpError ที่มี status/code แล้วตอบตรง ๆ",
-          "error อื่นทั้งหมดเป็น 500: log รายละเอียดฝั่ง server (stack, request id) แต่ตอบ client ด้วยข้อความทั่วไป",
+          "error ที่ middleware ของ Express สร้างเอง เช่น JSON เสีย (err.type \"entity.parse.failed\") หรือ body ใหญ่เกิน (\"entity.too.large\") มี status 4xx อยู่แล้ว ให้แปลงเป็นรูปแบบ error ของเราด้วย status เดิม ไม่ใช่ 500",
+          "error ที่ไม่คาดคิดนอกจากนั้นเป็น 500: log รายละเอียดฝั่ง server (stack, request id) แต่ตอบ client ด้วยข้อความทั่วไป",
         ],
       },
     ],
@@ -442,7 +443,7 @@ export const backendLessons: Record<string, RichLesson> = {
       {
         heading: "2) constraint คือกติกาที่ฐานข้อมูลบังคับ",
         text: [
-          "NOT NULL ห้ามว่าง, UNIQUE ห้ามซ้ำ, CHECK (เงื่อนไข) ต้องเป็นจริง, PRIMARY KEY = NOT NULL + UNIQUE",
+          "NOT NULL ห้ามว่าง, UNIQUE ห้ามซ้ำ, CHECK (เงื่อนไข) ปฏิเสธเมื่อเงื่อนไขเป็น FALSE (ถ้าค่าเป็น NULL ผลเป็น unknown และผ่าน จึงต้องใส่ NOT NULL คู่กันเมื่อห้ามว่าง), PRIMARY KEY = NOT NULL + UNIQUE",
           "ละเมิดเมื่อไรคำสั่งนั้น error และไม่มีอะไรถูกบันทึก — เป็นด่านสุดท้ายแม้โค้ดส่วนไหนจะลืมตรวจ",
         ],
       },
@@ -729,6 +730,7 @@ export const backendLessons: Record<string, RichLesson> = {
       "ตรวจเอง: ย้ายสำเร็จได้ \"transferred\" และรายชื่อเปลี่ยนตาม",
       "ตรวจเอง: fromMember ไม่ได้เข้าร่วมได้ \"not-participant\" และข้อมูลไม่เปลี่ยน",
       "ตรวจเอง: toMember เข้าร่วมอยู่แล้วได้ \"already-joined\" และ fromMember ยังอยู่ (rollback ทั้งก้อน)",
+      "ตรวจเอง: fromMember กับ toMember เป็นคนเดียวกันได้ \"same-member\" โดยไม่มีการลบหรือเพิ่มแถว",
     ],
     solutionNotes: [
       "กรณี already-joined ต้อง rollback การลบที่ทำไปแล้ว การ throw ใน callback คือวิธีบอก PGlite ให้ rollback",
@@ -795,10 +797,11 @@ export const backendLessons: Record<string, RichLesson> = {
       local,
       "ตรวจเอง: test ชุดเดิมของ M5 ผ่านทั้งหมดกับ repository ใหม่",
       "ตรวจเอง: capacity ผิดได้ 400 (จาก validation หรือ error code 23514) ไม่ใช่ 500",
-      "ตรวจเอง: ข้อมูลยังอยู่หลัง restart server เมื่อรันกับ PostgreSQL จริง",
+      "ตรวจเอง: ข้อมูลยังอยู่หลัง restart server เมื่อรันกับ PostgreSQL จริงผ่าน src/database.mjs (join/update ใช้ transaction บน client เดียวกัน ไม่ใช่ pool.query ทีละคำสั่ง)",
     ],
     solutionNotes: [
-      "create คืน this.get(id) เพื่อให้รูปร่าง object (มี members) เหมือนกับที่ list/get คืน",
+      "create คืน get(id) เพื่อให้รูปร่าง object (มี members) เหมือนกับที่ list/get คืน",
+      "pg.Pool ไม่มี method transaction และ pool.query แต่ละครั้งอาจได้ connection คนละเส้น BEGIN/COMMIT จึงต้องส่งผ่าน client ที่ยืมมาเส้นเดียว createPgDatabase ห่อเรื่องนี้ให้ repository ใช้ได้ทั้ง PGlite และ PostgreSQL (เฉลยนี้ทดสอบกับ pg จริงผ่าน PGlite socket server)",
       "FILTER (WHERE p.member IS NOT NULL) ทำให้กิจกรรมที่ไม่มีสมาชิกได้ array ว่างแทน [null]",
     ],
     reflection: [
@@ -826,8 +829,9 @@ export const backendLessons: Record<string, RichLesson> = {
       {
         heading: "1) เก็บ hash ไม่เก็บรหัส",
         text: [
-          "สมัคร: สุ่ม salt → hash = scrypt(password, salt) → เก็บ salt:hash",
-          "login: อ่าน salt จากที่เก็บ → คำนวณ scrypt(รหัสที่กรอก, salt) → เทียบกับ hash ที่เก็บด้วย timingSafeEqual",
+          "สมัคร: สุ่ม salt → hash = scrypt(password, salt, ค่า cost) → เก็บ scrypt$logN$r$p$salt$hash (เก็บค่า cost ไว้ด้วย เพื่อเพิ่มความแรงภายหลังได้โดย hash เก่ายังตรวจได้)",
+          "ตั้งค่า cost เองอย่างชัดเจน: OWASP แนะนำ scrypt ขั้นต่ำ N=2^17, r=8, p=1 (ค่าเริ่มต้นของ Node คือ N=2^14 ต่ำกว่านั้น) และต้องตั้ง maxmem ให้พอ",
+          "login: อ่าน salt และ cost จากที่เก็บ → คำนวณ scrypt(รหัสที่กรอก, salt, cost) → เทียบกับ hash ที่เก็บด้วย timingSafeEqual",
           "ไม่ใช้ hash เร็ว (MD5, SHA-256 เดี่ยว ๆ) กับรหัสผ่าน",
         ],
       },
@@ -842,7 +846,8 @@ export const backendLessons: Record<string, RichLesson> = {
       {
         heading: "3) อย่าให้ข้อมูลแก่ผู้เดา",
         text: [
-          "login ผิดทุกกรณีตอบ 401 ข้อความเดียว ไม่บอกว่าอีเมลไม่มีหรือรหัสผิด",
+          "login ผิดทุกกรณีตอบ 401 ข้อความเดียว ไม่บอกว่าอีเมลไม่มีหรือรหัสผิด และ 401 ต้องมี header WWW-Authenticate (เช่น Bearer realm=\"planner\") บอกวิธียืนยันตัวตน",
+          "ข้อความเดียวกันยังไม่พอ: ถ้าอีเมลไม่มีแล้วตอบทันทีโดยไม่คำนวณ scrypt เวลาตอบจะสั้นกว่ากรณีรหัสผิดชัดเจน ให้ตรวจกับ dummy hash ที่เตรียมไว้แทน (timingSafeEqual ป้องกันแค่ขั้นเทียบ ไม่ได้ป้องกันการข้ามขั้น scrypt)",
           "กำหนดความยาวรหัสผ่านขั้นต่ำ (เช่น 12) และควรจำกัดจำนวนครั้งที่ลองผิด (rate limit) ในระบบจริง",
         ],
       },
@@ -850,11 +855,12 @@ export const backendLessons: Record<string, RichLesson> = {
     walkthrough: [
       "hashPassword สุ่ม salt ทุกครั้ง hash ของรหัสเดียวกันสองครั้งจึงต่างกัน",
       "login ที่รหัสถูก: verifyPassword ใช้ salt เดิมคำนวณแล้วเทียบได้ true ออก token ยาว 43 ตัวอักษร (32 byte แบบ base64url)",
-      "รหัสผิดและอีเมลที่ไม่มีได้ 401 ข้อความเดียวกัน",
+      "รหัสผิดและอีเมลที่ไม่มีได้ 401 ข้อความเดียวกัน และทั้งคู่ผ่าน scrypt หนึ่งครั้ง (อีเมลที่ไม่มีเทียบกับ dummyHash) เวลาตอบจึงใกล้กัน",
     ],
     pitfalls: [
       "เก็บรหัสผ่านตรง ๆ หรือใช้ SHA-256 ไม่มี salt",
-      "บอกว่า “ไม่พบอีเมลนี้”: user enumeration",
+      "บอกว่า “ไม่พบอีเมลนี้” หรือตอบเร็วกว่าเมื่ออีเมลไม่มี: user enumeration",
+      "ใช้ค่า cost เริ่มต้นของ scrypt โดยไม่ตั้งเอง: ต่ำกว่าที่ OWASP แนะนำ",
       "เก็บ token ใน localStorage ของเว็บที่มีช่องโหว่ XSS: ถูกขโมยได้ (cookie HttpOnly ปลอดภัยกว่าสำหรับเว็บ)",
       "token ไม่มีวันหมดอายุ หรือ logout แล้วไม่ลบ token",
     ],
@@ -867,11 +873,11 @@ export const backendLessons: Record<string, RichLesson> = {
       "token สุ่ม เก็บฝั่ง server มีวันหมดอายุ",
       "login ผิด = 401 ข้อความเดียว",
     ],
-    traceHint: "เขียนสิ่งที่ถูกเก็บในฐานข้อมูลหลังสมัคร (salt:hash) และสิ่งที่ถูกคำนวณตอน login แล้วชี้ว่าการเทียบเกิดที่บรรทัดไหน",
+    traceHint: "เขียนสิ่งที่ถูกเก็บในฐานข้อมูลหลังสมัคร (scrypt$17$8$1$salt$hash) และสิ่งที่ถูกคำนวณตอน login แล้วชี้ว่าการเทียบเกิดที่บรรทัดไหน",
     practiceHints: [
-      "ตาราง users: id, email UNIQUE, password_hash ตาราง sessions: token PRIMARY KEY, user_id REFERENCES users, expires_at TIMESTAMPTZ",
-      "register: validate → hashPassword → INSERT (จับ 23505 เป็น 409) login: SELECT ตาม email → verifyPassword → INSERT session พร้อม expires_at = now() + interval '1 hour'",
-      "requireUser: อ่าน Bearer token → SELECT session ที่ expires_at > now() JOIN users → ไม่พบตอบ 401 → พบแนบ req.user แล้ว next()",
+      "ตาราง users: id, email UNIQUE, password_hash, role ตาราง sessions: token_hash PRIMARY KEY (เก็บ SHA-256 ของ token), user_id REFERENCES users, expires_at TIMESTAMPTZ",
+      "register: validate → hashPassword → INSERT (จับ 23505 เป็น 409) login: SELECT ตาม email → verifyPassword(รหัส, hash ของผู้ใช้ หรือ dummyHash ถ้าไม่พบ) → INSERT session พร้อม expires_at = now() + interval '1 hour'",
+      "requireUser: อ่าน Bearer token → SELECT session ที่ token_hash ตรงและ expires_at > now() JOIN users (เลือก id, email, role) → ไม่พบตอบ 401 พร้อม WWW-Authenticate → พบแนบ req.user แล้ว next() · logout ลบแถว session ของ token นั้น",
     ],
     acceptance: [
       local,
@@ -881,12 +887,13 @@ export const backendLessons: Record<string, RichLesson> = {
     ],
     solutionNotes: [
       "scrypt จาก node:crypto ไม่ต้องติดตั้ง package เพิ่ม ถ้าใช้ bcrypt/argon2 หลักการเหมือนกัน",
-      "การเทียบ token ใน SQL (WHERE token = $1) ใช้ได้เพราะ token ยาวและสุ่มมาก ระบบจริงบางแห่งเก็บ hash ของ token แทน token ตรง ๆ เพื่อกันกรณีฐานข้อมูลรั่ว",
+      "เฉลยเก็บ SHA-256 ของ token แทน token ตรง ๆ: ถ้าตาราง sessions รั่ว ผู้โจมตีนำค่าไปใช้สวมรอยไม่ได้ (SHA-256 เร็วก็พอสำหรับกรณีนี้ เพราะ token สุ่ม 32 byte เดาไม่ได้ ต่างจากรหัสผ่านที่คนตั้งเอง)",
+      "test ใช้ cost ต่ำกว่า (logN 14) ผ่าน createAuth(db, { passwordParams }) เพื่อให้เร็ว ส่วน production ใช้ค่าเริ่มต้น N=2^17 (ประมาณ 0.3 วินาทีต่อครั้งในเครื่องทดสอบ)",
     ],
     reflection: [
       "ถ้าฐานข้อมูลของ Planner รั่ววันนี้ ข้อมูลไหนของผู้ใช้ที่ยังปลอดภัย และข้อมูลไหนที่ต้องรีบเปลี่ยน",
     ],
-    extension: "เพิ่ม POST /auth/logout ที่ลบ session ของ token ปัจจุบัน และ job ที่ลบ session หมดอายุทุกชั่วโมง",
+    extension: "เพิ่มการ rehash: เมื่อ login สำเร็จและ hash ที่เก็บใช้ cost ต่ำกว่า DEFAULT_PASSWORD_PARAMS ให้ hash รหัสใหม่ด้วยค่าปัจจุบันแล้ว UPDATE ทันที พร้อม job ที่ลบ session หมดอายุทุกชั่วโมง",
   },
   "be-authorization": {
     hook: "หลังทำ login เสร็จ ทุกคนที่เข้าสู่ระบบได้กลับลบกิจกรรมของคนอื่นได้ เพียงเปลี่ยนเลข id ใน URL ระบบรู้ว่าเป็นใคร แต่ไม่เคยถามว่าคนนั้นมีสิทธิ์ทำสิ่งนี้ไหม",
@@ -974,13 +981,13 @@ export const backendLessons: Record<string, RichLesson> = {
       {
         heading: "3) OWASP Top 10 ในภาษาของ Planner",
         text: [
-          "Broken Access Control → ตรวจสิทธิ์ทุก endpoint (บท authorization) · Injection → placeholder (บท db-node) · Identification/Authentication Failures → hash + session (บท auth)",
-          "Security Misconfiguration → CORS/headers/limit ในบทนี้ · Vulnerable Components → อัปเดต dependency และดู npm audit อย่างมีวิจารณญาณ",
+          "อ้างอิง OWASP Top 10:2021 (ชื่อหมวดตามฉบับนั้น; OWASP ออกฉบับใหม่เป็นระยะและปรับชื่อบางหมวด ให้ระบุปีของฉบับที่อ้างเสมอ): A01 Broken Access Control → ตรวจสิทธิ์ทุก endpoint (บท authorization) · A03 Injection → placeholder (บท db-node) · A07 Identification and Authentication Failures → hash + session (บท auth)",
+          "A05 Security Misconfiguration → CORS/headers/limit ในบทนี้ · A06 Vulnerable and Outdated Components → อัปเดต dependency และดู npm audit อย่างมีวิจารณญาณ",
         ],
       },
     ],
     walkthrough: [
-      "middleware ตั้ง X-Content-Type-Options ทุก response และ cors ตรวจ origin กับ allow-list",
+      "middleware ตั้ง X-Content-Type-Options ทุก response; cors ตั้ง Vary: Origin ทุก response แล้วจึงตรวจ origin กับ allow-list",
       "OPTIONS จาก localhost:5173 ได้ header อนุญาต ส่วน evil.example ไม่ได้ (null)",
       "body ใหญ่เกิน 1kb ถูก express.json ปฏิเสธด้วย error type entity.too.large แปลงเป็น 413",
       "response ไม่มี x-powered-by และมี nosniff",
@@ -1101,7 +1108,8 @@ export const backendLessons: Record<string, RichLesson> = {
       {
         heading: "2) ส่งสิ่งที่ต้องใช้เข้ามา",
         text: [
-          "createActivityService({ repository, clock, mailer }) รับ dependency ตอนสร้าง test จึงส่ง fake ได้ (เวลาแน่นอน, ไม่ส่งอีเมลจริง)",
+          "createActivityService({ repository, clock }) รับ dependency ตอนสร้าง test จึงส่ง fake ได้ (เวลาแน่นอน, ฐานข้อมูลปลอม)",
+          "แยกชั้นไม่ได้แปลว่าย้ายทุกการตรวจขึ้นไปที่ service: กฎที่ต้องถูกต้องแม้มีคำขอพร้อมกัน (ที่นั่งเต็ม, เข้าร่วมซ้ำ) ต้องตรวจพร้อมบันทึกใน transaction เดียวกันใน repository ถ้า service อ่านแล้วค่อยสั่งบันทึก race condition จากบท be-transactions จะกลับมา",
           "composition root (server.mjs) อ่าน config ครั้งเดียว สร้าง pool → repository → service → app แล้ว listen",
         ],
       },
@@ -1114,10 +1122,11 @@ export const backendLessons: Record<string, RichLesson> = {
       },
     ],
     walkthrough: [
-      "service.join ตรวจตามลำดับ: มีกิจกรรมไหม → เริ่มแล้วหรือยัง (ใช้ clock) → ซ้ำไหม → เต็มไหม → บันทึกผ่าน repository",
+      "service.join ตรวจตามลำดับ: มีกิจกรรมไหม → เริ่มแล้วหรือยัง (ใช้ clock) → ให้ repository.join ตรวจซ้ำ/เต็มและบันทึกในจังหวะเดียว",
       "fakeRepository ใช้ Map ทำงานจริงแบบง่ายสำหรับทดสอบ",
       "clock คงที่ที่ 1000 ทำให้กิจกรรม 2 (เริ่ม 500) ถือว่าเริ่มแล้ว",
       "ผลแต่ละครั้งเป็น { ok, reason } ที่ route นำไปแปลงเป็น status ภายหลัง",
+      "บรรทัดสุดท้ายเรียก join พร้อมกันสองครั้งกับกิจกรรมที่เหลือหนึ่งที่: ได้สำเร็จหนึ่งและ full หนึ่ง เพราะการตรวจที่นั่งกับการบันทึกอยู่ใน repository.join ครั้งเดียว",
     ],
     pitfalls: [
       "service รับ req/res: ผูกกับ HTTP",
@@ -1137,11 +1146,11 @@ export const backendLessons: Record<string, RichLesson> = {
     traceHint: "สำหรับแต่ละการเรียก join ไล่ return ที่เกิดขึ้นตามลำดับเงื่อนไข และสังเกตว่าไม่มีบรรทัดไหนรู้จัก HTTP",
     practiceHints: [
       "เริ่มจากย้ายกฎของ join ออกจาก route ก่อน (ชิ้นเดียว) แล้วรัน test เดิมให้ผ่าน",
-      "service รับ { repository, clock } คืน { ok, reason } และ route มี map reason → status ที่เดียว",
-      "unit test ของ service ใช้ fake repository (Map) และ clock คงที่ ทดสอบ not-found, already-started, already-joined, full และสำเร็จ",
+      "service รับ { repository } คืน { ok, reason } และ route มีตาราง reason → status ที่เดียว ส่วนที่นั่ง/ซ้ำ/ลด capacity ยังตรวจใน transaction ของ repository",
+      "unit test ของ service ใช้ fake repository (Map ที่คืนสำเนาด้วย structuredClone) ทดสอบเจ้าของแก้ได้, คนอื่น forbidden, admin ได้, not-found, already-joined, full",
     ],
     acceptance: [
-      "ตัวอย่างพิมพ์ผลสี่บรรทัดตาม expected output (Run ได้บนเว็บ)",
+      "ตัวอย่างพิมพ์ผลห้าบรรทัดตาม expected output (Run ได้บนเว็บ)",
       local,
       "ตรวจเอง: service ไม่ import express และไม่ใช้ req/res",
       "ตรวจเอง: unit test ของ service ≥ 5 กรณีผ่านโดยไม่เปิด HTTP และ integration test เดิมยังผ่าน",

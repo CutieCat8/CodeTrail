@@ -40,7 +40,7 @@
 
 ## Node.js Fundamentals (`node-foundations`) — ชุด B4 เขียนแล้ว (10 หัวข้อ)
 
-ลำดับ: node-runtime → node-process-cli → node-modules → node-npm → node-fs → node-event-loop → node-events-streams → node-http → node-test → node-project-planner-cli (Planner M4) · ตามด้วย 4 หัวข้อ Express เดิม (บาง) ที่จะย้ายไป `backend` ใน B5
+ลำดับ: node-runtime → node-process-cli → node-modules → node-npm → node-fs → node-event-loop → node-events-streams → node-http → node-test → node-project-planner-cli (Planner M4) · หัวข้อ Express 4 อันย้ายไป `backend` แล้วใน B5 (ID เดิม)
 
 | สถานะ | รายละเอียด |
 |---|---|
@@ -49,12 +49,16 @@
 | ตรวจเชื่อม UI | build ผ่าน; ยังไม่ได้ตรวจใน browser |
 | ข้อจำกัด | practice ทุกบทรันในเครื่อง (checklist) เพราะต้องใช้ fs/process/http |
 
-## Back-end Development (`backend`, คอร์สใหม่)
+## Back-end Development (`backend`) — ชุด B5 เขียนแล้ว (17 หัวข้อ)
 
-| Topic | Inventory |
+ลำดับ: be-rest-design → node-express-route → node-input → node-middleware → node-errors → be-project-planner-api-1 (M5) → be-sql-basics → be-sql-joins → be-db-node → be-transactions → be-project-planner-api-2 (M6) → be-auth → be-authorization → be-security-basics → be-testing-api → be-architecture → be-project-planner-capstone
+
+| สถานะ | รายละเอียด |
 |---|---|
-| node-express-route, node-input, node-middleware, node-errors | บาง (จะย้ายจาก node-foundations; step ID เดิม) |
-| be-rest-design, be-project-planner-api-1, be-sql-basics, be-sql-joins, be-db-node, be-transactions, be-project-planner-api-2, be-auth, be-authorization, be-security-basics, be-testing-api, be-architecture, be-project-planner-capstone | ใหม่ |
+| เขียน | 17 หัวข้อ `standard: "v3"` · 4 หัวข้อ Express ย้ายจาก node-foundations โดยคง topic/step ID เดิม (hash URL และ progress เดิมใช้ได้) · ภาษาใหม่ `sql` และ field `requires` (express / pglite) |
+| ตรวจเทคนิค | `scripts/verify-lesson-deps.ts` รัน example + code ใน explain ที่มี output กับ Express 5.2.1 และ PGlite 0.5.8 (PostgreSQL 18.3 WASM) ในโฟลเดอร์นอก repo: 14/14 ตรง · เฉลย SQL และ transferSeat (4 กรณีรวม rollback) รันจริง · เฉลยของ M5, M6, be-auth, be-authorization, be-security-basics, be-testing-api, be-architecture มาจากโปรเจกต์อ้างอิงที่ test ผ่าน (ดูบันทึกชุดงาน) · be-auth / be-rest-design / be-architecture / capstone รันใน test ของ repo · Codex review: ดูบันทึกชุดงาน |
+| ตรวจเชื่อม UI | build ผ่าน; ยังไม่ได้ตรวจใน browser |
+| ข้อจำกัด | เว็บไม่รันหรือตรวจ Express/SQL — ทุกบทที่ต้องใช้ package มีข้อความ "ตรวจเองในเครื่อง" ใน acceptance · package.json ของแอปไม่เพิ่ม dependency |
 
 ## Java Foundations (`java-foundations`)
 
@@ -91,4 +95,5 @@ react, nextjs, postgres — คง planned; ปรับคำอธิบาย
 | B1 มาตรฐาน + js-functions | Claude เขียน; Codex review 2 รอบ (รอบ 1: 7 ข้อ เช่น Submit ข้าม tests, editor แก้ระหว่างรัน; รอบ 2: 4 ข้อใน snippet runner ใหม่) | เสร็จ แก้ครบ | commit `01f6048` |
 | B4 Node.js | Claude เขียน; Codex audit 1 รอบ (commit `1a90cfd`): 14 ข้อ เช่น M4 CLI พังเมื่อรายการไม่ใช่ object, Node 24 ตรวจ ESM จาก syntax เมื่อไม่ตั้ง type, assert.equal ใช้ Object.is, เฉลยไม่ครบไฟล์, ข้ออ้างหน่วยความจำของ stream | แก้ครบ; เฉลย M4 รันจริงพร้อม test 6/6 ผ่านในโฟลเดอร์ชั่วคราว | commit `1a90cfd` + commit แก้ |
 | B3 TypeScript | Claude เขียน; Codex audit 1 รอบ (commit `80d905e`): 14 ข้อ เช่นคำสั่ง tsc ไม่ใช้ tsconfig/strict, npx tsc อาจดึง package ผิด, Planner M3 ลืมตรวจวัน, groupBy กับ key \"constructor\", Partial ยอม undefined, ความหมายของ NodeNext | แก้ครบ — ตั้ง ts-lab (tsconfig strict) ในบท ts-why แล้วทุกบทใช้ `npx tsc -p .` | commit `80d905e` + commit แก้ |
+| B5 Back-end | Claude เขียน; Codex audit 1 รอบ (commit `20001ba`, codex exec read-only, ไม่ได้ใช้ web search — ลิงก์ที่ Codex อ้างมาจากความรู้ของโมเดล ไม่ได้ fetch จริง): 16 ข้อ (High 1, Medium 11, Low 4) เช่น repository ของ M6 เรียก db.transaction ซึ่ง pg.Pool ไม่มี, เฉลย M5/auth/testing ไม่ครบตามโจทย์, scrypt ใช้ cost เริ่มต้นต่ำกว่า OWASP, อีเมลที่ไม่มีข้าม scrypt (timing enumeration), 401 ไม่มี WWW-Authenticate, error ของ express.json กลายเป็น 500, Vary: Origin ไม่ครบทุก response, service ใน be-architecture นำ race condition กลับมา, ชื่อหมวด OWASP ไม่ระบุฉบับ, CHECK กับ NULL | แก้ครบ 16 ข้อ — สร้างโปรเจกต์อ้างอิง planner-api สามระยะนอก repo (M5 in-memory 9 test, M6 PGlite 11 test, final auth/authz/security/service 16 test) แล้วนำไฟล์จริงไปเป็นเฉลย; adapter ของ pg ทดสอบกับ node-postgres จริงผ่าน PGlite socket server (join/update/rollback/remove); mutation 3 แบบ (ลบการตรวจสิทธิ์, Vary เฉพาะ origin ที่อนุญาต, ตอบอีเมลที่ไม่มีต่างออกไป) ทำให้ test ล้มทุกแบบ; transferSeat 4 กรณีรันจริง | commit `20001ba` + commit แก้ |
 | B2 JavaScript Foundations | Claude เขียน; Codex audit 1 รอบ: 12 ข้อ (prerequisite ใช้ก่อนสอน, Infinity ในราคา, ลำดับ microtask, สาเหตุ fetch reject, การตรวจ non-mutation, key "constructor", hint ที่เฉลยเร็ว ฯลฯ) | เสร็จ แก้ครบ — เพิ่ม outputCheck สำหรับโจทย์แบบสคริปต์ช่วงต้น | commit ชุด B2 |

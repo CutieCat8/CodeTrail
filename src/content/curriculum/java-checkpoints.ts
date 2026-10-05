@@ -92,40 +92,114 @@ queue = 9 ได้ round 3 slot 1 และบรรทัดสุดท้า
 7 / 2 คำนวณเป็น int ได้ 3 ก่อน แล้วค่อยคูณ 2.0 จึงได้ 6.0 ไม่ใช่ 7.0`,
   },
   "java-variables": {
-    "prompt": "ประเมินบริบทใหม่ — เปิด documentation ได้ ไม่เปิดrubric/เฉลยก่อนส่ง: เครดิต600 ซื้อครั้งแรก120 ครั้งสอง80 แสดงค่าหลังซื้อแต่ละครั้ง ราคาคงที่ในโปรแกรมนี้ เลือกfinal/ตัวแปรให้เหมาะและอธิบายการเปลี่ยนค่าด้วยassignmentพร้อมผลทดลอง\nแนบโค้ด/คำสั่ง/ค่าทำนายและoutputหรือerrorจริง การส่งเป็นบันทึกความพยายาม ยังต้องเทียบเกณฑ์ด้วยตนเอง",
-    "rubric": [
-      "ผล480/400",
-      "ราคาคงที่อธิบายfinalได้ creditต้องเปลี่ยนหรือใช้ชื่อผลใหม่",
-      "การเปลี่ยนค่าตรวจได้จากการรันจริง"
+    prompt: prompt(
+      "เครดิตเริ่มต้น 600 ซื้อครั้งแรก 120 และครั้งที่สอง 80 แสดงค่าเครดิตหลังซื้อแต่ละครั้ง",
+      "ราคาสินค้าสองรายการนี้ต้องกันไม่ให้โปรแกรมเปลี่ยนโดยไม่ตั้งใจ ให้เลือกวิธีประกาศที่เหมาะสมเอง และอธิบายการเปลี่ยนค่าด้วย assignment พร้อมผลทดลอง",
+    ),
+    rubric: [
+      "ผล 480 และ 400",
+      "ราคาที่ไม่ควรเปลี่ยนใช้ final และอธิบายได้ ส่วน credit ต้องเปลี่ยนค่าได้",
+      "การเปลี่ยนค่าตรวจได้จากการรันจริง",
     ],
-    "modelAnswer": "final int first=120;final int second=80;int credit=600;credit-=first;System.out.println(credit);credit-=second;System.out.println(credit); =assignส่วน==เทียบค่า ไม่ใช่การassign เปลี่ยนโครงเป็นconstไม่มีในJava; ใช้finalชื่อใหม่ทุกขั้นก็ได้"
+    modelAnswer: `public class Main {
+    public static void main(String[] args) {
+        final int FIRST_COST = 120;
+        final int SECOND_COST = 80;
+        int credit = 600;
+
+        credit -= FIRST_COST;
+        System.out.println(credit);
+        credit -= SECOND_COST;
+        System.out.println(credit);
+    }
+}
+
+ผลที่ได้คือ 480 แล้ว 400
+= คือ assignment เอาค่าทางขวาไปเก็บในตัวแปรทางซ้าย credit -= FIRST_COST จึงแปลว่า credit = credit - FIRST_COST ส่วน == ใช้เทียบค่า ไม่ใช่การเก็บค่า
+ราคาประกาศเป็น final และตั้งชื่อ UPPER_SNAKE_CASE ถ้าลองเขียน FIRST_COST = 100; จะเกิด compile error เพราะ final เปลี่ยนค่าซ้ำไม่ได้ ส่วน credit ไม่ใช่ final เพราะต้องเปลี่ยนค่าหลังซื้อแต่ละครั้ง`,
   },
   "java-primitives": {
-    "prompt": "ประเมินบริบทใหม่ — เปิด documentation ได้ ไม่เปิดrubric/เฉลยก่อนส่ง: ยอดวิวเริ่ม3,000,000,000 เพิ่ม1 เก็บชนิดใด? ราคา10.10+20.20บาทต้องรวมแม่นยำเป็นสตางค์ แสดงยอดวิวและยอดราคา อธิบายว่าทำไมแค่เปลี่ยนตัวรับผลเป็นlongไม่ป้องกันintoverflowก่อนหน้า\nแนบโค้ด/คำสั่ง/ค่าทำนายและoutputหรือerrorจริง การส่งเป็นบันทึกความพยายาม ยังต้องเทียบเกณฑ์ด้วยตนเอง",
-    "rubric": [
-      "ยอดวิว3000000001",
-      "เก็บ1010+2020เป็นจำนวนเต็มและแสดง30.30",
-      "ให้operandเป็นlongก่อนคำนวณเมื่อช่วงintไม่พอ"
+    prompt: prompt(
+      "ระบบเก็บไฟล์มีไฟล์สองไฟล์ ไฟล์ละ 1,200,000,000 ไบต์ ต้องแสดงขนาดรวมเป็นไบต์ ทำนายก่อนรันว่าการบวกด้วย int ได้ค่าอะไร แล้วแก้ให้ถูกต้อง",
+      "ทดลอง long stillWrong = a + b; ด้วย แล้วอธิบายว่าทำไมการเปลี่ยนแค่ตัวรับผลเป็น long ไม่ช่วย จากนั้นแสดง 0.1 + 0.2 และเก็บ 10 สตางค์กับ 20 สตางค์เป็นจำนวนเต็มแทน",
+    ),
+    rubric: [
+      "a + b ได้ -1894967296 เพราะ int overflow และค่าที่ถูกคือ 2400000000",
+      "long stillWrong = a + b ยังผิด เพราะการบวกเป็น int ก่อนแล้วจึงเก็บลง long ต้องให้ operand ตัวหนึ่งเป็น long ก่อนคำนวณ (เช่น 1L * a + b)",
+      "0.1 + 0.2 ได้ 0.30000000000000004 และสตางค์เป็นจำนวนเต็มรวมได้ 30 พอดี",
     ],
-    "modelAnswer": "long views=3_000_000_000L;views++;System.out.println(views);long satang=1010+2020;System.out.printf(\"%.2f%n\",satang/100.0); long ms=30*24*60*60*1000 ยังoverflowฝั่งขวา ต้องเริ่ม30Lก่อนคูณ"
+    modelAnswer: `public class Main {
+    public static void main(String[] args) {
+        int a = 1_200_000_000;
+        int b = 1_200_000_000;
+
+        System.out.println(a + b);
+        long stillWrong = a + b;
+        System.out.println(stillWrong);
+        long total = 1L * a + b;
+        System.out.println(total);
+
+        System.out.println(0.1 + 0.2);
+        int satang = 10 + 20;
+        System.out.println(satang);
+    }
+}
+
+ผลที่ได้: -1894967296 / -1894967296 / 2400000000 / 0.30000000000000004 / 30
+a + b เป็นการบวก int กับ int จึง overflow ก่อน แม้ผลจะถูกเก็บลงตัวแปร long ก็ได้ค่าที่ผิดมาแล้ว ต้องทำให้ตัวหนึ่งเป็น long ก่อนบวก (1L * a)
+double เก็บ 0.1 และ 0.2 ได้แค่ใกล้เคียง ผลรวมจึงมีเศษต่อท้าย เงินจึงเก็บเป็นสตางค์ (จำนวนเต็ม) แล้วหาร 100.0 ตอนแสดงผลเท่านั้น`,
   },
   "java-string": {
-    "prompt": "ประเมินบริบทใหม่ — เปิด documentation ได้ ไม่เปิดrubric/เฉลยก่อนส่ง: รหัส \"  Room A  \" ต้องเป็น \"room a\" แต่ค่าเดิมยังคงเดิม แสดงค่าเดิมและค่าที่ทำสะอาด เทียบเนื้อหากับ \"ROOM A\" โดยไม่สนตัวพิมพ์ ทดลองsubstring0ถึง4และรหัสที่ไม่มีคำที่ค้น\nแนบโค้ด/คำสั่ง/ค่าทำนายและoutputหรือerrorจริง การส่งเป็นบันทึกความพยายาม ยังต้องเทียบเกณฑ์ด้วยตนเอง",
-    "rubric": [
-      "ค่าทำสะอาดroom a ค่าเดิมยังมีช่องว่าง",
-      "equalsIgnoreCaseได้true ไม่ใช้==แทนเนื้อหา",
-      "substringได้roomและindexOfเมื่อไม่พบได้-1"
+    prompt: prompt(
+      "รหัส \"  Room A  \" ต้องได้ \"room a\" แต่ค่าเดิมต้องคงเดิม แสดงค่าเดิมและค่าที่ทำความสะอาดแล้ว เทียบเนื้อหากับ \"ROOM A\" โดยไม่สนตัวพิมพ์เล็กใหญ่",
+      "ทดลอง substring จากตำแหน่ง 0 ถึง 4 และค้นคำที่ไม่มีในรหัส",
+    ),
+    rubric: [
+      "ค่าที่ทำความสะอาดแล้วคือ room a และค่าเดิมยังมีช่องว่างหัวท้าย",
+      "equalsIgnoreCase ได้ true ไม่ใช้ == เทียบเนื้อหา",
+      "substring ได้ room และ indexOf เมื่อไม่พบได้ -1",
     ],
-    "modelAnswer": "String raw=\"  Room A  \";String code=raw.strip().toLowerCase();System.out.println(\"[\"+raw+\"] [\"+code+\"]\");System.out.println(code.equalsIgnoreCase(\"ROOM A\"));System.out.println(code.substring(0,4));System.out.println(code.indexOf(\"desk\")); ผลtrue/room/-1"
+    modelAnswer: `public class Main {
+    public static void main(String[] args) {
+        String raw = "  Room A  ";
+        String code = raw.strip().toLowerCase();
+
+        System.out.println("[" + raw + "] [" + code + "]");
+        System.out.println(code.equalsIgnoreCase("ROOM A"));
+        System.out.println(code.substring(0, 4));
+        System.out.println(code.indexOf("desk"));
+    }
+}
+
+ผลที่ได้: [  Room A  ] [room a] / true / room / -1
+strip และ toLowerCase คืน String ใหม่ ตัวแปร raw จึงไม่เปลี่ยน
+equalsIgnoreCase เทียบเนื้อหาโดยไม่สนตัวพิมพ์ ส่วน == เทียบว่าเป็นอ็อบเจกต์เดียวกันหรือไม่ จึงไม่ควรใช้เทียบข้อความ`,
   },
   "java-casting": {
-    "prompt": "ประเมินบริบทใหม่ — เปิด documentation ได้ ไม่เปิดrubric/เฉลยก่อนส่ง: คะแนนรวม7จาก2รายการ ต้องแสดงเฉลี่ย3.5 ไม่ใช่3.0 เลือกวิธีแปลงเอง แล้วทำนาย (int)2.9 กับ (int)-2.9 ก่อนรัน; ข้อความ \"12x\" แปลงด้วยparseIntเกิดอะไร?\nแนบโค้ด/คำสั่ง/ค่าทำนายและoutputหรือerrorจริง การส่งเป็นบันทึกความพยายาม ยังต้องเทียบเกณฑ์ด้วยตนเอง",
-    "rubric": [
-      "ให้การหารเป็นdoubleก่อนตัดเศษ ได้3.5",
-      "cast2.9เป็น2,-2.9เป็น-2 ตัดเข้าหาศูนย์",
-      "12xเกิดNumberFormatExceptionไม่ใช่12"
+    prompt: prompt(
+      "คะแนนรวม 7 จาก 2 รายการ ต้องแสดงค่าเฉลี่ย 3.5 ไม่ใช่ 3.0 เลือกวิธีแปลงเอง",
+      "ทำนาย (int) 2.9 กับ (int) -2.9 ก่อนรัน และบอกว่าข้อความ \"12x\" ถ้าแปลงด้วย Integer.parseInt จะเกิดอะไร",
+    ),
+    rubric: [
+      "ให้การหารเป็น double ก่อนตัดเศษ ได้ 3.5",
+      "(int) 2.9 ได้ 2 และ (int) -2.9 ได้ -2 เพราะตัดเศษเข้าหาศูนย์",
+      "\"12x\" เกิด NumberFormatException ไม่ใช่ 12",
     ],
-    "modelAnswer": "int sum=7;int count=2;double average=(double)sum/count;System.out.println(average);System.out.println((int)2.9);System.out.println((int)-2.9); (double)(sum/count)ช้าเกินไปเพราะintหารไปแล้ว; Integer.parseInt(\"12x\")รันแล้วexception"
+    modelAnswer: `public class Main {
+    public static void main(String[] args) {
+        int sum = 7;
+        int count = 2;
+        double average = (double) sum / count;
+
+        System.out.println(average);
+        System.out.println((int) 2.9);
+        System.out.println((int) -2.9);
+    }
+}
+
+ผลที่ได้: 3.5 / 2 / -2
+(double) sum แปลงตัวตั้งเป็น double ก่อนหาร จึงได้ 3.5 ถ้าเขียน (double) (sum / count) จะช้าเกินไป เพราะ int หารกันได้ 3 ไปแล้วจึงได้ 3.0
+Integer.parseInt("12x") ไม่คืน 12 แต่เกิด NumberFormatException เพราะทั้งข้อความต้องเป็นตัวเลข`,
   },
   "java-scanner": {
     "prompt": "ประเมินบริบทใหม่ — เปิด documentation ได้ ไม่เปิดrubric/เฉลยก่อนส่ง: อ่านชื่อสินค้า จำนวน และราคาต่อชิ้นคนละบรรทัด เช่น \"Lamp\",3,2.5 แล้วแสดง Lamp: 7.50 ทดลองชื่อมีช่องว่างหัวท้ายและinputไม่ครบ เก็บerror อธิบายว่าทำไมไม่ใช้nextIntแล้วnextLineโดยไม่จัดการnewline\nแนบโค้ด/คำสั่ง/ค่าทำนายและoutputหรือerrorจริง การส่งเป็นบันทึกความพยายาม ยังต้องเทียบเกณฑ์ด้วยตนเอง",

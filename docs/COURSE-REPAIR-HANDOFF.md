@@ -1,143 +1,114 @@
-# สถานะล่าสุด (Claude รับช่วง 2026-10-05/06)
+# ส่งต่อ curriculum repair (สำหรับ session ใหม่)
 
-> ส่วนนี้ใหม่กว่าเนื้อหาด้านล่าง อ่านก่อน
+อัปเดต 2026-10-06 โดย Claude (Opus 5.5) · ฉบับก่อนหน้าของ Codex ดูได้ที่ `git show 2691362:docs/COURSE-REPAIR-HANDOFF.md`
+**รอบปรับหลักสูตรยังไม่จบ** เอกสารนี้แยกสิ่งที่ยืนยันแล้วกับสิ่งที่ยังไม่ได้ตรวจ อย่าถือว่า WIP ผ่าน
 
-- Claude รับช่วงจาก Codex ที่ 2691362; commit identity `Claude <claude@local.invalid>` ผ่าน env ต่อคำสั่ง ไม่แก้ git config
-- **Independent review R1/R2-JS/R2-Java เสร็จแล้ว (Claude, read-only)**: ทั้งสองชุด REQUEST CHANGES — [R1+JS](verification/REVIEW-R1-R2/review-R1-JS.md), [Java](verification/REVIEW-R1-R2/review-R2-Java.md) ข้อหลัก: concept step เผย trace/debug answer ใน bridge 14 บท, model answer/โค้ดถูกบีบเป็นบรรทัดเดียวและภาษาไทยถูกตัดช่องว่าง (บางประโยคความหมายกลับ), checkpoint หลายข้อแค่เปลี่ยนชื่อจาก practice, คำสั่ง Bash ใน PowerShell path ของ Java, split ใช้ก่อนสอน
-- แก้แล้วบน branch หลัก: 40f7646 JS assessment มีปุ่ม Run (ไม่มี tests) ให้เก็บ output ได้, reveal ตัดบรรทัด, ข้อความหลังส่ง
-- 2026-10-05 agents 7 ตัวพร้อมกันชน API session limit ก่อน commit → ต่อไปรันไม่เกิน 2 ตัวพร้อมกันและ commit ทีละส่วน
-- งานตาม worktree (merge เข้า feat/curriculum-learning-repair ทีละ branch ด้วย `git merge --no-ff`, แล้วรัน tsc/lint/vitest):
-  | worktree | branch | สถานะ |
-  |---|---|---|
-  | ../sfq-r2-javafix | r2/java-fix | กำลังแก้ตาม review Java |
-  | ../sfq-r2-jsfix | r2/js-fix | กำลังแก้ตาม review R1+JS |
-  | ../sfq-r3-node | r3/node | WIP e8c37e0 ร่างค้าง ยัง compile ไม่ได้ (ขาด node-bridges/node-checkpoints) |
-  | ../sfq-r3-typescript | r3/typescript | WIP de9bb5c มีแค่ typescript-bridges.ts ร่าง |
-  | ../sfq-r3-backend, ../sfq-r3-oop, ../sfq-r4-labs | r3/backend, r3/oop, r4/labs | ยังไม่เริ่ม (ไม่มีการแก้) |
-- สัญญาการเขียนของทุกชุด: [R3-WRITER-BRIEF](R3-WRITER-BRIEF.md) + กฎเพิ่มจาก review: ห้ามคัด traceAnswer ลง walkthrough / bugExplanation ลง pitfalls, checkpoint ต้องเปลี่ยนรูปโจทย์ไม่ใช่เปลี่ยนชื่อ
-- เครื่องมือตรวจ: JDK/JUnit /tmp/sea-quest-java-tools, Express/PGlite /tmp/lesson-verify (สร้างใหม่: `mkdir -p /tmp/lesson-verify && cd /tmp/lesson-verify && npm init -y && npm pkg set type=module && npm install express@5.2.1 @electric-sql/pglite@0.5.8 pg`)
-- Preview :3100 หยุดแล้ว (process หายหลัง session เดิม) ต้อง build+start ใหม่ตอนตรวจ browser
+## 1. สถานะ repo (ตรวจจริงตอนเขียน)
 
----|---|---|
-  | ../sfq-r3-typescript | r3/typescript | TypeScript: narrowing/generics แยกบท, checkpoints ทุกบท, M3 |
-  | ../sfq-r3-node | r3/node | Node: prerequisites, checkpoints, M4, assessment CLI ใหม่ |
-  | ../sfq-r3-backend | r3/backend | Back-end: SQL tables→CRUD→constraints→relationships→JOIN→aggregation, auth แยก, เฉลย routes ครบ, M5–M7 |
-  | ../sfq-r3-oop | r3/oop | Java OOP: references ก่อน identity/override, file I/O + JUnit setup ก่อน capstone, checkpoints, Library M1–M3/RPG |
-  | ../sfq-r4-labs | r4/labs | 22 labs: solutionNotes/verify/reflection เฉพาะ lab, scripts/verify-labs.ts |
-- ถ้า session นี้หยุดกลางทาง: ดู `git -C ../sfq-r3-<x> log --oneline -3` และ `docs/verification/R3-<x>/checks.md` ใน worktree นั้น; branch ที่ commit แล้วให้ merge เข้า feat/curriculum-learning-repair ทีละ branch (`git merge --no-ff r3/<x>`) แล้วรัน tsc/lint/vitest; branch ที่ยังไม่ commit ให้ตรวจ `git -C ../sfq-r3-<x> status` ก่อน ห้ามลบ worktree ที่มีงานค้าง
-- เครื่องมือตรวจ: JDK/JUnit ที่ /tmp/sea-quest-java-tools, Express/PGlite ที่ /tmp/lesson-verify (สร้างใหม่: `mkdir -p /tmp/lesson-verify && cd /tmp/lesson-verify && npm init -y && npm pkg set type=module && npm install express@5.2.1 @electric-sql/pglite@0.5.8 pg`)
+- Repo หลัก `/home/cnux/work/sea-fullstack-quest` · branch `feat/curriculum-learning-repair` · HEAD ก่อน commit เอกสารนี้ `c524f16`
+- Working tree หลัก: ไม่มีไฟล์ tracked ค้าง; untracked เฉพาะ `.omc/` และ `src/content/curriculum/.omc/` (state ของเครื่องมือ OMC ห้าม commit ไม่ต้องลบ)
+- Commit identity ที่ใช้: `Claude <claude@local.invalid>` ผ่าน env ต่อคำสั่ง (`GIT_AUTHOR_NAME=Claude GIT_AUTHOR_EMAIL=claude@local.invalid GIT_COMMITTER_NAME=Claude GIT_COMMITTER_EMAIL=claude@local.invalid git commit ...`) ไม่แก้ git config; Codex ใช้ `Codex <codex@local.invalid>` แบบเดียวกัน
+- `/node_modules` ถูกเพิ่มใน `.git/info/exclude` เพราะทุก worktree ใช้ symlink `node_modules` → repo หลัก
 
----
+Commits บน branch หลักหลัง Codex (2691362):
 
-# ส่งต่อ curriculum repair ให้ Claude session ใหม่
+| commit | เนื้อหา |
+|---|---|
+| 08c79b4 | `docs/R3-WRITER-BRIEF.md` สัญญาการเขียนของทุกชุด |
+| 68aa1fb, c524f16 | handoff ระหว่างทาง |
+| f7bbe3a, ac46a7c | บันทึก independent review (ดูข้อ 3) |
+| 40f7646 | UI: assessment ของ JavaScript มีปุ่ม Run (ไม่มี tests) เพื่อเก็บ output เป็นหลักฐาน; `.reveal pre` ตัดบรรทัด; ข้อความหลังส่งของ assessment; test ใหม่ใน `tests/assessment-workspace.test.tsx` |
 
-อัปเดต 2026-10-05 หลังผู้ใช้สั่งหยุดเริ่มชุดใหม่ เพราะโควตาเหลือประมาณ 9%
-Codex ปิด Java Foundations แล้วหยุด; **ยังไม่จบรอบปรับหลักสูตรทั้งหมด**
+## 2. Worktrees (ทั้งหมดยังไม่ merge เข้า branch หลัก)
 
-## เป้าหมายและขอบเขต
+| path | branch | HEAD | สถานะจริง |
+|---|---|---|---|
+| ../sfq-r2-javafix | r2/java-fix | e8260d2 | 1 commit แก้ตาม review Java (ข้อ 4) ไม่มีไฟล์ค้าง |
+| ../sfq-r2-jsfix | r2/js-fix | 86cf82b | 3f60427 + WIP 86cf82b (ข้อ 4) ไม่มีไฟล์ค้าง |
+| ../sfq-r3-node | r3/node | e8c37e0 | WIP ร่าง `node-foundations.ts` (+907/−123) **compile ไม่ผ่าน**: import `./node-bridges` และ `./node-checkpoints` ที่ยังไม่ได้สร้าง |
+| ../sfq-r3-typescript | r3/typescript | de9bb5c | WIP มีเพียง `typescript-bridges.ts` (617 บรรทัด) ร่าง ยังไม่ wire เข้า `typescript.ts` ไม่ได้ตรวจ |
+| ../sfq-r3-backend | r3/backend | 08c79b4 | ยังไม่เริ่ม |
+| ../sfq-r3-oop | r3/oop | 08c79b4 | ยังไม่เริ่ม |
+| ../sfq-r4-labs | r4/labs | 08c79b4 | ยังไม่เริ่ม; untracked `scripts/_tmp_dump.ts`, `scripts/_tmp_dump2.ts` (ไฟล์ช่วยของ agent ที่หยุด ไม่ใช่งานส่งมอบ) |
 
-พัฒนาเว็บเดิมใน `/home/cnux/work/sea-fullstack-quest` ให้ผู้เริ่มจากศูนย์มีเส้นทางอ่าน/ทำนายโค้ด ไล่ค่า เขียนโปรแกรมใหม่ debug และประกอบโปรเจกต์พร้อมอธิบายเหตุผล ไม่รับประกันผลสัมฤทธิ์ก่อนทดลองผู้เรียนจริง
-สอนภาษาไทย อธิบาย syntax/เครื่องมือก่อนใช้ ฝึกจากมีตัวช่วยไปทำเอง ประเมินบริบทใหม่พร้อม rubric/feedback หลังส่ง และเฉลยต้องตรง acceptance/fixtures
-ขอบเขต: เจ็ดคอร์สปัจจุบัน + Friends Activity Planner/Library CLI/RPG Battle CLI + 22 labs; ไม่สร้างผลิตภัณฑ์ Planner เต็มระบบแยกออกมา
-เวลาวันละประมาณหนึ่งชั่วโมงเป็นแนวแบ่งกิจกรรม ไม่ใช่บังคับจบแปดสัปดาห์
-รักษา IDs/hash/progress/storage เดิม เนื้อหาดีและ analogy ที่เชื่อมโค้ด ไม่ reset กลับ audit snapshot
-**ไม่ push, merge, deploy หรือแตะ /mnt/c**; Import/XP/streak/AI assistant backlog; React/Next.js/PostgreSQL เต็มคอร์สยัง planned
+Branch ทั้งหมดแยกจาก 08c79b4 ขึ้นไป; การรวมให้ทำทีละ branch ด้วย `git merge --no-ff <branch>` หลังตรวจผ่านเท่านั้น ห้ามลบ worktree ที่มีงาน
 
-อ่านเอกสารปัจจุบันก่อนรับช่วง:
-- [แผน repair](COURSE-REPAIR-PLAN.md), [coverage/หลักฐาน](COURSE-REPAIR-EVIDENCE.md)
-- [COURSE-PLAN](COURSE-PLAN.md), [COURSE-PROGRESS](COURSE-PROGRESS.md), [COURSE-RESEARCH](COURSE-RESEARCH.md), [REDESIGN-HANDOFF](REDESIGN-HANDOFF.md)
-- Audit snapshot faa1de2: [REPORT](/home/cnux/work/curriculum-audit-faa1de2/REPORT.md), [A-syllabus](/home/cnux/work/curriculum-audit-faa1de2/A-syllabus.md), [B-lesson-samples](/home/cnux/work/curriculum-audit-faa1de2/B-lesson-samples.md), [C-codex-report-java](/home/cnux/work/curriculum-audit-faa1de2/C-codex-report-java.md), [D-references-claude](/home/cnux/work/curriculum-audit-faa1de2/D-references-claude.md)
+## 3. Independent review ของงาน Codex (เสร็จแล้ว, read-only, Claude)
 
-Audit เก่าเป็นจุดตั้งต้น ต้องเทียบ source ใหม่ ไม่ใช่ reset หรือถือว่าข้อค้นพบยังอยู่ทั้งหมด ประวัติ B0–B8 ใน docs ไม่ใช่การผ่านเกณฑ์รอบ repair นี้
+- [review-R1-JS.md](verification/REVIEW-R1-R2/review-R1-JS.md): R1 b7f8aa5 + R2-JS 8ca15ac → **REQUEST CHANGES** (Critical 5 / Major 6 / Minor 11)
+- [review-R2-Java.md](verification/REVIEW-R1-R2/review-R2-Java.md): R2-Java f79b9e2 (+ส่วน Java ของ b7f8aa5) → **REQUEST CHANGES**
+- ผู้ review ยืนยันว่าถูกต้อง: IDs เดิมครบ, prerequisites มาก่อนตามลำดับ, model answer JS 24 ข้อและ Java 18 ข้อให้ตัวเลขตรง rubric, verifier Java 25 บท 0 fail, คำสั่ง shell ของ Developer Foundations ตรง shell ที่ระบุ, assessment gating ทำงาน
+- ข้อค้นพบร่วมที่สำคัญ: concept step เผย trace/debug answer (walkthrough=traceAnswer, pitfalls=bugExplanation) ใน bridge 7 JS + 7 Java; code/model answer ถูกบีบบรรทัดเดียวและภาษาไทยถูกตัดช่องว่าง (Java 2 ประโยคความหมายกลับ); checkpoint หลายข้อแค่เปลี่ยนชื่อจาก practice
 
-## Branch / snapshot / working tree
+## 4. สถานะการแก้ตาม review
 
-- Branch `feat/curriculum-learning-repair`
-- Implementation ล่าสุด **f79b9e2** — `fix(curriculum): scaffold Java foundations and verify array contracts`
-- JavaScript **8ca15ac** — `fix(curriculum): scaffold JavaScript foundations and topic assessments`
-- เครื่องมือ/assessment infrastructure **b7f8aa5** — `fix(curriculum): prepare beginner tools and truthful assessment feedback`
-- หลัง f79b9e2 ไม่มี source ที่แก้ค้างไม่ commit; handoff นี้และ log หลักฐาน Java ถูกบันทึกเป็น docs commit ถัดมา (hash ล่าสุดจริงดู `git log -1 --oneline` ไม่ใช่ hash implementation)
-- Logs ถูก ignore ด้วยกฎ *.log จึงเพิ่มไฟล์หลักฐานที่ระบุด้วย `git add -f` โดยเฉพาะ ไม่แก้กฎ ignore ทั้ง repo
-- สถานะหลัง docs commit ตรวจด้วย `git status --short`; ไม่ทิ้ง/reset งานเพื่อทำให้สะอาด
+**e8260d2** (r2/java-fix) — แก้เฉพาะ `java-bridges.ts`: format Java หลายบรรทัด + braces, คืนช่องว่างภาษาไทย (รวม C1 สองประโยคที่ความหมายกลับ), walkthrough/pitfalls ไม่เผยคำตอบ, สอน `split` ใน java-array-basics, checkpoint ของ bridge เปลี่ยนรูปโจทย์
+- ตรวจแล้ว: ไม่มีหลักฐาน — agent ถูกสั่งให้ผ่าน `tsc --noEmit` ก่อน commit แต่ไม่มี log/checks.md; **ยังไม่ได้รัน vitest, lint, Java verifier**
+- ค้าง (Java review): C2 คำสั่ง Bash ใน PowerShell path (`java-foundations.ts`, `lessons/java-foundations.ts`), C3 ส่วนที่เหลือ (objective ของ java-string, ยืนยันว่า split สอนก่อน java-arraylist), M1/M2 ของ `java-checkpoints.ts` (model answer 17 ข้อบรรทัดเดียว + spacing) และ `lessons/java-foundations.ts`, M3 (array ใน java-loops buggy, cast ใน java-primitives), M4/M5 checkpoint ใน `java-checkpoints.ts`, M6 (java-declarations อยู่ใน bridges — ตรวจว่าแก้แล้วหรือยัง), M7, minors
 
-## ชุดที่ปิดได้และผลตรวจจริง
+**3f60427** (r2/js-fix) — แก้เฉพาะ `javascript-bridges.ts`: C1 leak, M1 checkpoint ใหม่ของ js-array-basics/js-function-values/js-loop-control/js-nested-loops, M2 readability ของ bridges, M3 ตัด callback/this ใน js-function-values, M4 js-function-basics, m4 wording ของ js-loop-basics
+- ตรวจแล้ว: ไม่มีหลักฐานเช่นเดียวกัน; **ยังไม่ได้รัน vitest/lint/รัน model answer**
 
-| ชุด | งานที่ปิด | หลักฐาน/ผลตรวจ |
+**86cf82b** (r2/js-fix) — **WIP ยังไม่ตรวจ** agent ถูกผู้ใช้หยุดกลางทาง: `javascript-checkpoints.ts` (+703 บรรทัด เขียน checkpoints ของ 20 บทเดิมใหม่ — ยังไม่รู้ว่าครบ/ถูกหรือไม่), `javascript-foundations.ts` (js-runtime bug อธิบาย recursion, js-values "ค่าทั้งสอง", js-numbers buggy ไม่ใช้ if/else, starter ของ js-conditions/js-objects เปลี่ยนเล็กน้อย), `lessons/javascript-foundations.ts` (อธิบาย % และ === ใน js-numbers)
+
+ค้าง (R1+JS review) นอกจากที่ WIP อาจแตะ: C3 js-errors checkpoint ซ้ำ bug, C4 model answer js-async, C5 dev-process trace/example, M1 checkpoint ที่เปลี่ยนชื่อ 12 ข้อใน `javascript-checkpoints.ts`, M2 model answer dev 9 ข้อ, M3 ส่วน Developer Foundations (Get-Content/cat, ~/.bashrc ก่อน dev-editor, git show ใน dev-git rubric, const/Number ใน dev-errors) และ js-async `.join`, ternary ใน js-conditions, M5 js-values, minors m5 m6 m8 m9 (m10 เป็นของ OOP), M6 test guard (เป็นงาน coordinator — ข้อ 7)
+
+## 5. Checks ที่ผ่านจริง (แยกจากงานที่ยังไม่ตรวจ)
+
+| check | ผล | ขอบเขต/commit |
 |---|---|---|
-| R1 | files/terminal/Node/npm/editor/save/run/Git/PATH, developer checkpoint เฉพาะเรื่องพร้อม feedback หลังส่ง; แก้ constructor/polymorphism/M0→M1 contract | 379 tests + lint/typecheck/buildWebpack; baseline browser 7 courses/545 steps/22 labs, representative interaction/TypeScript illustration/mobile ผ่าน ดู [R1](verification/R1/browser-report.json) |
-| R2-JS | เริ่ม js-start ไม่ใช้ nested function เป็นบทแรก; คง js-runtime แล้วเลื่อนไปหลัง functions; เพิ่ม function/loop/accumulator/array/arrow/control/nested-loop bridges; checkpoint เฉพาะเรื่องทั้ง28บท | IDsเดิม20บท/100stepsอยู่ครบ; 408 tests + lint/typecheck/build; browserเฉพาะJS140steps/hints/testsผิด-ถูก/gatedfeedback/save/continue/reviewfocus/mobile ผ่าน ดู [R2-JS](verification/R2-JS/browser-report.json) |
-| R2-Java | declarationก่อน output/expressions; for/sum/method/array/minimum/copyก่อนโจทย์ประกอบ; Stringไม่ใช้array/regex/ifก่อนสอน; ทางเริ่มไม่บังคับNode; checkpoint25บทและequipmentCLIassessmentเฉลยเต็ม | IDsเดิม18บท/90stepsอยู่ครบ; Temurin21.0.12.1 compile/run25topics **0fail**; mutants/ขอบ/ต้นฉบับไม่เปลี่ยน/CLIstateผ่าน; browser125steps/feedback/focus/save/mobileผ่าน |
+| Codex: lint, typecheck, Vitest 8 files/415 tests, build `--webpack`, Java verifier 25 บท, browser Java 125 steps | ผ่าน (รายงานของ Codex) | source f79b9e2 |
+| Reviewer Java: `verify-java-lessons.ts` 25 บท 0 fail, `verify-java-repair.ts` PASS, compile/run model answer 18 ข้อ | ผ่าน | f79b9e2 (ก่อนแก้) |
+| Reviewer JS: content + assessment-workspace tests ผ่าน; curriculum-quality 1 fail = timeout 5 s ของ tsc warm-up ใน ts-why (น่าจะเป็น environment) | ผ่านยกเว้น timeout | 2691362 |
+| `scripts/verify-lesson-deps.ts` (Express/PGlite) | 13 topics, 0 fail | 2691362 (baseline) |
+| `tsc --noEmit`, eslint ไฟล์ที่แก้, `tests/assessment-workspace.test.tsx` 4/4 | ผ่าน | 40f7646 |
 
-Java หลักฐาน: [compiler](verification/R2-Java/compiler-checks.log), [contracts](verification/R2-Java/contract-checks.log), [browser](verification/R2-Java/browser-report.json), [script](verification/R2-Java/browser-script.cjs.txt), [model CLI ที่ compile จริง](verification/R2-Java/EquipmentMain.java)
-ตรวจปิดล่าสุด source f79b9e2: [lint](verification/R2-Java/lint.log) ผ่าน, [typecheck](verification/R2-Java/typecheck.log) ผ่าน (logว่างเมื่อผ่าน), [Vitest](verification/R2-Java/tests.log) **8 files/415 tests** ผ่าน; `npm run build -- --webpack` ผ่าน Next16.3.6/TypeScript5.9.2/Node24.21.0
-Tests/route countsไม่ใช่หลักฐานคุณภาพการสอนหรือการเรียนรู้จริง การเปิดทุกrouteในคอร์สไม่ใช่การอ่านทุกบทในbrowser
+**ยังไม่ได้ตรวจ:** e8260d2, 3f60427, 86cf82b, ร่าง Node/TS ทั้งหมด; full `npm test`/build หลัง 40f7646; browser หลัง R2
+Preview :3100 **หยุดแล้ว** ต้อง build + start ใหม่ก่อนตรวจ browser
 
-ตัวตรวจ Java รอบแรกพบเอา Bash setup ไป compile เป็น Java จึงเพิ่ม `RichLesson.explain[].language` และ verifier บันทึก setup เป็น manual ไม่อ้างว่า shell/installer ผ่าน Java compiler; ตรวจ Java25บทใหม่ผ่านแล้ว
-`JAVA_TOPIC_IDS` ใน verifier ใช้เลือกตรวจเฉพาะชุดที่เปลี่ยน; ไม่เพิ่ม Java cloud/browser runner
-`verify-java-repair.ts` ตรวจ model CLI ใน feedback ตรงกับ fixture ที่compile และปฏิเสธ wrong state transition; minimum/copyตรวจ correctและmutantที่compileได้จริง มิใช่แค่syntaxผิด
+## 6. งานแรกของ session ใหม่: ปิด JavaScript บน r2/js-fix ทีละกลุ่ม
 
-## งานค้าง / checks ที่ยังไม่รัน
+ทำใน `../sfq-r2-jsfix` เท่านั้น ทีละกลุ่ม และ commit หลังแต่ละกลุ่มผ่าน:
+1. ตรวจ 3f60427 (bridges): `npx tsc --noEmit`, `npx vitest run tests/curriculum-quality.test.ts tests/content.test.ts tests/runner-compare.test.ts`, อ่าน diff เทียบ review ข้อ C1/M1–M4 ของ bridges
+2. ตรวจ WIP 86cf82b ส่วน `javascript-foundations.ts` + `lessons/javascript-foundations.ts` (diff เล็ก) แล้ว commit เป็น fix ที่ตรวจแล้ว
+3. ตรวจ `javascript-checkpoints.ts` ใน WIP ทีละบท: model answer หลายบรรทัด, ภาษาไทยเว้นวรรค, รูปโจทย์ใหม่ไม่ใช่เปลี่ยนชื่อ, ไม่บอก algorithm, รัน model answer ใน Node ให้ตรง rubric; แก้ C3/C4/M5 ถ้ายังไม่ครบ
+4. Developer Foundations (C5, M2, M3 ส่วน dev, m5 m6 m8 m9) — ถ้าเปลี่ยน checkpoint ของ dev-files ต้องแก้ `tests/assessment-workspace.test.tsx` ที่อ้าง heading `/ประเมินการอ่าน path/` และวลี `จาก club/src ใช้`
+5. บันทึก `docs/verification/R2-JS-fix/checks.md` (finding → fix → evidence)
+จากนั้นทำ Java ต่อบน r2/java-fix ตามรายการค้างข้อ 4 แล้วค่อย merge สอง branch นี้
 
-- ไม่มี source ของ Java ที่ไม่ commit หลังปิดชุดนี้; ไม่มีชุด R3 ที่เริ่มเขียน
-- R3 **planned**: TypeScript narrowing/discriminated union/predicate/exhaustive และ generics/constraints/keyof/indexed access แยกให้ฝึกก่อนประกอบ; Node prerequisites/modules/CLI/files/HTTP; Back-end เฉลย routesครบและ SQL tables→CRUD/WHERE→constraints/keys→relationships→JOIN→aggregation; Java OOP state/behavior/referenceก่อนidentity/override, file I/O/JUnit setupก่อนcapstone
-- R4 **planned**: ปรับ projects ทั้งสามและยกระดับ22labsให้ prerequisite/brief/starter/hints/solution/acceptance/dependencies/check commands/reflectionตรงกัน; R2 assessmentใหม่ไม่ใช่การปิด R4 projects/labsทั้งหมด
-- R5 final **planned**: coverageทั้งเจ็ดคอร์ส/กิจกรรม, routesทั้งหมดในsnapshotสุดท้าย, interactionแต่ละแบบ, keyboard/mobile/TypeScript illustration และ production checksท้ายรอบ
-- ยังไม่รัน combined browser บนทั้งหมดหลัง R2; R1 baselineกับR2 targetedไม่ใช่final acceptance
-- ยังไม่ลอง installer/PATH ทุกOSจริง และไม่มี beginner learner trial
-- ยังไม่ได้ประเมิน/reviewคุณภาพการสอนและassessmentทั้งรอบโดยผู้ไม่เขียน ดูข้อถัดไป
+## 7. ลำดับงานหลังจากนั้น
 
-## Independent review ที่ต้องทำ
+1. Coordinator หลัง merge r2/*: เพิ่ม test guard (walkthrough ไม่มี `traceAnswer.slice(0,40)`, pitfalls ไม่มี `bugExplanation.slice(0,40)`, code field ไม่มีบรรทัด > 120 ตัวอักษร) แล้วรัน tsc/lint/full test/build
+2. R3 ตาม [R3-WRITER-BRIEF](R3-WRITER-BRIEF.md): TypeScript (narrowing basics→discriminated union→type predicate→exhaustive; generics basics→constraints→keyof/indexed access; checkpoints ทุกบท; M3) และ Node (ใช้ร่าง WIP ได้แต่ต้องตรวจใหม่; checkpoints; M4; assessment CLI ใหม่)
+3. R3 Back-end/SQL (tables→CRUD/WHERE→constraints/keys→relationships→JOIN→aggregation, วิธีรัน SQL ในเครื่อง, auth แยก, เฉลย routes ครบ, M5–M7) และ Java OOP (references ก่อน identity/override, file I/O + วิธีรัน JUnit ก่อน capstone, checkpoints, Library M1–M3/RPG)
+4. R4 labs 22 บท (solutionNotes, verify steps ต่อ shell, reflection เฉพาะ lab, `scripts/verify-labs.ts`) — React/Next labs ต้องบอกตรงว่าคอร์สยัง planned
+5. R5 รวม: coverage ทั้ง 7 คอร์ส, full checks, browser (routes/interaction/focus/mobile/TypeScript illustration) ใน context แยก
 
-**R1, R2-JS และ R2-Java ทั้งหมด pending independent review** Codexเขียนและตรวจเองเท่านั้น Auditก่อนหน้าไม่ใช่review diffใหม่ ไม่อ้างว่าทั้งสองAIตรวจแล้ว
-Claude sessionใหม่เริ่มอ่าน diffแบบread-onlyของสามชุดนี้ โดยเฉพาะ syntaxก่อนสอน, scaffolding, rubric/model answer, manual completion semantics, source/fixture/acceptanceและการคง IDs
-บันทึก snapshot/log/ข้อค้นพบและสิ่งที่แก้ตามจริง ตรวจซ้ำเฉพาะประเด็นสำคัญที่ยังไม่ปิด ไม่วนreviewไม่สิ้นสุด
+ข้อจำกัดด้าน quota: 2026-10-05 รัน agents 7 ตัวพร้อมกันแล้วชน session limit ก่อน commit → ไม่เกิน 2 ตัวพร้อมกัน, commit ทีละส่วน
 
-ไฟล์สำคัญของ R2-JS: `javascript-start.ts`, `javascript-bridges.ts`, `javascript-checkpoints.ts`, `javascript-foundations.ts`, `lessons/javascript-foundations.ts`, และการเอาexplainขั้นต่ำ3ส่วนออกใน `tests/content.test.ts`
-ไฟล์สำคัญของ R2-Java: `java-bridges.ts`, `java-checkpoints.ts`, `java-foundations.ts`, `lessons/java-foundations.ts`, `src/types/curriculum.ts`, `scripts/verify-java-lessons.ts`, `scripts/verify-java-repair.ts`
-R1 UI assessment/gatingอยู่ `QuestApp.tsx`/`generate.ts`; tests `assessment-workspace.test.tsx`; ตรวจจากcommit b7f8aa5
+## 8. ข้อกำหนดและข้อห้ามที่ยังมีผล
 
-## ขั้นถัดไปและเกณฑ์ผ่าน
+- รักษา topic/step IDs, hash URL, storage และความคืบหน้าผู้เรียนเดิม ห้าม rename/ลบ ID; เพิ่มบทด้วย ID ใหม่และ order array
+- ห้าม push, merge เข้า main, deploy หรือแตะ repo ต้นฉบับ `/mnt/c/...`; การ merge ระหว่าง branch งานกับ `feat/curriculum-learning-repair` ในเครื่องทำได้หลังตรวจ
+- ห้าม reset/clean/ลบงานใน worktree ใดเพื่อให้สะอาด
+- ไม่ใช้ OMC team ที่เปิด bypass, ไม่ใช้ `--dangerously-bypass-approvals-and-sandbox`, ไม่แก้ config เพื่อข้ามสิทธิ์
+- Backlog: Import, XP, streak, AI assistant; React/Next.js/PostgreSQL เต็มคอร์สยัง planned (แต่ SQL ใน Back-end ต้องใช้เรียนต่อได้จริง)
+- รายงานตรงความจริง: แยก implementation / checks / browser / independent review; งานที่ Claude เขียนยังรอ independent review จาก Codex
+- ภาษาไทยอ่านง่าย, โค้ดหลายบรรทัด, PowerShell กับ Bash/WSL แยกชัด, ไม่คัดลอกเนื้อหาแพลตฟอร์มอื่น
 
-1. ตรวจ status/branch/log และ process ก่อนแก้ ถ้ามี agent เดิมกำลังเขียนไฟล์เดียวกันให้หยุด ไม่แก้ shared filesพร้อมกัน
-2. ทำ independent reviewสามชุดที่สะสมก่อน แก้เฉพาะข้อสำคัญภายในscopeเดิม เก็บหลักฐานใหม่
-3. เริ่ม R3 เป็นชุดเล็กชัดเจน แนะนำ TypeScriptก่อน ตาม dependencies; ownershipไฟล์ไม่ทับกัน ใช้branch/worktreeสำหรับการเขียนเมื่อมอบหมายหลายagent อย่าย้อนแก้OMC team/bypass
-4. ต่อ Node/Back-end/OOP แล้ว R4 projects/labs และ R5final; ไม่ต้องขออนุญาตซ้ำสำหรับงานในscopeที่ผู้ใช้อนุญาตไว้
-5. เกณฑ์ผ่านต่อชุด: syntax/เครื่องมือมีบท/prerequisiteก่อนใช้, ฝึกไล่ระดับและassessmentบริบทใหม่, feedbackหลังส่ง, เฉลย/acceptance/fixturesตรง, correctผ่านและwrongสำคัญไม่ผ่าน หรือmanualมีเกณฑ์/คำสั่งตรวจซ้ำ, IDs/storageเดิมใช้ได้, checksที่เกี่ยวข้อง+targetedbrowserผ่าน แล้วcommit+อัปเดตcoverage/evidence
-6. เกณฑ์จบรอบ: ทั้ง7คอร์สและ22labs/projectมีหลักฐานรองรับครบตามแผน, finalchecks/browserผ่านและข้อจำกัดตรงจริง จากนั้นหยุดส่งมอบและเสนอแผนReact→Next.js/PostgreSQLสั้น ๆ เท่านั้น ไม่implementต่อเอง
-
-## คำสั่งตรวจ / เครื่องมือ / preview และ process
-
-ทำจาก Linux repo เท่านั้น:
+## 9. เครื่องมือตรวจ
 
 ```bash
-git status --short
-git branch --show-current
-git log -4 --oneline
-npm run lint
-npx tsc --noEmit
-npm test
-npm run build -- --webpack
-JAVA_HOME=/tmp/sea-quest-java-tools/jdk21 ./node_modules/.bin/vite-node --config vitest.config.ts scripts/verify-java-repair.ts
-# ตรวจ Javaทั้งหมดรวมOOPต้องมีJUnit; เลือกบางบทใช้ JAVA_TOPIC_IDS=id1,id2
-JAVA_HOME=/tmp/sea-quest-java-tools/jdk21 JUNIT_JAR=/tmp/sea-quest-java-tools/junit-platform-console-standalone-6.1.3.jar ./node_modules/.bin/vite-node --config vitest.config.ts scripts/verify-java-lessons.ts
+npx tsc --noEmit && npm run lint && npx vitest run
+npm run build -- --webpack            # Turbopack เคยติด EPERM ใน sandbox
+VERIFY_DIR=/tmp/lesson-verify ./node_modules/.bin/vite-node --config vitest.config.ts scripts/verify-lesson-deps.ts
+JAVA_HOME=/tmp/sea-quest-java-tools/jdk21 JUNIT_JAR=/tmp/sea-quest-java-tools/junit-platform-console-standalone-6.1.3.jar \
+  ./node_modules/.bin/vite-node --config vitest.config.ts scripts/verify-java-lessons.ts   # JAVA_TOPIC_IDS=a,b เลือกบท
+npm run start -- --hostname 127.0.0.1 -p 3100   # preview หลัง build
 ```
 
-JDK/JUnitถูกcopyจากcacheเก่ามาpathกลางเพื่อการตรวจรอบนี้ ไม่พึ่งscratchpadในคำสั่งข้างต้น แต่ `/tmp` อาจถูกล้าง ต้องเตรียมเครื่องมือจากofficialdistributionใหม่เมื่อหาย ห้ามอ้างว่าโหลดใหม่/ตรวจchecksumofficialแล้วในรอบนี้
-Read relevant installed Next guide (`node_modules/next/dist/docs/`) ก่อนแก้codeตามAGENTS.md; ใช้WebpackเพราะTurbopackรอบR1ติดsandboxbind ไม่เปลี่ยนbuildconfig
+เครื่องมืออยู่ใน /tmp (อาจถูกล้าง): JDK 21 + JUnit 6.1.3 ที่ `/tmp/sea-quest-java-tools`, Express 5.2.1/PGlite 0.5.8/pg ที่ `/tmp/lesson-verify` (สร้างใหม่: `mkdir -p /tmp/lesson-verify && cd /tmp/lesson-verify && npm init -y && npm pkg set type=module && npm install express@5.2.1 @electric-sql/pglite@0.5.8 pg`), Playwright/Chromium ที่ `/tmp/sea-quest-browser` (วิธีเตรียมใน [COURSE-REPAIR-EVIDENCE](COURSE-REPAIR-EVIDENCE.md) ส่วน R1)
 
-Production preview **ยังเปิด** http://127.0.0.1:3100/#step/java-jdk-concept (JSเริ่ม `/#step/js-start-concept`)
-ตอนตรวจส่งต่อ: `next-server` PID **258961**, unified exec session **48839**, คำสั่ง `npm run start -- --hostname 127.0.0.1 -p 3100`; เป็นlocalhostไม่ใช่deploy หากต้องbuildใหม่ให้หยุด/restartเฉพาะserverนี้หลังตรวจpid/cwd
-ไม่มี compiler/browser verification process ค้างเมื่อปิดชุด; test/lint/typecheck/buildทั้งหมดจบแล้ว
-พบ Claude processเดิม PID19402 เปิดค้าง (session logล่าสุดจบaudit); ไม่ส่งข้อความ/เรียกให้เขียน ไม่แตะrepoต้นฉบับ มีCodexCLI PID236304และapp-serverตามsessionอยู่ ให้ตรวจสถานะจริงก่อนรับช่วง ไม่สรุปจากการมีprocessว่าagentยังเขียนอยู่
+## 10. Processes ตอนเขียน
 
-Playwright1.63.0/Chromiumและnative librariesอยู่ `/tmp/sea-quest-browser` ใช้freshcontextไม่ใช้profileหลัก ไม่ถ่ายscreenshot; วิธีเตรียมอยู่COURSE-REPAIR-EVIDENCEส่วนR1
-เรียกtargetedscriptเมื่อไฟล์และmanifestพร้อม:
-
-```bash
-cp docs/verification/R2-Java/browser-manifest.ts.txt /tmp/sea-quest-java-manifest.ts
-./node_modules/.bin/vite-node --config vitest.config.ts /tmp/sea-quest-java-manifest.ts
-cp docs/verification/R2-Java/browser-script.cjs.txt /tmp/sea-quest-browser/verify-java.cjs
-PLAYWRIGHT_BROWSERS_PATH=/tmp/sea-quest-browser/browsers LD_LIBRARY_PATH=/tmp/sea-quest-browser/libs/usr/lib/x86_64-linux-gnu FONTCONFIG_FILE=/tmp/sea-quest-browser/fonts.conf node /tmp/sea-quest-browser/verify-java.cjs
-```
-
-หยุดทำงานหลังบันทึกhandoffนี้ตามคำสั่งผู้ใช้ ไม่เริ่มชุดใหม่ ไม่reset/ทิ้งงาน ไม่push/merge/deploy
+ไม่มี worker ของงานนี้ทำงาน (ไม่มี vitest/vite-node/java/next-server/agent) ที่ยังเปิดอยู่: Codex CLI PID 236304 (cwd repo หลัก, ไม่เปิดไฟล์ใน repo), Codex app-server daemons, Claude PID 19402 (cwd `/mnt/c/...` session audit เดิม), Claude PID 260047 = terminal ของ session นี้

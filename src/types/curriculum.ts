@@ -1,5 +1,22 @@
 export type StepKind = "concept" | "trace" | "practice" | "debug" | "checkpoint";
 
+export type RichLesson = {
+  hook: string;
+  analogy: { title: string; text: string[] };
+  explain: Array<{ heading: string; text: string[] }>;
+  walkthrough: string[];
+  pitfalls: string[];
+  recap: string[];
+  traceHint?: string;
+  practiceHints?: string[];
+};
+
+export type StepSection =
+  | { kind: "hook" | "recap" | "pitfall" | "walkthrough"; title: string; items: string[] }
+  | { kind: "analogy" | "text"; title: string; items: string[] }
+  | { kind: "code"; title: string }
+  | { kind: "hints"; title: string; items: string[] };
+
 export type TopicSource = {
   id: string;
   courseId: string;
@@ -17,6 +34,7 @@ export type TopicSource = {
   buggy: string;
   bugExplanation: string;
   vocabulary: Array<[term: string, meaning: string]>;
+  lesson?: RichLesson;
 };
 
 export type LearningStep = {
@@ -34,6 +52,7 @@ export type LearningStep = {
   prompt?: string;
   reveal?: string;
   starter?: string;
+  sections?: StepSection[];
   vocabulary: Array<[term: string, meaning: string]>;
 };
 

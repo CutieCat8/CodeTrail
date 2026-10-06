@@ -4,7 +4,7 @@ test("fresh learner starts without invented progress", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator(".sidebar-progress")).toContainText("0 XP");
   await expect(page.locator(".sidebar-progress")).toContainText("0/22");
-  await expect(page.getByText("จังหวะการฝึก 20 สัปดาห์")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Last 20 weeks" })).toBeVisible();
   await expect(page.locator(".activity-cell.level-0")).toHaveCount(140);
 });
 
@@ -48,12 +48,25 @@ test("mobile navigation opens and the roadmap fits the viewport", async ({ page 
 
 test("micro-step completion contributes to heatmap, streak, and weekly goal", async ({ page }) => {
   await page.goto("/#step/dev-program-concept");
-  await page.locator(".micro-task textarea").fill("Source code คือข้อความที่เขียนให้โปรแกรมทำงาน");
-  await page.getByRole("button", { name: "บันทึกหลักฐาน" }).click();
+  await page.getByRole("textbox", { name: "Code editor index.js" }).fill("Source code คือข้อความที่เขียนให้โปรแกรมทำงาน");
+  await page.getByRole("button", { name: "Submit answer" }).click();
+  await page.getByRole("button", { name: "กางเมนูด้านข้าง" }).click();
   await page.locator(".sidebar nav").getByRole("button", { name: "ฐานปฏิบัติการ" }).click();
   await expect(page.locator(".activity-cell.level-0")).toHaveCount(139);
   await expect(page.locator(".weekly-mini-card")).toContainText("1/5");
   await expect(page.locator(".profile-stats > div").last().locator("strong")).toHaveText("1");
+});
+
+test("web foundations use browser instructions and the editor allows keyboard exit", async ({ page }) => {
+  await page.goto("/#step/web-semantics-practice");
+  const editor = page.getByRole("textbox", { name: "Code editor web-notes.txt" });
+  await expect(editor).toHaveValue(/<div/);
+  await editor.focus();
+  await page.keyboard.press("Shift+Tab");
+  await expect(editor).not.toBeFocused();
+  await page.getByRole("button", { name: "วิธีทดลอง" }).click();
+  await expect(page.locator(".terminal-output")).toContainText("ทดลองใน browser");
+  await expect(page.locator(".micro-console")).not.toContainText("SyntaxError");
 });
 
 test("browser history restores navigation between Home and Curriculum", async ({ page }) => {

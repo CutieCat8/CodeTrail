@@ -1,16 +1,17 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Activity, Braces, Check, ChevronLeft, ChevronRight, CircleDot, Clock3, Code2, Copy, Download, FlaskConical, FolderGit2, Gauge, Layers3, LayoutDashboard, LockKeyhole, Map, Maximize2, Menu, Minimize2, NotebookPen, Play, Route, Search, Settings, ShieldCheck, Sparkles, Target, Trophy, Upload, X } from "lucide-react";
+import { Activity, Bot, Braces, Check, ChevronDown, ChevronLeft, ChevronRight, CircleDot, Clock3, Code2, Copy, Download, FlaskConical, FolderGit2, Gauge, Layers3, LayoutDashboard, Lightbulb, LockKeyhole, Map, Maximize2, Menu, Minimize2, NotebookPen, PanelLeftClose, PanelLeftOpen, Play, Route, Search, Send, Settings, ShieldCheck, Sparkles, Target, Trophy, Upload, X } from "lucide-react";
 import { lessons, lessonById, plannedJava } from "@/content/lessons";
 import { curriculumCourses, learningSteps, stepById } from "@/content/curriculum";
 import { accessReason, recommendation, stepRecommendation } from "@/lib/recommendation";
 import { emptyData, loadData, newProgress, normalizeAppData, saveData, xpTotal } from "@/lib/storage";
-import { runIsolatedTests } from "@/lib/runner";
+import { runIsolatedSnippet, runIsolatedTests } from "@/lib/runner";
 import { recordActivity } from "@/lib/activity";
 import type { AppData, JournalEntry, Lesson, LessonProgress, StudyMode } from "@/types/domain";
 import { PixelCat } from "./PixelCat";
 import { FullStackRoadmap } from "./FullStackRoadmap";
+import { StepSections } from "./StepSections";
 import { WorldLandmark } from "./ExpeditionArt";
 import { QuestHome } from "./QuestHome";
 
@@ -26,6 +27,30 @@ const navGroups: readonly { label: string; items: readonly NavItem[] }[] = [
 ];
 const settingsNav: NavItem = ["settings", "ตั้งค่า", Settings];
 const nav: readonly NavItem[] = [...navGroups.flatMap((group) => group.items), settingsNav];
+
+function AICompanion({ context, prompts }: { context: string; prompts: string[] }) {
+  const [open, setOpen] = useState(false);
+  const [question, setQuestion] = useState("");
+  const [notice, setNotice] = useState("");
+  const ask = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!question.trim()) return;
+    setNotice("เก็บคำถามไว้แล้ว — AI Mentor จะตอบตรงนี้เมื่อเชื่อมต่อโมเดลในเวอร์ชันถัดไป");
+  };
+  return <section className={`ai-companion ${open ? "open" : ""}`}>
+    <button className="ai-companion-toggle" type="button" aria-expanded={open} onClick={() => setOpen(value => !value)}>
+      <span className="ai-orb"><Bot aria-hidden="true" /></span>
+      <span><small>AI MENTOR · PREVIEW</small><strong>ถามเรื่องที่ยังไม่เข้าใจ</strong></span>
+      <ChevronDown aria-hidden="true" />
+    </button>
+    {open && <div className="ai-companion-body">
+      <p>ผู้ช่วยจะใช้บริบทของ <b>{context}</b> โดยไม่เฉลยทันที และจะชวนคิดเป็นขั้นก่อน</p>
+      <div className="ai-prompt-chips">{prompts.map(prompt => <button type="button" key={prompt} onClick={() => { setQuestion(prompt); setNotice(""); }}>{prompt}</button>)}</div>
+      <form onSubmit={ask}><label htmlFor={`ai-${context.replace(/\W/g, "-")}`}>คำถามของซี</label><div><input id={`ai-${context.replace(/\W/g, "-")}`} value={question} onChange={event => { setQuestion(event.target.value); setNotice(""); }} placeholder="เช่น ช่วยเปรียบเทียบแนวคิดนี้กับของใกล้ตัว"/><button type="submit" aria-label="ส่งคำถาม"><Send aria-hidden="true" /></button></div></form>
+      {notice && <p className="ai-preview-notice" role="status">{notice}</p>}
+    </div>}
+  </section>;
+}
 
 const modules = [
   ["Developer Foundations", "web", "Git, terminal และการคิดเป็นระบบ"],
@@ -82,6 +107,7 @@ export function QuestApp() {
   const [activeLessonId, setActiveLessonId] = useState("web-ts-narrowing");
   const [activeStepId, setActiveStepId] = useState(learningSteps[0]?.id ?? "");
   const [mobileNav, setMobileNav] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const sidebarRef = useRef<HTMLElement>(null);
   const hadOpenNav = useRef(false);
@@ -91,12 +117,12 @@ export function QuestApp() {
       const hash = window.location.hash.slice(1);
       if (hash.startsWith("lesson/")) {
         const id = hash.slice(7);
-        if (lessonById(id)) { setActiveLessonId(id); setView("lesson"); }
+        if (lessonById(id)) { setActiveLessonId(id); setView("lesson"); setSidebarCollapsed(true); }
       } else if (hash.startsWith("step/")) {
         const id = hash.slice(5);
-        if (stepById(id)) { setActiveStepId(id); setView("step"); }
-      } else if (nav.some(([id]) => id === hash)) setView(hash as View);
-      else if (!hash) setView("dashboard");
+        if (stepById(id)) { setActiveStepId(id); setView("step"); setSidebarCollapsed(true); }
+      } else if (nav.some(([id]) => id === hash)) { setView(hash as View); setSidebarCollapsed(false); }
+      else if (!hash) { setView("dashboard"); setSidebarCollapsed(false); }
     };
     restoreRoute(); window.addEventListener("hashchange", restoreRoute); window.addEventListener("popstate", restoreRoute);
     return () => { window.removeEventListener("hashchange", restoreRoute); window.removeEventListener("popstate", restoreRoute); };
@@ -123,26 +149,26 @@ export function QuestApp() {
     window.addEventListener("keydown", handleDrawerKeys);
     return () => { document.body.style.overflow = previousOverflow; window.removeEventListener("keydown", handleDrawerKeys); };
   }, [mobileNav]);
-  const goView = (next: View) => { setView(next); setMobileNav(false); window.history.pushState(null, "", `#${next}`); window.scrollTo({ top: 0, behavior: "smooth" }); };
-  const openLesson = (id: string) => { setActiveLessonId(id); setView("lesson"); setMobileNav(false); window.history.pushState(null, "", `#lesson/${id}`); setData((d) => ({ ...d, lastLessonId: id })); window.scrollTo({ top: 0, behavior: "smooth" }); };
-  const openStep = (id: string) => { setActiveStepId(id); setView("step"); setMobileNav(false); window.history.pushState(null, "", `#step/${id}`); setData((d) => ({ ...d, lastStepId: id })); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const goView = (next: View) => { setView(next); setMobileNav(false); setSidebarCollapsed(false); window.history.pushState(null, "", `#${next}`); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const openLesson = (id: string) => { setActiveLessonId(id); setView("lesson"); setMobileNav(false); setSidebarCollapsed(true); window.history.pushState(null, "", `#lesson/${id}`); setData((d) => ({ ...d, lastLessonId: id })); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const openStep = (id: string) => { setActiveStepId(id); setView("step"); setMobileNav(false); setSidebarCollapsed(true); window.history.pushState(null, "", `#step/${id}`); setData((d) => ({ ...d, lastStepId: id })); window.scrollTo({ top: 0, behavior: "smooth" }); };
   if (!ready) return <div className="loading-screen"><PixelCat /><p>กำลังเปิดสมุดภารกิจของซี…</p></div>;
   const completed = Object.values(data.progress).filter((p) => p.status === "passed").length;
   const rec = recommendation(data);
   return (
-    <div className="app-shell">
+    <div className={`app-shell ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
       <a className="skip-link" href="#main">ข้ามไปเนื้อหาหลัก</a>
       {mobileNav && <button className="nav-backdrop" aria-label="ปิดเมนู" onClick={() => setMobileNav(false)} />}
-      <aside ref={sidebarRef} className={`sidebar ${mobileNav ? "open" : ""}`} aria-label="เมนูแอป">
+      <aside id="app-sidebar" ref={sidebarRef} className={`sidebar ${mobileNav ? "open" : ""}`} aria-label="เมนูแอป" aria-hidden={sidebarCollapsed && !mobileNav ? true : undefined} inert={sidebarCollapsed && !mobileNav ? true : undefined}>
         <div className="brand"><PixelCat small decorative /><div><strong>SEA’S QUEST</strong><span>FULL-STACK FIELD LOG</span></div><button className="mobile-close" onClick={() => setMobileNav(false)} aria-label="ปิดเมนู"><X /></button></div>
-        <div className="sidebar-progress"><span><Trophy size={15} aria-hidden="true" /> EXPEDITION LEVEL</span><strong>{xpTotal(data, xpMap)} XP</strong><small>{completed}/{lessons.length} บท Lab ผ่านแล้ว</small></div>
+        <div className="sidebar-progress"><span><Trophy size={15} aria-hidden="true" /> EXPEDITION LEVEL</span><strong>{xpTotal(data, xpMap)} XP</strong><small>{completed}/{lessons.length} Labs passed</small></div>
         <nav aria-label="เมนูหลัก">
           {navGroups.map((group) => <section key={group.label}><span>{group.label}</span>{group.items.map(([id, label, Icon]) => <button key={id} aria-current={view === id ? "page" : undefined} className={view === id ? "active" : ""} onClick={() => goView(id)}><Icon size={18} aria-hidden="true" />{label}</button>)}</section>)}
         </nav>
         <div className="sidebar-foot"><button aria-current={view === "settings" ? "page" : undefined} className={view === "settings" ? "active" : ""} onClick={() => goView("settings")}><Settings size={18} aria-hidden="true" />ตั้งค่า</button></div>
       </aside>
       <div className="content-shell">
-        <header className="topbar"><button ref={menuButtonRef} className="menu-button" onClick={() => setMobileNav(true)} aria-label="เปิดเมนู" aria-expanded={mobileNav}><Menu aria-hidden="true" /></button><div className="breadcrumb"><span>Sea’s Full-stack Quest</span><strong>{view === "lesson" ? lessonById(activeLessonId)?.title : view === "step" ? stepById(activeStepId)?.title : nav.find(([id]) => id === view)?.[1]}</strong></div><div className={`save-pill ${saveState}`} aria-live="polite"><CircleDot size={12} aria-hidden="true" /> {saveState === "saving" ? "กำลังบันทึก" : saveState === "error" ? "บันทึกไม่สำเร็จ" : "บันทึกแล้ว"}</div></header>
+        <header className="topbar"><button className="desktop-nav-toggle" onClick={() => setSidebarCollapsed(value => !value)} aria-label={sidebarCollapsed ? "กางเมนูด้านข้าง" : "พับเมนูด้านข้าง"} aria-controls="app-sidebar" aria-expanded={!sidebarCollapsed} title={sidebarCollapsed ? "กางเมนูด้านข้าง" : "พับเมนูด้านข้าง"}>{sidebarCollapsed ? <PanelLeftOpen aria-hidden="true" /> : <PanelLeftClose aria-hidden="true" />}</button><button ref={menuButtonRef} className="menu-button" onClick={() => setMobileNav(true)} aria-label="เปิดเมนู" aria-expanded={mobileNav}><Menu aria-hidden="true" /></button><div className="breadcrumb"><span>Sea’s Full-stack Quest</span><strong>{view === "lesson" ? lessonById(activeLessonId)?.title : view === "step" ? stepById(activeStepId)?.title : nav.find(([id]) => id === view)?.[1]}</strong></div><div className={`save-pill ${saveState}`} aria-live="polite"><CircleDot size={12} aria-hidden="true" /> {saveState === "saving" ? "กำลังบันทึก" : saveState === "error" ? "บันทึกไม่สำเร็จ" : "บันทึกแล้ว"}</div></header>
         <main id="main">
           {view === "dashboard" && <Dashboard data={data} setData={setData} openLesson={openLesson} openStep={openStep} />}
           {view === "curriculum" && <CurriculumView data={data} openStep={openStep} />}
@@ -154,7 +180,7 @@ export function QuestApp() {
           {view === "projects" && <Projects data={data} setData={setData} />}
           {view === "settings" && <SettingsView data={data} setData={setData} />}
           {view === "lesson" && <LessonWorkspace lesson={lessonById(activeLessonId) ?? rec.lesson} data={data} setData={setData} saveState={saveState} openLesson={openLesson} onExit={() => goView("map")} />}
-          {view === "step" && stepById(activeStepId) && <MicroStepWorkspace stepId={activeStepId} data={data} setData={setData} openStep={openStep} onExit={() => goView("curriculum")} />}
+          {view === "step" && stepById(activeStepId) && <MicroStepWorkspace key={activeStepId} stepId={activeStepId} data={data} setData={setData} openStep={openStep} onExit={() => goView("curriculum")} />}
         </main>
       </div>
     </div>
@@ -204,21 +230,31 @@ function CurriculumView({ data, openStep }: { data: AppData; openStep: (id: stri
 }
 
 function MicroStepWorkspace({stepId,data,setData,openStep,onExit}:{stepId:string;data:AppData;setData:React.Dispatch<React.SetStateAction<AppData>>;openStep:(id:string)=>void;onExit:()=>void}) {
-  const step=stepById(stepId)!; const courseSteps=learningSteps.filter(s=>s.courseId===step.courseId); const index=courseSteps.findIndex(s=>s.id===stepId); const course=curriculumCourses.find(c=>c.id===step.courseId); const saved=data.stepProgress[stepId]??{stepId,answer:"",notes:"",completed:false,updatedAt:new Date().toISOString()}; const [revealed,setRevealed]=useState(!!saved.answerRevealed);
+  const step=stepById(stepId)!; const courseSteps=learningSteps.filter(s=>s.courseId===step.courseId); const index=courseSteps.findIndex(s=>s.id===stepId); const course=curriculumCourses.find(c=>c.id===step.courseId); const saved=data.stepProgress[stepId]??{stepId,answer:"",notes:"",completed:false,updatedAt:new Date().toISOString()}; const topicPractice=courseSteps.find(candidate=>candidate.topicId===step.topicId&&candidate.kind==="practice"); const starterCode=step.starter??step.code??topicPractice?.starter??"// เขียนโค้ดของซีที่นี่\nconsole.log(\"Hello, quest!\");"; const [code,setCode]=useState(saved.answer||starterCode); const [revealed,setRevealed]=useState(!!saved.answerRevealed); const [runResult,setRunResult]=useState<{output:string[];error?:string;durationMs:number}|null>(null); const [running,setRunning]=useState(false);
   const update=(patch:Partial<typeof saved>)=>setData(d=>{const next={...d,lastStepId:stepId,stepProgress:{...d.stepProgress,[stepId]:{...(d.stepProgress[stepId]??saved),...patch,updatedAt:new Date().toISOString()}}};return patch.completed && !d.stepProgress[stepId]?.completed ? recordActivity(next,"step-completed",stepId) : next;});
   const next=courseSteps[index+1]; const previous=courseSteps[index-1];
-  const kindCopy={concept:["ทำความเข้าใจ","สร้าง mental model ก่อนลงมือ"],trace:["อ่านและทำนาย","ไล่ค่าจากโค้ดโดยยังไม่รัน"],practice:["ลงมือเขียน","สร้างคำตอบจาก starter code"],debug:["ตามหาบั๊ก","ตั้งสมมติฐานแล้วแก้ให้น้อยที่สุด"],checkpoint:["อธิบายโดยไม่ลอก","ดึงความเข้าใจออกมาด้วยคำของตัวเอง"]} as const;
-  const effectivePrompt=step.prompt??`อธิบายว่า “${step.title.replace(/^.*?:\s*/,"")}” ทำงานอย่างไรด้วยคำของซีเอง 1–2 ประโยค และยกตัวอย่างสั้น ๆ`;
+  const kindCopy={concept:["ทำความเข้าใจ","เรียนแล้วทดลองกับโค้ดทันที"],trace:["ทำนายแล้วรัน","เดาผลก่อนใช้ Terminal ตรวจ"],practice:["ลงมือเขียน","สร้างคำตอบจาก starter code"],debug:["ตามหาบั๊ก","ตั้งสมมติฐานแล้วแก้ให้น้อยที่สุด"],checkpoint:["สร้างจากความจำ","เขียนตัวอย่างใหม่แล้วรันให้ได้"]} as const;
+  const isWebFoundation=step.courseId==="web-platform-foundations"; const isJava=course?.track==="java"; const fileName=isWebFoundation?"web-notes.txt":isJava?"Main.java":step.courseId==="developer-foundations"&&/Get-|Set-|npm |node |git /i.test(starterCode)?"terminal.ps1":"index.js"; const canRunInBrowser=fileName==="index.js";
+  const effectivePrompt=isWebFoundation?(step.prompt??`อธิบายว่า “${step.title.replace(/^.*?:\s*/,"")}” ทำงานอย่างไรด้วยคำของซีเอง และยกตัวอย่างสั้น ๆ`):step.kind==="checkpoint"?`เขียนโค้ดตัวอย่างใหม่ของ “${step.title.replace(/^.*?:\s*/,"")}" จาก starter code แล้วกด Run ให้เห็นผลลัพธ์`:step.prompt??`เปลี่ยนค่าในตัวอย่างอย่างน้อย 1 จุด แล้วกด Run เพื่อสังเกตว่า output เปลี่ยนอย่างไร`;
+  const runCode=async()=>{setRunning(true);setRunResult(null);if(isWebFoundation){setRunResult({output:["บทนี้ใช้การอธิบายและทดลองใน browser: บันทึก HTML/CSS เป็นไฟล์แล้วเปิดใน browser หรือใช้ DevTools ตรวจตามโจทย์ จากนั้น Submit answer เพื่อเก็บหลักฐาน"],durationMs:0});setRunning(false);return;}if(!canRunInBrowser){setRunResult({output:[],error:isJava?"บท Java ต้องใช้ JDK: บันทึกเป็น Main.java แล้วรัน javac Main.java และ java Main":"บทคำสั่งระบบต้องทดลองใน Terminal จริงของเครื่อง เพื่อไม่ให้เว็บไซต์แตะไฟล์ในเครื่อง",durationMs:0});setRunning(false);return;}const result=await runIsolatedSnippet(code);setRunResult(result);setRunning(false);};
   return <div className="micro-workspace micro-v2">
     <header className="micro-header-v2"><button onClick={onExit}><ChevronLeft/>คอร์ส</button><div className="micro-title"><span className="eyebrow">{course?.title} · {step.unit}</span><h1>{step.title}</h1><p>{step.objective}</p></div><div className="micro-position"><span>STEP</span><strong>{step.position}</strong><small>/ {courseSteps.length}</small></div></header>
     <div className="micro-progress" aria-label={`ผ่านตำแหน่ง ${step.position} จาก ${courseSteps.length}`}><i style={{width:`${step.position/courseSteps.length*100}%`}}/></div>
     <div className="micro-stagebar"><span className={`kind ${step.kind}`}>{kindCopy[step.kind][0]}</span><span><Clock3/>{step.minutes} นาที</span><p>{kindCopy[step.kind][1]}</p><div className="rail-nav"><button disabled={!previous} onClick={()=>previous&&openStep(previous.id)}><ChevronLeft/>ก่อนหน้า</button><button disabled={!next} onClick={()=>next&&openStep(next.id)}>ถัดไป<ChevronRight/></button></div></div>
-    <main className="micro-content-v2">
-      <section className="micro-learn"><div className="phase-label"><span>01</span><div><small>ทำความเข้าใจ</small><strong>อ่านหนึ่งแนวคิดให้เห็นภาพก่อน</strong></div></div>{step.body.map(paragraph=><p className="teaching-copy" key={paragraph}>{paragraph}</p>)}{step.vocabulary.length>0&&<dl className="vocabulary">{step.vocabulary.map(([term,meaning])=><div key={term}><dt>{term}</dt><dd>{meaning}</dd></div>)}</dl>}{step.code&&<div className="micro-code"><span>ตัวอย่างที่ใช้สังเกต</span><pre><code>{step.code}</code></pre></div>}{step.starter&&<div className="micro-code starter"><span>Starter code</span><pre><code>{step.starter}</code></pre></div>}</section>
-      <section className="micro-task"><div className="phase-label"><span>02</span><div><small>ลองด้วยตัวเอง</small><strong>หยุดอ่านแล้วสร้างคำตอบ</strong></div></div><h2>{effectivePrompt}</h2><textarea value={saved.answer} onChange={event=>update({answer:event.target.value})} placeholder={step.kind==='practice'||step.kind==='debug'?"เขียนโค้ดและอธิบายเหตุผลของซีที่นี่…":"ตอบก่อนกลับไปดูตัวอย่าง…"}/><div className="task-actions">{step.reveal&&<button className="secondary" onClick={()=>{setRevealed(true);update({answerRevealed:true})}}>เปิดแนวทางทีละขั้น</button>}<button className="primary" onClick={()=>update({completed:true})} disabled={!saved.answer.trim()}>บันทึกหลักฐาน <Check/></button></div>{revealed&&step.reveal&&<div className="reveal"><strong>แนวทางตรวจคำตอบ</strong><pre><code>{step.reveal}</code></pre><p>เทียบเหตุผลและ behavior ไม่จำเป็นต้องเขียนเหมือนตัวอย่างทุกตัวอักษร</p></div>}</section>
-      <section className="step-notes"><div className="phase-label"><span>03</span><div><small>ปิดรอบการเรียน</small><strong>เก็บสิ่งที่เพิ่งเข้าใจไว้กลับมาทบทวน</strong></div></div><label htmlFor={`notes-${step.id}`}>Field notes</label><textarea id={`notes-${step.id}`} value={saved.notes} onChange={event=>update({notes:event.target.value})} placeholder="สิ่งที่เข้าใจ / จุดที่ยังสงสัย / error ที่พบ…"/></section>
-      {saved.completed&&<div className="step-complete"><PixelCat small variant="celebrate" decorative/><div><strong>บันทึกหลักฐานแล้ว</strong><p>ปุ่มถัดไปเป็นการนำทาง คำตอบเดิมยังกลับมาแก้ได้เสมอ</p></div>{next&&<button className="primary" onClick={()=>openStep(next.id)}>ไป step ถัดไป<ChevronRight/></button>}</div>}
-      <nav className="micro-footer-nav" aria-label="นำทางระหว่าง micro-step"><button disabled={!previous} onClick={()=>previous&&openStep(previous.id)}><ChevronLeft/><span><small>ก่อนหน้า</small><strong>{previous?.title??"จุดเริ่มต้นคอร์ส"}</strong></span></button><button disabled={!next} onClick={()=>next&&openStep(next.id)}><span><small>ถัดไป</small><strong>{next?.title??"จบคอร์สนี้"}</strong></span><ChevronRight/></button></nav>
+    <main className="micro-split-workbench">
+      <article className="micro-lesson-pane">
+        <section className="micro-learn"><div className="phase-label"><span>01</span><div><small>ทำความเข้าใจ</small><strong>สร้างภาพในหัวก่อนแตะโค้ด</strong></div></div><StepSections step={step}/>{step.vocabulary.length>0&&<dl className="vocabulary">{step.vocabulary.map(([term,meaning])=><div key={term}><dt>{term}</dt><dd>{meaning}</dd></div>)}</dl>}{step.code&&!step.sections?.some(x=>x.kind==="code")&&<div className="micro-code"><span>ตัวอย่างที่ใช้สังเกต</span><pre><code>{step.code}</code></pre></div>}{step.starter&&<div className="micro-code starter"><span>Starter code</span><pre><code>{step.starter}</code></pre></div>}</section>
+        <section className="micro-lab-brief"><div className="phase-label"><span>02</span><div><small>LAB INSTRUCTIONS</small><strong>อ่านโจทย์ แล้วเขียนโค้ดทางขวา</strong></div></div><div className="lab-brief-card"><Lightbulb aria-hidden="true"/><div><span>ภารกิจของซี</span><h2>{effectivePrompt}</h2><p>{isWebFoundation?"เขียนคำอธิบายหรือ HTML/CSS ตามโจทย์ ทดลองใน browser แล้วส่งคำตอบเพื่อเก็บหลักฐาน": "แก้หรือเติมโค้ดใน editor ทางขวา จากนั้นกด Run แล้วเทียบสิ่งที่เกิดขึ้นใน Terminal กับสิ่งที่ซีคาดไว้"}</p></div></div></section>
+        <AICompanion context={step.title} prompts={["อธิบายด้วยการเปรียบเทียบให้หน่อย", "ถามฉันทีละคำถามโดยยังไม่เฉลย", "ช่วยใบ้ว่าควรเริ่มคิดจากตรงไหน"]}/>
+        <nav className="micro-footer-nav" aria-label="นำทางระหว่าง micro-step"><button disabled={!previous} onClick={()=>previous&&openStep(previous.id)}><ChevronLeft/><span><small>ก่อนหน้า</small><strong>{previous?.title??"จุดเริ่มต้นคอร์ส"}</strong></span></button><button disabled={!next} onClick={()=>next&&openStep(next.id)}><span><small>ถัดไป</small><strong>{next?.title??"จบคอร์สนี้"}</strong></span><ChevronRight/></button></nav>
+      </article>
+      <aside className="micro-practice-pane">
+        <div className="micro-editor-head"><div><span className="dot red"/><span className="dot amber"/><span className="dot green"/><strong>{fileName}</strong></div><span className={saved.completed?"done":"working"}>{saved.completed?"ส่งแล้ว":"แก้ไขได้"}</span></div>
+        <section className="micro-answer-workspace"><textarea aria-label={`Code editor ${fileName}`} title="ใช้ Shift+Tab เพื่อออกจาก editor" spellCheck={false} value={code} onKeyDown={event=>{if(event.key!=="Tab"||event.shiftKey)return;event.preventDefault();const target=event.currentTarget;const start=target.selectionStart;const end=target.selectionEnd;const nextCode=`${code.slice(0,start)}  ${code.slice(end)}`;setCode(nextCode);update({answer:nextCode,completed:false});requestAnimationFrame(()=>{target.selectionStart=target.selectionEnd=start+2;});}} onChange={event=>{setCode(event.target.value);update({answer:event.target.value,completed:false});setRunResult(null);}}/><div className="task-actions">{step.reveal&&<button className="secondary" onClick={()=>{setRevealed(true);update({answerRevealed:true})}}>Hint / Solution</button>}<button className="run" onClick={runCode} disabled={running}><Play/>{running?"กำลังรัน…":isWebFoundation?"วิธีทดลอง":"Run"}</button><button className="primary" onClick={()=>update({answer:code,completed:true})} disabled={!code.trim()}>Submit answer <Check/></button></div></section>
+        <section className="micro-console" aria-live="polite"><header><span>TERMINAL</span><small>{running?"RUNNING":runResult?.error?"ERROR":runResult?"DONE":"READY"}</small></header>{runResult?<div className={`terminal-output ${runResult.error?"has-error":""}`}>{runResult.output.map((line,i)=><pre key={`${line}-${i}`}>{line}</pre>)}{runResult.error&&<pre>{runResult.error}</pre>}{!runResult.error&&runResult.output.length===0&&<p>โปรแกรมทำงานสำเร็จ แต่ยังไม่มี output — ลองใช้ console.log(...)</p>}<small>เสร็จใน {runResult.durationMs} ms</small></div>:<div className="console-empty"><Play/><p>{canRunInBrowser?'กด Run เพื่อดู output ของโค้ดตรงนี้':isWebFoundation?'ทดลองใน browser แล้วส่งคำตอบ':isJava?'กดเพื่อดูคำสั่งรันด้วย JDK ในเครื่อง':'กดเพื่อดูวิธีทดลองใน Terminal ของเครื่อง'}</p></div>}{revealed&&step.reveal&&<div className="reveal"><strong>แนวทางตรวจคำตอบ</strong><pre><code>{step.reveal}</code></pre><p>ลองทำเองและรันก่อน แล้วค่อยเทียบกับแนวทางนี้</p></div>}</section>
+        <section className="step-notes"><div className="phase-label"><span>03</span><div><small>ปิดรอบการเรียน</small><strong>เก็บสิ่งที่เพิ่งเข้าใจ</strong></div></div><label htmlFor={`notes-${step.id}`}>Field notes</label><textarea id={`notes-${step.id}`} value={saved.notes} onChange={event=>update({notes:event.target.value})} placeholder="สิ่งที่เข้าใจ / จุดที่ยังสงสัย / error ที่พบ…"/></section>
+        {saved.completed&&<div className="step-complete"><PixelCat small variant="celebrate" decorative/><div><strong>เยี่ยม—รอบนี้มีหลักฐานแล้ว</strong><p>คำตอบเดิมยังกลับมาแก้ได้เสมอ</p></div>{next&&<button className="primary" onClick={()=>openStep(next.id)}>ไป step ถัดไป<ChevronRight/></button>}</div>}
+      </aside>
     </main>
   </div>;
 }
@@ -355,9 +391,9 @@ function LessonWorkspace({lesson,data,setData,saveState,openLesson,onExit}:{less
   const selfComplete=()=>{const all=lesson.acceptance.every((_,i)=>progress.checklist[i]); if(!all)return;patchProgress({status:"passed",completedAt:progress.completedAt??new Date().toISOString(),attempts:progress.attempts+1,lastResult:{passed:true,at:new Date().toISOString(),details:[]}},true);setTab("result");};
   const next=lessons.find(l=>l.track===lesson.track&&l.order===lesson.order+1);
   const copyExample=async()=>{try{await navigator.clipboard.writeText(lesson.example);setCopied(true);window.setTimeout(()=>setCopied(false),1600);}catch{setCopied(false);}};
-  const indent=(event:React.KeyboardEvent<HTMLTextAreaElement>)=>{if(event.key!=="Tab")return;event.preventDefault();const target=event.currentTarget;const start=target.selectionStart;const end=target.selectionEnd;const code=`${progress.code.slice(0,start)}  ${progress.code.slice(end)}`;patchProgress({code});requestAnimationFrame(()=>{target.selectionStart=target.selectionEnd=start+2;});};
+  const indent=(event:React.KeyboardEvent<HTMLTextAreaElement>)=>{if(event.key!=="Tab"||event.shiftKey)return;event.preventDefault();const target=event.currentTarget;const start=target.selectionStart;const end=target.selectionEnd;const code=`${progress.code.slice(0,start)}  ${progress.code.slice(end)}`;patchProgress({code});requestAnimationFrame(()=>{target.selectionStart=target.selectionEnd=start+2;});};
   const lessonContent=<div className="lesson-content-block"><section className="outcome"><Target/><div><strong>หลังบทนี้ ซีจะ…</strong><p>{lesson.objective}</p></div></section><section><h2>ทำไมใช้ในงานจริง</h2><p>{lesson.realWorld}</p></section><section className="prerequisite-line"><span>Prerequisite</span><p>{lesson.prerequisites.length?lesson.prerequisites.map(id=>lessonById(id)?.title).join(" → "):"เริ่มได้ทันที ไม่ต้องผ่านเส้นทางอื่น"}</p></section><section><h2>แนวคิดสำคัญ</h2><div className="concepts">{lesson.concepts.map(c=><span key={c}>{c}</span>)}</div>{lesson.explanation.map(p=><p key={p}>{p}</p>)}</section><section><div className="reading-section-head"><h2>ตัวอย่างที่รันได้</h2><button onClick={copyExample}><Copy/>{copied?"คัดลอกแล้ว":"คัดลอก"}</button></div><pre tabIndex={0}><code>{lesson.example}</code></pre><ul>{lesson.exampleNotes.map(n=><li key={n}>{n}</li>)}</ul></section><section className="mistakes"><span>จุดที่มักพลาด</span><ul>{lesson.commonMistakes.map(m=><li key={m}>{m}</li>)}</ul></section></div>;
-  const taskContent=<div className="task-content-block"><span className="eyebrow">Field assignment</span><h2>{lesson.prompt}</h2><h3>Acceptance criteria</h3><div className="check-list">{lesson.acceptance.map((item,i)=><label key={item}><input type="checkbox" checked={!!progress.checklist[i]} onChange={()=>toggleCheck(i)}/><span>{item}</span></label>)}</div>{lesson.expectedOutput&&<><h3>ผลลัพธ์ที่คาดหวัง</h3><pre tabIndex={0}><code>{lesson.expectedOutput}</code></pre></>}<div className="hint-box"><div><strong>Hint {Math.min(hintCount+1,3)}/3</strong><button onClick={()=>setHintCount(c=>Math.min(3,c+1))}>{hintCount===0?"เปิด Hint แรก":"ช่วยเพิ่มอีกขั้น"}</button></div>{lesson.hints.slice(0,hintCount).map((h,i)=><p key={h}><b>{i+1}</b>{h}</p>)}</div><details open={showSolution} onToggle={e=>setShowSolution((e.currentTarget as HTMLDetailsElement).open)}><summary onClick={()=>patchProgress({solutionViewed:true})}>ดูตัวอย่างคำตอบ (เลือกเปิดเอง)</summary><pre tabIndex={0}><code>{lesson.solution}</code></pre><p className="muted">การเปิดคำตอบไม่ทำให้ได้ XP และการผ่านซ้ำไม่เพิ่ม XP</p></details></div>;
+  const taskContent=<div className="task-content-block"><span className="eyebrow">Field assignment</span><h2>{lesson.prompt}</h2><h3>Acceptance criteria</h3><div className="check-list">{lesson.acceptance.map((item,i)=><label key={item}><input type="checkbox" checked={!!progress.checklist[i]} onChange={()=>toggleCheck(i)}/><span>{item}</span></label>)}</div>{lesson.expectedOutput&&<><h3>ผลลัพธ์ที่คาดหวัง</h3><pre tabIndex={0}><code>{lesson.expectedOutput}</code></pre></>}<div className="hint-box"><div><strong>Hint {Math.min(hintCount+1,3)}/3</strong><button onClick={()=>setHintCount(c=>Math.min(3,c+1))}>{hintCount===0?"เปิด Hint แรก":"ช่วยเพิ่มอีกขั้น"}</button></div>{lesson.hints.slice(0,hintCount).map((h,i)=><p key={h}><b>{i+1}</b>{h}</p>)}</div><details open={showSolution} onToggle={e=>setShowSolution((e.currentTarget as HTMLDetailsElement).open)}><summary onClick={()=>patchProgress({solutionViewed:true})}>ดูตัวอย่างคำตอบ (เลือกเปิดเอง)</summary><pre tabIndex={0}><code>{lesson.solution}</code></pre><p className="muted">การเปิดคำตอบไม่ทำให้ได้ XP และการผ่านซ้ำไม่เพิ่ม XP</p></details><AICompanion context={lesson.title} prompts={["ช่วยอธิบายโจทย์ด้วยภาษาง่าย ๆ", "ถามฉันเพื่อเช็กว่าฉันเข้าใจจริงไหม", "ช่วยใบ้ขั้นแรกโดยยังไม่เฉลย"]}/></div>;
   const editorContent=<div className="editor-block"><div className="editor-head"><div><span className="dot red"/><span className="dot amber"/><span className="dot green"/><strong>{lesson.track==="java"?(javaEntry?`${javaEntry}.java`:"Java files"):"solution.js"}</strong><em>{lesson.track==="java"?"Java":"JavaScript"}</em></div><span className={`save-inline ${saveState}`}>{saveState==="saving"?"กำลังบันทึก…":saveState==="error"?"บันทึกไม่สำเร็จ":"บันทึกแล้ว"}</span></div><textarea className="code-editor" aria-label="พื้นที่เขียนโค้ด" spellCheck={false} value={progress.code} onKeyDown={indent} onChange={e=>patchProgress({code:e.target.value})}/><div className="runner-note"><ShieldCheck/><p>{lesson.checkMode==="auto"?"รันใน Web Worker แยกจาก UI ปิด network/import และหยุดเมื่อเกิน 1.5 วินาที ระบบตรวจ behavior ของฟังก์ชันจริง":"ระบบไม่อ้างว่าคอมไพล์โค้ดนี้ ให้รันในเครื่องและยืนยันหลักฐานด้วย checklist"}</p></div><div className="editor-actions">{lesson.checkMode==="auto"?<button className="run" onClick={run} disabled={running}><Play/>{running?"กำลังทดสอบ":"Run tests"}</button>:<button className="run" onClick={selfComplete} disabled={!lesson.acceptance.every((_,i)=>progress.checklist[i])}><Check/>ยืนยันตรวจในเครื่อง</button>}<span>{lesson.checkMode==="local-java"?(javaEntry?`JDK 25 · javac ${javaEntry}.java → java ${javaEntry}`:"JDK 25 · รันในโปรเจกต์ Java ของคุณ"):lesson.checkMode==="auto"?`${lesson.tests?.length??0} test cases · จำกัด 1.5s`:"ตรวจด้วยหลักฐาน"}</span></div></div>;
   const resultContent=<div className="result-block"><div className="panel-title"><div><span className="eyebrow">ผลตรวจล่าสุด</span><h2>{progress.lastResult?.passed?"ผ่านเงื่อนไขรอบนี้":progress.lastResult?"ยังมี test ที่ไม่ผ่าน":"พร้อมรับผลการทดสอบ"}</h2></div>{progress.lastResult?.details.length?<strong>{progress.lastResult.details.filter(result=>result.passed).length}/{progress.lastResult.details.length}</strong>:null}</div>{progress.lastResult?.details.length?<div className="test-results">{progress.lastResult.details.map(result=><article className={result.passed?"pass":"fail"} key={result.name}><div>{result.passed?<Check/>:<X/>}<strong>{result.name}</strong></div><dl><dt>expected</dt><dd>{result.expected}</dd><dt>actual</dt><dd>{result.actual}</dd>{result.error&&<><dt>error</dt><dd>{result.error}</dd></>}</dl></article>)}</div>:progress.lastResult?.passed?<div className="self-proof"><Check/><h3>ตรวจตาม acceptance criteria ครบแล้ว</h3><p>สถานะนี้คือ “ตรวจด้วยตัวเอง” ไม่ใช่ผลยืนยันจาก runner ของเว็บไซต์</p></div>:<div className="result-empty"><CircleDot/><p>ยังไม่มีผลตรวจ กด Run tests หรือยืนยัน checklist หลังทดลองในเครื่อง</p></div>}<section className="reflection"><h3>สะท้อนความเข้าใจ</h3><p>{lesson.reflection}</p><textarea value={progress.reflection} onChange={e=>patchProgress({reflection:e.target.value})} placeholder="เขียนด้วยคำของซีเอง…"/></section>{progress.status==="passed"&&<div className="completion-card"><PixelCat variant="celebrate"/><div><span className="eyebrow">Mission complete</span><h3>เพิ่มหลักฐานให้ {lesson.skillIds.length} ทักษะแล้ว</h3><p>{lesson.xp} XP ได้จากการผ่านครั้งแรก การรันซ้ำจะไม่เพิ่มรางวัล</p>{next&&<button className="primary" onClick={()=>openLesson(next.id)}>ไปบทถัดไป <ChevronRight/></button>}</div></div>}</div>;
   const notesContent=<div className="notes-block"><span className="eyebrow">Private field notes</span><h2>บันทึกระหว่างเรียน</h2><p>จด hypothesis, error message หรือสิ่งที่จะกลับมาทดลอง ข้อมูลบันทึกอัตโนมัติใน browser นี้</p><textarea className="notes-editor" value={progress.notes} onChange={e=>patchProgress({notes:e.target.value})} placeholder="ฉันสังเกตว่า…"/><div className="bonus"><Sparkles/><div><strong>Bonus challenge</strong><p>{lesson.bonus}</p></div></div></div>;

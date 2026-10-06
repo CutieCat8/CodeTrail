@@ -1,7 +1,23 @@
 # ส่งต่อ curriculum repair (สำหรับ session ใหม่)
 
 อัปเดต 2026-10-06 โดย Claude (Opus 5.5) · ฉบับก่อนหน้าของ Codex ดูได้ที่ `git show 2691362:docs/COURSE-REPAIR-HANDOFF.md`
-**รอบปรับหลักสูตรยังไม่จบ** เอกสารนี้แยกสิ่งที่ยืนยันแล้วกับสิ่งที่ยังไม่ได้ตรวจ อย่าถือว่า WIP ผ่าน
+**โปรเจกต์ PAUSED ตั้งแต่ 2026-10-06 (ไปทำโปรเจกต์มหาวิทยาลัย) รอบปรับหลักสูตรยังไม่จบ** เอกสารนี้แยกสิ่งที่ยืนยันแล้วกับสิ่งที่ยังไม่ได้ตรวจ อย่าถือว่า WIP ผ่าน
+
+## PAUSED (2026-10-06): วิธีรับช่วงเมื่อกลับมา
+
+**สถานะ:** push แล้ว `main` = `7714c96` บน https://github.com/CutieCat8/CodeTrail (Windows `C:\Users\Asus\Documents\sea-fullstack-quest` และ WSL `/home/cnux/work/sea-fullstack-quest` ตรงกัน) งานซ่อม R1/JS/Developer Foundations/Java อยู่ใน main ประวัติ commit ถูกเขียนใหม่ให้ผู้เขียนเป็น วีรชิต มงคล ไม่มี Co-Authored-By; ห้ามใช้ชื่อ Claude/Codex เป็น author และไม่ใส่ co-author
+**เฉพาะเครื่อง (WSL) ยังไม่ push:** branch `r3/typescript` (`b1d76bf`, WIP 1 commit), `r3/node` (`fbf785c`, WIP 1 commit, compile ไม่ผ่าน); `r3/backend`, `r3/oop`, `r4/labs` = `0be1ffe` (ว่าง, อยู่ใน main แล้วเป็นฐาน); `r4/labs` มี untracked `scripts/_tmp_dump.ts`, `_tmp_dump2.ts`; repo หลัก untracked `.omc/` (ห้าม commit) ไม่มีไฟล์ tracked ค้างใน worktree ใด
+**Worktrees (อย่าลบ):** repo หลัก (branch feat/curriculum-learning-repair `7d8049c`, อยู่ใน main แล้ว), `../sfq-main` (main), `../sfq-r2-javafix`, `../sfq-r2-jsfix`, `../sfq-r3-{typescript,node,backend,oop}`, `../sfq-r4-labs`
+**Process:** ไม่มี worker/server/vitest/java ของโปรเจกต์นี้ค้าง ณ ตอนพัก
+
+**งานแรกเมื่อกลับมา: รับช่วง TypeScript จากร่างเดิม**
+1. `git status --short --branch`, `git worktree list` และตรวจว่า HEAD ตรงตารางด้านล่าง; ทำใน `../sfq-r3-typescript` (branch `r3/typescript`) แล้ว merge `main` เข้ามาก่อนเริ่ม (`git merge main`) เพราะ branch แยกจากฐานเก่า
+2. อ่าน [R3-WRITER-BRIEF.md](R3-WRITER-BRIEF.md) และ `typescript.ts`, `lessons/typescript.ts`, ร่าง `typescript-bridges.ts` (617 บรรทัด ยังไม่ตรวจ ไม่ wire) ตามแบบ `javascript-foundations.ts`/`javascript-bridges.ts`
+3. ทำทีละ 3–5 บท: wire bridges เข้า order/prerequisites, checkpoints ใหม่, ตรวจ example/solution ด้วย `tsc`, commit + บันทึก `docs/verification/R3-TypeScript/checks.md`
+4. ขอบเขตและเงื่อนไขเสร็จดู [PROJECT-BACKLOG.md](PROJECT-BACKLOG.md) แถว 1; ตัวตรวจ `NO_COLOR=1 FORCE_COLOR=0 npx vitest run`
+5. ไม่เกิน 2 agents พร้อมกัน, commit ทีละส่วน (ดู quota note ข้อ 7); ไม่ push/deploy จนผู้ใช้อนุญาต
+
+backlog ทั้งหมด (หลักสูตร + ข้อค้างเล็ก): [PROJECT-BACKLOG.md](PROJECT-BACKLOG.md)
 
 ## 0. สถานะล่าสุด (2026-10-06, Sonnet 5.5): รวมรอบซ่อม R1/JS/Developer Foundations/Java เข้า main แล้ว
 
@@ -33,17 +49,17 @@ Commits บน branch หลักหลัง Codex (2691362):
 | f7bbe3a, ac46a7c | บันทึก independent review (ดูข้อ 3) |
 | 40f7646 | UI: assessment ของ JavaScript มีปุ่ม Run (ไม่มี tests) เพื่อเก็บ output เป็นหลักฐาน; `.reveal pre` ตัดบรรทัด; ข้อความหลังส่งของ assessment; test ใหม่ใน `tests/assessment-workspace.test.tsx` |
 
-## 2. Worktrees (ทั้งหมดยังไม่ merge เข้า branch หลัก)
+## 2. Worktrees (HEAD หลังเขียนประวัติใหม่ 2026-10-06; r2/* อยู่ใน main แล้ว, r3/* r4 ยังไม่ merge)
 
 | path | branch | HEAD | สถานะจริง |
 |---|---|---|---|
-| ../sfq-r2-javafix | r2/java-fix | 8d34e93 | e8260d2 + กลุ่ม 1–2 (self-check ครบ review Java ยกเว้นข้อค้างใน checks.md) บันทึกที่ `docs/verification/R2-Java-fix/checks.md` ในบรานช์นั้น; รอ independent review |
-| ../sfq-r2-jsfix | r2/js-fix | f7b3873 | **ปิดแล้ว (self-check)**: 3f60427 + 86cf82b ตรวจแล้ว + 7b08748 + f7b3873 (Developer Foundations) บันทึกที่ `docs/verification/R2-JS-fix/checks.md` ในบรานช์นั้น; รอ independent review (Gemini อ่านอย่างเดียว) |
-| ../sfq-r3-node | r3/node | e8c37e0 | WIP ร่าง `node-foundations.ts` (+907/−123) **compile ไม่ผ่าน**: import `./node-bridges` และ `./node-checkpoints` ที่ยังไม่ได้สร้าง |
-| ../sfq-r3-typescript | r3/typescript | de9bb5c | WIP มีเพียง `typescript-bridges.ts` (617 บรรทัด) ร่าง ยังไม่ wire เข้า `typescript.ts` ไม่ได้ตรวจ |
-| ../sfq-r3-backend | r3/backend | 08c79b4 | ยังไม่เริ่ม |
-| ../sfq-r3-oop | r3/oop | 08c79b4 | ยังไม่เริ่ม |
-| ../sfq-r4-labs | r4/labs | 08c79b4 | ยังไม่เริ่ม; untracked `scripts/_tmp_dump.ts`, `scripts/_tmp_dump2.ts` (ไฟล์ช่วยของ agent ที่หยุด ไม่ใช่งานส่งมอบ) |
+| ../sfq-r2-javafix | r2/java-fix | baa8619 | e8260d2 + กลุ่ม 1–2 (self-check ครบ review Java ยกเว้นข้อค้างใน checks.md) บันทึกที่ `docs/verification/R2-Java-fix/checks.md` ในบรานช์นั้น; รอ independent review |
+| ../sfq-r2-jsfix | r2/js-fix | 59aa45a | **ปิดแล้ว (self-check)**: 3f60427 + 86cf82b ตรวจแล้ว + 7b08748 + f7b3873 (Developer Foundations) บันทึกที่ `docs/verification/R2-JS-fix/checks.md` ในบรานช์นั้น; รอ independent review (Gemini อ่านอย่างเดียว) |
+| ../sfq-r3-node | r3/node | fbf785c | WIP ร่าง `node-foundations.ts` (+907/−123) **compile ไม่ผ่าน**: import `./node-bridges` และ `./node-checkpoints` ที่ยังไม่ได้สร้าง |
+| ../sfq-r3-typescript | r3/typescript | b1d76bf | WIP มีเพียง `typescript-bridges.ts` (617 บรรทัด) ร่าง ยังไม่ wire เข้า `typescript.ts` ไม่ได้ตรวจ |
+| ../sfq-r3-backend | r3/backend | 0be1ffe | ยังไม่เริ่ม |
+| ../sfq-r3-oop | r3/oop | 0be1ffe | ยังไม่เริ่ม |
+| ../sfq-r4-labs | r4/labs | 0be1ffe | ยังไม่เริ่ม; untracked `scripts/_tmp_dump.ts`, `scripts/_tmp_dump2.ts` (ไฟล์ช่วยของ agent ที่หยุด ไม่ใช่งานส่งมอบ) |
 
 Branch ทั้งหมดแยกจาก 08c79b4 ขึ้นไป; การรวมให้ทำทีละ branch ด้วย `git merge --no-ff <branch>` หลังตรวจผ่านเท่านั้น ห้ามลบ worktree ที่มีงาน
 
@@ -86,7 +102,7 @@ Preview :3100 **หยุดแล้ว** ต้อง build + start ใหม�
 
 **งานค้าง (ห้ามถือว่าปิดสมบูรณ์):** (1) JS: รอผล Gemini ที่ snapshot f7b3873 + M6 test guard (walkthrough/pitfalls ไม่เผยเฉลย, code ไม่มีบรรทัด >120) ทำหลัง merge r2/* ไม่ได้ merge ในรอบนี้, m6 ชื่อไฟล์ใน editor, m8; (2) Java: checkpoint library-0 ซ้ำโดเมน M0 (ตัดสินใจว่าจะเปลี่ยนโดเมนไหม), `copyExcept` skip guard, build + browser หลัง R2; (3) ยังไม่ merge r2/js-fix และ r2/java-fix เข้า feat/curriculum-learning-repair; (4) ทั้งหมดเป็นงาน Claude รอ independent review
 
-## 6. งานแรกของ session ใหม่ (ทำเสร็จแล้วตามข้อ 5.1): ปิด JavaScript บน r2/js-fix ทีละกลุ่ม
+## 6. (ประวัติ) งานแรกของ session ก่อน: ปิด JS/Java ทำเสร็จแล้ว ดู PAUSED ด้านบนสำหรับงานแรกปัจจุบัน: ปิด JavaScript บน r2/js-fix ทีละกลุ่ม
 
 ทำใน `../sfq-r2-jsfix` เท่านั้น ทีละกลุ่ม และ commit หลังแต่ละกลุ่มผ่าน:
 1. ตรวจ 3f60427 (bridges): `npx tsc --noEmit`, `npx vitest run tests/curriculum-quality.test.ts tests/content.test.ts tests/runner-compare.test.ts`, อ่าน diff เทียบ review ข้อ C1/M1–M4 ของ bridges
@@ -129,6 +145,6 @@ npm run start -- --hostname 127.0.0.1 -p 3100   # preview หลัง build
 
 เครื่องมืออยู่ใน /tmp (อาจถูกล้าง): JDK 21 + JUnit 6.1.3 ที่ `/tmp/sea-quest-java-tools`, Express 5.2.1/PGlite 0.5.8/pg ที่ `/tmp/lesson-verify` (สร้างใหม่: `mkdir -p /tmp/lesson-verify && cd /tmp/lesson-verify && npm init -y && npm pkg set type=module && npm install express@5.2.1 @electric-sql/pglite@0.5.8 pg`), Playwright/Chromium ที่ `/tmp/sea-quest-browser` (วิธีเตรียมใน [COURSE-REPAIR-EVIDENCE](COURSE-REPAIR-EVIDENCE.md) ส่วน R1)
 
-## 10. Processes ตอนเขียน
+## 10. Processes ตอนเขียน (ฉบับเดิม; ตอน PAUSED ไม่มี worker ของโปรเจกต์นี้ค้าง)
 
 ไม่มี worker ของงานนี้ทำงาน (ไม่มี vitest/vite-node/java/next-server/agent) ที่ยังเปิดอยู่: Codex CLI PID 236304 (cwd repo หลัก, ไม่เปิดไฟล์ใน repo), Codex app-server daemons, Claude PID 19402 (cwd `/mnt/c/...` session audit เดิม), Claude PID 260047 = terminal ของ session นี้

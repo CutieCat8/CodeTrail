@@ -15,6 +15,7 @@ import { StepSections } from "./StepSections";
 import { WorldLandmark } from "./ExpeditionArt";
 import { QuestHome } from "./QuestHome";
 import BackupRecovery from "./BackupRecovery";
+import { LessonSearch } from "./LessonSearch";
 import { LearningDiagnostic } from "./LearningDiagnostic";
 import { ProjectMilestones } from "./ProjectMilestones";
 import { friendsActivityProjectId } from "@/content/projects";
@@ -225,6 +226,8 @@ function CurriculumView({ data, openStep }: { data: AppData; openStep: (id: stri
     <header className="curriculum-intro"><div><span className="eyebrow">{learningSteps.length} micro-steps · เริ่มจากศูนย์</span><h1>เลือกเส้นทางจากสิ่งที่อยากทำได้</h1><p>แต่ละหัวข้อแบ่งเป็นแนวคิด → ทำนายผล → ลงมือเขียน → แก้บั๊ก → อธิบาย เพื่อสร้าง mental model ก่อนพึ่ง framework</p></div><div className="curriculum-total"><strong>{readyCourses.length}</strong><span>คอร์สพร้อมเรียน</span></div></header>
 
     <div className="segmented curriculum-filter" aria-label="กรองเส้นทาง">{([['all','ทั้งหมด'],['foundation','พื้นฐานนักพัฒนา'],['java','Java & OOP'],['web','Web & Back-end']] as const).map(([id,label])=><button key={id} aria-pressed={track===id} onClick={()=>setTrack(id)}>{label}</button>)}</div>
+
+    <details className="lesson-search-disclosure"><summary>ค้นหาและกรองบทเรียน</summary><LessonSearch data={data} openStep={openStep} track={track} /></details>
 
     {selectedCourse && <section className={`featured-course ${selectedCourse.track}`}>
       <div className="featured-course-art"><WorldLandmark world={artFor(selectedCourse.id)} decorative /></div>

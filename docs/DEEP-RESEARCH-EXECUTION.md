@@ -25,7 +25,7 @@ Source: `/Users/floridae/Downloads/deep-research-report-6.md`. This file tracks 
 - [ ] Add a deterministic review queue and delayed retrieval tasks.
 - [ ] Expand interaction formats after testing the existing five-step learning loop with a learner.
 - [ ] Extend the Java route through testing, SQL/JDBC, and a backend project; keep SQL concepts ahead of ORM lessons.
-- [ ] Build Friends Activity Planner into a sequence of project milestones backed by artifacts.
+- [x] Build Friends Activity Planner into nine project milestones with tasks, acceptance criteria, artifact links, self-review notes, available lesson links, a downloadable brief, and Home continuation. Preserve legacy checklist/links and include milestones in v1 export/import. Submission is learner self-review; repository execution and external artifact verification are not automated.
 - [ ] Add diagnostics that allow a learner to skip content without claiming mastery.
 
 ## Personal Cloud and offline

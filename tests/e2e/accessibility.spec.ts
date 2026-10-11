@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-for (const route of ["#dashboard", "#curriculum", "#roadmap", "#lesson/web-ts-narrowing"]) {
+for (const route of ["#dashboard", "#curriculum", "#roadmap", "#projects", "#lesson/web-ts-narrowing"]) {
   test(`has no serious automated accessibility violations on ${route}`, async ({ page }) => {
     await page.goto(`/${route}`);
     await expect(page.locator(".loading-screen")).toHaveCount(0);

@@ -7,6 +7,8 @@ import { lessonById, lessons } from "@/content/lessons";
 import { stepRecommendation } from "@/lib/recommendation";
 import { calculateStreak, xpTotal } from "@/lib/storage";
 import { weeklyActivityCount } from "@/lib/activity";
+import { friendsActivityProjectId } from "@/content/projects";
+import { projectMilestoneSummary } from "@/lib/projects";
 import type { AppData, StudyMode } from "@/types/domain";
 import { ActivityHeatmap } from "./ActivityHeatmap";
 import { ExpeditionBase } from "./ExpeditionArt";
@@ -17,13 +19,14 @@ type Props = {
   setData: Dispatch<SetStateAction<AppData>>;
   openLesson: (id: string) => void;
   openStep: (id: string) => void;
+  openProjects: () => void;
 };
 
 const modeOptions: [StudyMode, string][] = [["fullstack", "Full-stack"], ["java", "Java & OOP"], ["mixed", "ผสมสองเส้นทาง"]];
 const fullstackCourseIds = new Set(["developer-foundations", "web-platform-foundations", "javascript-foundations", "node-foundations"]);
 const javaCourseIds = new Set(["java-foundations", "java-oop"]);
 
-export function QuestHome({ data, setData, openLesson, openStep }: Props) {
+export function QuestHome({ data, setData, openLesson, openStep, openProjects }: Props) {
   const recommended = stepRecommendation(data);
   const passedLessons = Object.values(data.progress).filter((progress) => progress.status === "passed").length;
   const completedSteps = Object.values(data.stepProgress).filter((progress) => progress.completed).length;
@@ -58,8 +61,8 @@ export function QuestHome({ data, setData, openLesson, openStep }: Props) {
   const totalLearningItems = lessons.length + learningSteps.length;
   const completedItems = passedLessons + completedSteps;
   const progressPercent = totalLearningItems ? Math.round((completedItems / totalLearningItems) * 100) : 0;
-  const project = data.projectProgress?.["friends-activity-planner"];
-  const projectChecks = project?.checklist.filter(Boolean).length ?? 0;
+  const project = data.projectProgress?.[friendsActivityProjectId];
+  const projectSummary = projectMilestoneSummary(project);
   const today = new Intl.DateTimeFormat("th-TH", { weekday: "long", day: "numeric", month: "long", timeZone: "Asia/Bangkok" }).format(new Date());
 
   return <div className="page home-page">
@@ -100,9 +103,10 @@ export function QuestHome({ data, setData, openLesson, openStep }: Props) {
 
         <section className="home-project-card">
           <div className="home-project-head"><FolderGit2 /><span><small>PROJECT IN PROGRESS</small><strong>Friends Activity Planner</strong></span></div>
-          <p>{project ? "มีงานโปรเจกต์ที่บันทึกไว้แล้ว กลับไปทำต่อจาก milestone ล่าสุดได้" : "เชื่อมบทเว็บแต่ละบทเป็นระบบวางแผนกิจกรรมสำหรับเพื่อน 9 คน"}</p>
-          <div className="home-project-progress"><span><i style={{ width: `${Math.round(projectChecks / 4 * 100)}%` }}/></span><small>{projectChecks}/4 milestones</small></div>
+          <p>{projectSummary.next ? `ขั้นแนะนำ: ${projectSummary.next.title}` : "ส่งหลักฐานครบทุกขั้นแล้ว กลับไปตรวจและปรับผลงานต่อได้"}</p>
+          <div className="home-project-progress"><span><i style={{ width: `${Math.round(projectSummary.submitted / projectSummary.total * 100)}%` }}/></span><small>{projectSummary.submitted}/{projectSummary.total} milestones · ตรวจเอง</small></div>
           <div className="home-project-links"><span className={project?.repositoryUrl ? "ready" : ""}><Code2 /> {project?.repositoryUrl ? "Repository linked" : "Repository not linked yet"}</span></div>
+          <button className="home-project-open" onClick={openProjects}>ไปทำโปรเจกต์<ChevronRight aria-hidden="true" /></button>
         </section>
 
         <section className="weekly-mini-card">

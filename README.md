@@ -94,6 +94,16 @@ java Main
 - ล้าง browser data แล้วข้อมูลหาย
 - ใช้ Export JSON สำรอง และ Import เพื่อย้ายเครื่อง
 
+## Friends Activity Planner: โปรเจกต์ฝึกทีละขั้น
+
+หน้า `#projects` มี 9 milestones: repo → domain model → UI → API → PostgreSQL → เข้าร่วม/โหวต → integration → tests/reliability → portfolio แต่ละขั้นมีงาน เกณฑ์ตรวจ ผลงานที่ต้องแนบ คำถามสะท้อนความเข้าใจ และปุ่มเปิดบทเรียนที่มีอยู่จริง พร้อมดาวน์โหลดโจทย์ทั้งชุดเป็น Markdown
+
+บันทึก draft/checklist/ลิงก์หลักฐานแยกตาม milestone ได้ เมื่อเกณฑ์ครบ มีลิงก์ HTTP(S) และคำอธิบายผลตรวจ จึงกดส่งหลักฐานได้ สถานะนี้คือ **ผู้เรียนตรวจเอง** ไม่ใช่ผลตรวจ repository หรือการรับรองจากระบบ การแก้ข้อมูลหลังส่งจะคืนขั้นนั้นเป็น draft เพื่อให้ตรวจและส่งใหม่
+
+หน้า Home แสดงจำนวน milestone ที่ส่งหลักฐานและแนะนำขั้นแรกที่ยังไม่ส่ง ข้อมูลอยู่ใน `projectProgress["friends-activity-planner"].milestones` ของ schema v1 เดิม โดยเก็บ checklist และ repository/demo links เดิมไว้แยกกัน; Export/Import รวมข้อมูล milestone ด้วย
+
+นี่คือเส้นทางฝึกสร้าง Friends Activity Planner ไม่ใช่บริการจัดกิจกรรมที่ deploy แล้ว ผู้เรียนสร้างและทดลองชิ้นงานใน repository ของตนเอง Java เป็นทางเลือกฝึก CLI/domain และยังรันในเครื่อง
+
 ## Next.js ที่ใช้ในบทเรียน
 
 ตัวแอปใช้ Next.js **16.3.6** กับ App Router บทเรียนย้ำให้ระบุ `cache: "no-store"`, `cache: "force-cache"` หรือ revalidation ตาม intent ของ request และไม่สมมติว่า `fetch` มี default cache behavior เหมือนกันทุกเวอร์ชัน

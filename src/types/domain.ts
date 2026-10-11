@@ -81,6 +81,15 @@ export type ProjectProgress = {
   demoUrl: string;
   checklist: boolean[];
   updatedAt: string;
+  milestones?: Record<string, ProjectMilestoneProgress>;
+};
+
+export type ProjectMilestoneProgress = {
+  checks: Record<string, boolean>;
+  evidenceUrl: string;
+  notes: string;
+  updatedAt: string;
+  submittedAt?: string;
 };
 
 export type ActivityEvent = {

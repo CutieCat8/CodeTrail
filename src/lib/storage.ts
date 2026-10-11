@@ -53,6 +53,15 @@ export function isAppData(value: unknown): value is AppData {
       const item = progress as { repositoryUrl?: unknown; demoUrl?: unknown; checklist?: unknown; updatedAt?: unknown };
       if (typeof item.repositoryUrl !== "string" || typeof item.demoUrl !== "string" || typeof item.updatedAt !== "string") return false;
       if (!isBooleanArray(item.checklist)) return false;
+      if (progress.milestones !== undefined) {
+        if (!isRecord(progress.milestones)) return false;
+        for (const milestone of Object.values(progress.milestones)) {
+          if (!isRecord(milestone) || !isRecord(milestone.checks)) return false;
+          if (!Object.values(milestone.checks).every(value => typeof value === "boolean")) return false;
+          if (typeof milestone.evidenceUrl !== "string" || typeof milestone.notes !== "string" || typeof milestone.updatedAt !== "string") return false;
+          if (milestone.submittedAt !== undefined && (typeof milestone.submittedAt !== "string" || !Number.isFinite(Date.parse(milestone.submittedAt)))) return false;
+        }
+      }
     }
   }
   if (candidate.activityEvents !== undefined) {

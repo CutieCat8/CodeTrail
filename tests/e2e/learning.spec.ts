@@ -120,10 +120,11 @@ test("Journal and project evidence survive a reload", async ({ page }) => {
 
   await page.locator(".sidebar nav").getByRole("button", { name: "โปรเจกต์" }).click();
   await page.getByRole("checkbox", { name: "API มี error contract" }).check();
-  await expect(page.locator(".project-status")).toContainText("1/4");
+  await expect(page.getByRole("checkbox", { name: "API มี error contract" })).toBeChecked();
+  await expect(page.locator(".project-status")).toContainText("0/9");
   await expect(page.locator(".save-pill")).toContainText("บันทึกแล้ว");
   await page.reload();
-  await expect(page.locator(".project-status")).toContainText("1/4");
+  await expect(page.getByRole("checkbox", { name: "API มี error contract" })).toBeChecked();
   await page.locator(".sidebar nav").getByRole("button", { name: "สมุดบันทึก" }).click();
   await expect(page.locator(".journal-entry-list")).toContainText("HTTP response");
 });

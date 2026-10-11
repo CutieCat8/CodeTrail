@@ -12,6 +12,7 @@ import { projectMilestoneSummary } from "@/lib/projects";
 import type { AppData, StudyMode } from "@/types/domain";
 import { ActivityHeatmap } from "./ActivityHeatmap";
 import { ExpeditionBase } from "./ExpeditionArt";
+import { RouteCompletion } from "./RouteCompletion";
 import { PixelCat } from "./PixelCat";
 
 type Props = {
@@ -73,7 +74,7 @@ export function QuestHome({ data, setData, openLesson, openStep, openProjects }:
 
     <div className="home-layout">
       <div className="home-main-column">
-        <section className="continue-quest">
+        {recommended.routeComplete ? <RouteCompletion data={data} openStep={openStep} openProjects={openProjects} /> : <section className="continue-quest">
           <div className="continue-art"><ExpeditionBase /></div>
           <div className="continue-overlay" />
           <div className="continue-copy">
@@ -84,7 +85,7 @@ export function QuestHome({ data, setData, openLesson, openStep, openProjects }:
             <div className="continue-meta"><span><Clock3 /> {continueMinutes} นาที</span><span><Layers3 /> {isMixedMission ? `Next: ${recommended.companionCourse?.title}` : resumableStep ? "Micro-step" : resumableLesson ? "Lab" : recommended.step.kind}</span></div>
             <div className="continue-actions"><button className="primary" onClick={openContinue}>{isMixedMode ? "เริ่มเลย" : "เรียนต่อ"} <ChevronRight /></button>{!isMixedMode && <button className="home-quiet-action" onClick={() => openStep(recommended.step.id)}>ดูภารกิจแนะนำ</button>}</div>
           </div>
-        </section>
+        </section>}
 
         <section className="diagnostic-invitation"><h2>หาจุดเริ่มเรียน</h2><p>ลองตอบ 8 ข้อเพื่อเลือกหัวข้อทบทวน ไม่เปลี่ยนความคืบหน้าหรือ XP</p><a className="home-quiet-action" href="#diagnostic">{data.diagnosticResult ? "ดูผลประเมินก่อนเรียน" : "ทำแบบประเมินก่อนเรียน"}</a></section>
         <ActivityHeatmap data={data} />

@@ -186,3 +186,17 @@ button{min-width:24px;min-height:24px}
 .diagnostic-page button { white-space: normal; text-align: left; }
 .diagnostic-invitation { padding: 20px; border: 1px solid var(--color-border); border-radius: 16px; }
 .diagnostic-invitation h2 { margin-top: 0; }
+
+.route-completion { min-width: 0; max-width: 100%; padding: clamp(18px, 3vw, 30px); border: 1px solid var(--color-border); border-radius: 16px; background: #101a2d; overflow-wrap: anywhere; }
+.route-completion p { color: var(--color-text-secondary); line-height: 1.7; }
+.route-completion dl { display: flex; flex-wrap: wrap; gap: 24px; }
+.route-completion dd { margin: 8px 0; font-size: 24px; }
+.route-completion ul { padding: 0; list-style: none; }
+.route-completion li { display: flex; justify-content: space-between; flex-wrap: wrap; align-items: center; gap: 12px; margin: 16px 0; }
+.route-completion button { white-space: normal; }
+
+.route-completion .button-row { flex-wrap: wrap; }
+.route-completion .home-quiet-action { max-width: 100%; white-space: normal; }
+.route-completion li > span { min-width: 0; }
+
+.home-page .home-main-column { grid-template-columns: minmax(0, 1fr); }

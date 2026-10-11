@@ -89,7 +89,7 @@ test("project brief downloads and linked lessons open without losing drafts", as
   await expect(page.getByRole("textbox", { name: "สิ่งที่ทำและผลตรวจ" })).toHaveValue("กำลังเขียน README");
 });
 
-test("milestone workspace fits mobile and supports keyboard controls", async ({ page }) => {
+test("milestone workspace fits mobile and supports keyboard controls", async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/#projects");
   await page.getByRole("navigation", { name: "เลือก milestone" }).getByRole("button", { name: /เก็บข้อมูลใน PostgreSQL/ }).focus();
@@ -97,8 +97,8 @@ test("milestone workspace fits mobile and supports keyboard controls", async ({ 
   await expect(page.getByRole("heading", { name: "เก็บข้อมูลใน PostgreSQL", exact: true })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
-  await page.screenshot({ path: "/private/tmp/codetrail-projects-mobile.png", fullPage: true });
+  await page.screenshot({ path: testInfo.outputPath("projects-mobile.png"), fullPage: true });
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
-  await page.screenshot({ path: "/private/tmp/codetrail-projects-desktop.png", fullPage: true });
+  await page.screenshot({ path: testInfo.outputPath("projects-desktop.png"), fullPage: true });
 });

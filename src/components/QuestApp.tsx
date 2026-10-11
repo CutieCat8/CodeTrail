@@ -14,17 +14,18 @@ import { FullStackRoadmap } from "./FullStackRoadmap";
 import { StepSections } from "./StepSections";
 import { WorldLandmark } from "./ExpeditionArt";
 import { QuestHome } from "./QuestHome";
+import { LearningDiagnostic } from "./LearningDiagnostic";
 import { ProjectMilestones } from "./ProjectMilestones";
 import { friendsActivityProjectId } from "@/content/projects";
 import { projectMilestoneSummary } from "@/lib/projects";
 
-type View = "dashboard" | "curriculum" | "roadmap" | "map" | "challenges" | "skills" | "journal" | "projects" | "settings" | "lesson" | "step";
+type View = "diagnostic" | "dashboard" | "curriculum" | "roadmap" | "map" | "challenges" | "skills" | "journal" | "projects" | "settings" | "lesson" | "step";
 type SaveState = "idle" | "saving" | "saved" | "error";
 type NavView = Exclude<View, "lesson" | "step">;
 type NavItem = readonly [NavView, string, typeof LayoutDashboard];
 
 const navGroups: readonly { label: string; items: readonly NavItem[] }[] = [
-  { label: "เริ่มต้น", items: [["dashboard", "ฐานปฏิบัติการ", LayoutDashboard]] },
+  { label: "เริ่มต้น", items: [["dashboard", "ฐานปฏิบัติการ", LayoutDashboard], ["diagnostic", "ประเมินก่อนเรียน", Target]] },
   { label: "เรียน", items: [["curriculum", "คอร์ส", Layers3], ["roadmap", "Roadmap", Route], ["map", "Lab", Map], ["challenges", "คลังโจทย์", FlaskConical]] },
   { label: "ผลงาน", items: [["skills", "หลักฐานทักษะ", Gauge], ["journal", "สมุดบันทึก", NotebookPen], ["projects", "โปรเจกต์", FolderGit2]] },
 ];
@@ -178,6 +179,7 @@ export function QuestApp() {
         <header className="topbar"><button className="desktop-nav-toggle" onClick={() => setSidebarCollapsed(value => !value)} aria-label={sidebarCollapsed ? "กางเมนูด้านข้าง" : "พับเมนูด้านข้าง"} aria-controls="app-sidebar" aria-expanded={!sidebarCollapsed} title={sidebarCollapsed ? "กางเมนูด้านข้าง" : "พับเมนูด้านข้าง"}>{sidebarCollapsed ? <PanelLeftOpen aria-hidden="true" /> : <PanelLeftClose aria-hidden="true" />}</button><button ref={menuButtonRef} className="menu-button" onClick={() => setMobileNav(true)} aria-label="เปิดเมนู" aria-expanded={mobileNav}><Menu aria-hidden="true" /></button><div className="breadcrumb"><span>Sea’s Full-stack Quest</span><strong>{view === "lesson" ? lessonById(activeLessonId)?.title : view === "step" ? stepById(activeStepId)?.title : nav.find(([id]) => id === view)?.[1]}</strong></div><div className={`save-pill ${saveState}`} aria-live="polite"><CircleDot size={12} aria-hidden="true" /> {saveState === "saving" ? "กำลังบันทึก" : saveState === "error" ? "บันทึกไม่สำเร็จ" : "บันทึกแล้ว"}</div></header>
         <main id="main">
           {view === "dashboard" && <Dashboard data={data} setData={setData} openLesson={openLesson} openStep={openStep} openProjects={() => goView("projects")} />}
+          {view === "diagnostic" && <LearningDiagnostic key={data.diagnosticResult?.completedAt ?? "new"} result={data.diagnosticResult} onSave={result => setData(current => ({ ...current, diagnosticResult: result }))} openStep={openStep} />}
           {view === "curriculum" && <CurriculumView data={data} openStep={openStep} />}
           {view === "roadmap" && <FullStackRoadmap data={data} setData={setData} openStep={openStep} openLesson={openLesson} />}
           {view === "map" && <LearningMap data={data} openLesson={openLesson} />}

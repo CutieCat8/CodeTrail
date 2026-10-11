@@ -130,3 +130,7 @@ vercel
 ## ความเป็นส่วนตัวของ source
 
 Repository และ deployment ต้องตั้งเป็น private/protected แยกกัน การทำ GitHub repository เป็น private ไม่ทำให้ deployment private โดยอัตโนมัติ
+
+### แบบประเมินก่อนเรียน
+
+หน้า `#diagnostic` มีคำถาม 8 ข้อครอบคลุมพื้นฐานนักพัฒนา เว็บ JavaScript และ Java เพื่อแนะนำบททบทวน ผลบันทึกในเครื่องและรวมใน JSON Export/Import ทำใหม่ได้ ผลปรนัยไม่ใช่การยืนยัน mastery และไม่เพิ่ม XP, activity หรือสถานะผ่านบทเรียน

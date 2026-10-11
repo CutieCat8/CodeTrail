@@ -1,5 +1,6 @@
 import type { AppData, LessonProgress, LessonStatus, RoadmapMark, StudyMode } from "@/types/domain";
 
+import { isDiagnosticResult } from "./diagnostics";
 import { activityTimestamps, withLegacyActivityEvents } from "./activity";
 
 export const STORAGE_KEY = "seas-fullstack-quest:v1";
@@ -89,6 +90,7 @@ export function isAppData(value: unknown): value is AppData {
       && typeof event.id === "string" && typeof event.occurredAt === "string" && typeof event.sourceId === "string"
       && ["step-completed", "lab-attempt", "journal-saved", "project-evidence", "legacy-snapshot"].includes(String(event.type)))) return false;
   }
+  if (candidate.diagnosticResult !== undefined && !isDiagnosticResult(candidate.diagnosticResult)) return false;
   if (candidate.lastLessonId !== undefined && typeof candidate.lastLessonId !== "string") return false;
   if (candidate.lastStepId !== undefined && typeof candidate.lastStepId !== "string") return false;
   return candidate.journal.every((entry) => isRecord(entry)

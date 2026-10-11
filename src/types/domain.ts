@@ -113,4 +113,5 @@ export type AppData = {
   roadmapMarks?: Record<string, RoadmapMark>;
   projectProgress?: Record<string, ProjectProgress>;
   activityEvents?: ActivityEvent[];
+  diagnosticResult?: import("@/lib/diagnostics").DiagnosticResult;
 };

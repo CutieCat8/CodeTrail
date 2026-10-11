@@ -23,7 +23,7 @@ type Props = {
 };
 
 const modeOptions: [StudyMode, string][] = [["fullstack", "Full-stack"], ["java", "Java & OOP"], ["mixed", "ผสมสองเส้นทาง"]];
-const fullstackCourseIds = new Set(["developer-foundations", "web-platform-foundations", "javascript-foundations", "node-foundations"]);
+const fullstackCourseIds = new Set(["developer-foundations", "web-platform-foundations", "javascript-foundations", "typescript", "node-foundations", "backend"]);
 const javaCourseIds = new Set(["java-foundations", "java-oop"]);
 
 export function QuestHome({ data, setData, openLesson, openStep, openProjects }: Props) {
@@ -86,6 +86,7 @@ export function QuestHome({ data, setData, openLesson, openStep, openProjects }:
           </div>
         </section>
 
+        <section className="diagnostic-invitation"><h2>หาจุดเริ่มเรียน</h2><p>ลองตอบ 8 ข้อเพื่อเลือกหัวข้อทบทวน ไม่เปลี่ยนความคืบหน้าหรือ XP</p><a className="home-quiet-action" href="#diagnostic">{data.diagnosticResult ? "ดูผลประเมินก่อนเรียน" : "ทำแบบประเมินก่อนเรียน"}</a></section>
         <ActivityHeatmap data={data} />
       </div>
 

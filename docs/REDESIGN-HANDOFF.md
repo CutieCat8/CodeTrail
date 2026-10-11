@@ -1,15 +1,50 @@
 # Redesign handoff
 
-อัปเดตล่าสุด: 2026-10-01
-Branch: `main`  
+## รอบแก้หลัง curriculum audit (Codex ลงมือหลัก)
+
+ฐาน faa1de2 → branch `feat/curriculum-learning-repair` · 2026-10-05
+สถานะทั้งรอบ: **in progress**; บันทึก B0–B8 ด้านล่างเป็นประวัติการเขียน ไม่ใช่การผ่านเกณฑ์คุณภาพรอบใหม่
+แผนล่าสุด: [COURSE-REPAIR-PLAN.md](COURSE-REPAIR-PLAN.md) · coverage/หลักฐาน: [COURSE-REPAIR-EVIDENCE.md](COURSE-REPAIR-EVIDENCE.md)
+Claude ติด usage limit ตามผู้ใช้; Codex เขียนและตรวจเองในรอบนี้ ยังไม่มี independent review ของ diff ใหม่ ไม่อ้างว่าทั้งสอง AI ตรวจแล้ว
+
+R1 implement แล้ว: ลำดับ files → terminal → Node/npm tools → editor → program → process → errors → Git → docs; คง IDs เดิมและเพิ่ม dev-runtime-tools
+เพิ่ม checkpoint เฉพาะเรื่องใน Developer Foundations พร้อม rubric/model answer หลังส่ง ไม่มี starter algorithm; การส่งข้อความบันทึกความพยายาม ไม่ใช่ยืนยันถูก
+แก้ความขัดกัน oop-constructor / oop-polymorphism / M0→M1; เพิ่ม JDK setup และ prerequisite npm ของ ts-why
+R2-JS implement และตรวจแล้ว: ทางเริ่มจากศูนย์/สะพาน function-loop-array/28 checkpoint เฉพาะเรื่อง; IDs เดิมคงอยู่ รายละเอียดใน COURSE-REPAIR-EVIDENCE
+R2-Java implement และตรวจแล้ว: declaration/loop/method/array/minimum/copyก่อนประกอบ, 25 checkpoint และequipmentCLIassessment; compiler25บท0fail, contract tests/browserผ่าน
+R3–R4ยังplanned: TypeScript/Node/Back-end/OOP, SQL, projects และ22labsยังไม่ปิด; หยุดเริ่มชุดใหม่ตามโควตา ส่งต่อในCOURSE-REPAIR-HANDOFF.md
+R5 ตรวจ baseline ชุดแรกแล้ว: build Webpack ผ่าน; browser เปิด 7 courses/545 steps/22 labs และตรวจ interaction ตัวแทน/TypeScript/mobile ผ่าน ต้องรันใหม่หลัง R2–R4; ไม่ใช่ final acceptance ทั้งรอบ
+
+
+อัปเดตล่าสุด: 2026-10-05  
+Branch: `feat/curriculum-expansion` (แตกจาก `fix/import-validation` ที่ `57e1cd2` ← `fix/runner-comparator` `480ad3f` ← `main` `f9a7613`; ทุก commit อยู่ในสำเนา Linux `~/work/sea-fullstack-quest` เท่านั้น ยังไม่ push/merge)  
 Remote: `origin` → `https://github.com/CutieCat8/CodeTrail.git`  
-ฐาน implementation ที่ push แล้ว: `46a96e2`
-สถานะรอบ: **Roadmap แบบ skill expedition map เขียนและ push แล้ว; รอผู้ใช้ตรวจภาพจริงใน browser**
+ฐาน implementation ที่ push แล้ว: `f9a7613` บน `main`
+สถานะรอบล่าสุด: **ยกระดับเนื้อหาหลักสูตรทั้งระบบ — ชุด B0–B8 เสร็จ** (commit ล่าสุดของรอบดูด้วย `git log --oneline f9a7613..`) ยังไม่ได้ตรวจหน้าเว็บใน browser ทั้งหมด — สถานะ/แผน/หลักฐานอยู่ใน `docs/COURSE-PROGRESS.md`, `docs/COURSE-PLAN.md`, `docs/COURSE-RESEARCH.md` (ไฟล์นี้ไม่ทำสถานะรายบทซ้ำ) งานระบบที่ค้างย้ายไป “Backlog ระบบ” ด้านล่าง  
+สถานะรอบ Import: แก้ Import validation และความปลอดภัยของข้อมูลตอนโหลด/บันทึกแล้ว (`57e1cd2`); automated checks และ Codex review ผ่าน; ยังไม่ได้ตรวจในเบราว์เซอร์ (รอตรวจ) (ดู “Defect fix: Import validation”)  
+สถานะรอบก่อน: แก้ตัวเปรียบเทียบผลของ auto runner (`d51e7ca`, `480ad3f`); ผลตรวจ Chrome ที่ผู้ใช้ส่งต่อมายืนยัน auto lessons 3 บท (ไม่ใช่ final acceptance); defect XP หายเมื่อส่งคำตอบผิดหลังผ่าน ยังรอตรวจยืนยัน  
+ก่อนหน้านั้น: Roadmap แบบ skill expedition map เขียนและ push แล้ว; รอผู้ใช้ตรวจภาพจริงใน browser
 
 เอกสารหลักมีหน้าที่แยกกัน:
 
-- ไฟล์นี้: สถานะจริงและจุดเริ่มทำงานรอบถัดไป
+- ไฟล์นี้: สถานะจริงและจุดเริ่มทำงานรอบถัดไป (ระบบ/UI) และ backlog ระบบ
+- `docs/COURSE-PROGRESS.md`: สถานะรายบทของหลักสูตร งานถัดไป และบันทึกชุดงาน
+- `docs/COURSE-PLAN.md`: syllabus, มาตรฐานบทเรียน, บทบาท Claude/Codex และคำสั่งที่ใช้ได้จริง
+- `docs/COURSE-RESEARCH.md`: ผลค้นคว้าแหล่งอ้างอิงพร้อมข้อจำกัด
 - `docs/REDESIGN-PLAN.md`: ช่วงงานและ acceptance gate ที่ยังเปิด
+
+## Backlog ระบบ (พักไว้ระหว่างงานหลักสูตร)
+
+ไม่ทำต่อในรอบขยายเนื้อหา เว้นแต่ขัดขวางการเรียนหรือทำให้ข้อมูลหายใน flow ที่กำลังแก้
+
+| งาน | สถานะ | หลักฐาน |
+|---|---|---|
+| ตรวจ Import validation ในเบราว์เซอร์ (profile/origin แยก) | รอตรวจ | หัวข้อ “Defect fix: Import validation”, commit `57e1cd2` |
+| XP หายเมื่อส่งคำตอบผิดหลังผ่านบท | รอตรวจยืนยัน + ให้ผู้ใช้ตัดสินพฤติกรรม | หัวข้อ “Defect แยก (รอตรวจยืนยัน, ยังไม่แก้)”, `run()` ใน `QuestApp.tsx` |
+| XP นับซ้ำเมื่อ `lessonId` ซ้ำ / อ่าน key จาก prototype | ยังไม่แก้ | ผล Codex รอบตรวจ storage (2026-10-05) |
+| นิยาม streak (ไม่นับ step/project, เก็บเฉพาะ `updatedAt` ล่าสุด) | รอผู้ใช้ตัดสินก่อนเปลี่ยน schema | ผล Codex รอบตรวจ storage |
+| race ข้ามแท็บของ autosave, UI กู้คืน `:rejected:*` | ข้อจำกัดที่บันทึกไว้ | หัวข้อ Import validation |
+| runner: timeout รวมทุก case, output async หาย, API บางตัวยังไม่ปิด, แยก realm กันปลอมผล | ยังไม่ทำ | หัวข้อ runner comparator |
 - `docs/ACCEPTANCE-CHECKLIST.md`: ขั้นตอน browser/manual QA สำหรับผู้ใช้
 - `docs/DESIGN-RESEARCH.md`: หลักฐานงานวิจัยและ design decisions
 - `docs/APP-OVERVIEW.md`: เอกสารบริบทจากผู้ใช้ (ยัง untracked; อย่า stage โดยไม่ตั้งใจ)
@@ -47,6 +82,64 @@ Remote: `origin` → `https://github.com/CutieCat8/CodeTrail.git`
 - หลักฐาน: `src/lib/recommendation.ts`, `src/components/QuestHome.tsx`, `tests/recommendation.test.ts`, commit `a5b0408` (pushed)
 - ตรวจแล้ว: regression tests 10/10, lint และ production build ผ่าน; code review ไม่พบ blocking/high issue
 - Manual verification: รอผู้ใช้ตรวจการสลับโหมดและการกลับ Home หลังผ่าน step
+
+### Defect fix: ตัวเปรียบเทียบผลของ auto runner (2026-10-05)
+
+- พื้นที่ทำงาน: สำเนา Linux `/home/cnux/work/sea-fullstack-quest` ฐาน `f9a7613`, branch `fix/runner-comparator`; commit แล้วในสำเนาเท่านั้น ยังไม่ push/merge และยังไม่ sync กลับ repo บน `/mnt/c/Users/Asus/Documents/sea-fullstack-quest` (handoff ใน repo นั้นจึงยังไม่มีหัวข้อนี้)
+- สาเหตุเดิม: `stable()` ใน `src/lib/runner.ts` ใช้ `JSON.stringify(value, keysArray)` ซึ่งกรอง key ทุกชั้นด้วย key ชั้นบนสุด array ของ object จึงกลายเป็น `[{}]` คำตอบผิดของ `filterActivities` (`src/content/lessons.ts:36-37`) และ object ซ้อนที่ค่าผิดจึง “ผ่าน”; `NaN`/`null`, `[undefined]`/`[null]` ก็ถือว่าเท่ากัน
+- พฤติกรรมใหม่: `compareTestValue()` ใน `src/lib/compare.ts` รองรับเฉพาะ `null`, boolean, string, finite number, array และ plain object ที่ประกอบจากค่าเหล่านี้ ลำดับ key ของ object ไม่มีผล ลำดับ array มีผล ค่าอื่นทั้งหมด (undefined, NaN, Infinity, bigint, symbol, function, Date, Map, Set, class instance, sparse array, property เสริมบน array, symbol key, property ที่ไม่ enumerable, getter/setter, circular, ซ้อนเกิน 200 ชั้น) ได้ผล “ไม่ผ่าน” พร้อม error ภาษาไทยที่ระบุตำแหน่งค่า
+- Snapshot: อ่านค่าครั้งเดียวผ่าน own property descriptors แล้วใช้ snapshot เดียวทั้งเทียบและแสดง `actual`; ไม่เรียก getter ของคำตอบผู้เรียน รวมถึง `then` (Worker ตรวจ async ด้วย `instanceof Promise`) และ `constructor` บน prototype
+- Worker ใช้ logic เดียวกับ tests: `buildTestWorkerSource()` ฝัง `compareTestValue.toString()` และ `tests/runner-compare.test.ts` รัน source string นั้นจริงด้วย `self` จำลอง
+- Tests: `tests/runner-compare.test.ts` 42 กรณี ครอบคลุม array ของ object, object ซ้อน, key คนละลำดับ, array คนละลำดับ, ค่าที่ไม่รองรับ, reference solution ผ่านทุก auto lesson และคำตอบผิดไม่ผ่านทุก auto lesson; mutation check ยืนยันว่า comparator เก่าและ snapshot ระหว่างทางทำให้ regression tests ล้มจริง
+- Checks ล่าสุด (snapshot `compare.ts` `83de524e…`, `runner.ts` `654c1ae6…`, test `f473515c…`): Vitest 70/70, `npm run lint`, `tsc --noEmit` และ `npm run build` ผ่าน; ตรวจ comparator ที่ minify ใน production chunk (`eM`) แยก module scope ผ่าน 12 กรณี
+- ผลตรวจ Codex (`codex exec -s read-only --ephemeral`, model `gpt-6.1-sol`, ไม่ใช้ OMC team/bypass; ทุกรอบตรวจ snapshot ที่บันทึก hash ก่อนและ hash ตรงหลังตรวจ):
+  - รอบ 1 (04:51–04:53): พบ 4 จุดที่ CONFIRMED — symbol key บน array, property ที่ไม่ enumerable, sparse array ที่เติมจาก `Array.prototype`, getter ถูกอ่านซ้ำจนค่าที่ตรวจกับค่าที่รายงานไม่ตรงกัน → แก้ทั้งหมดด้วย snapshot จาก own property descriptors
+  - รอบ 2 (05:03–05:06): พบ 5 จุด → แก้ 3 (Worker อ่าน `actual.then` ซึ่งเรียก getter, การตั้งชื่อ error อ่าน `constructor` getter, object ลึกมากเกิด stack overflow) และบันทึก 2 เป็นข้อจำกัด (Proxy ที่โกหก descriptor, โค้ดผู้เรียนแทนที่ built-in)
+  - รอบ 3 (05:08–05:11, snapshot สุดท้าย): ไม่พบปัญหาใหม่; Node harness จำลองชุดทดสอบผ่าน 42/42, reference ผ่านและ `return "WRONG"` ไม่ผ่านทั้ง 3 auto lessons / 9 cases
+- ผลตรวจ Claude: ยืนยัน false positive เดิมด้วย node; mutation check ใส่ comparator เวอร์ชันก่อนหน้ากลับชั่วคราวแล้ว regression tests ล้ม (เวอร์ชันเดิม 5, หลังรอบ 1 → 6, หลังรอบ 2 → 3) แล้วคืนไฟล์และตรวจ `cmp`
+- ข้อจำกัดที่ตั้งใจไม่แก้: Proxy ที่ trap โกหก descriptor และโค้ดผู้เรียนที่แทนที่ built-in เช่น `Object.getOwnPropertyDescriptors` ยังทำให้ผลผ่านได้ เพราะโค้ดผู้เรียนรันใน Worker/realm เดียวกับตัวตรวจ (เป็นการโกงผลตัวเอง; runner ไม่ใช่ security boundary)
+- Automated verification: tests และ Codex ใช้ Node harness เท่านั้น; Claude ในสำเนา Linux ไม่ได้เรียก Chrome หรือถ่าย screenshot ตามข้อกำหนดเดิม
+
+#### ผลตรวจเบราว์เซอร์ (2026-10-05, ส่งต่อจากผู้ใช้)
+
+แหล่งที่มา: ผลตรวจผ่าน Chrome โดย Claude อีก session ที่ผู้ใช้ส่งต่อมา **ไม่ใช่การตรวจที่ทำใน session ที่แก้โค้ดนี้** และ **ไม่ใช่ final acceptance ของเว็บไซต์ทั้งหมด** ตรวจบน production preview `http://localhost:3100` จาก build ของ commit `d51e7ca` ด้วยคำตอบผิดและคำตอบถูกที่เตรียมไว้ล่วงหน้า (คำตอบผิดของ filter/form เคยผ่านครบ 3/3 กับ comparator เดิม)
+
+| Lesson | คำตอบผิด | คำตอบถูก |
+|---|---|---|
+| `web-react-filter` | ผ่าน 1/3 (เฉพาะ “รายการว่าง” ซึ่งถูกต้องจริง) | ผ่าน 3/3 |
+| `web-react-form` | ผ่าน 0/3 พร้อม error ค่า `undefined` ที่ runner ไม่รองรับ | ผ่าน 3/3 |
+| `web-ts-narrowing` | ผ่าน 2/3 (“กิจกรรมที่มีห้อง” ไม่ผ่าน) | ผ่าน 3/3 |
+
+- expected/actual ที่แสดงตรงตามค่าที่เตรียมไว้
+- หลังผ่านครบสามบท Dashboard แสดง 300 XP; รันคำตอบถูกของ `web-ts-narrowing` ซ้ำแล้ว XP ยังเป็น 300
+- ยังไม่ได้ตรวจ: XP เริ่มต้นเป็น 0 ก่อนทดสอบ; การพิมพ์ด้วยมือและ auto-save/reload; การส่งคำตอบผิดหลังผ่านบทแล้ว
+- ข้อมูลทดสอบอยู่ใน Chrome profile หลักที่ origin `localhost:3100`: **ห้ามล้าง site data หรือ localStorage ทั้ง origin** เพราะยังไม่ยืนยันว่ามีข้อมูลเดิมใน origin นี้หรือไม่
+
+#### Defect แยก (รอตรวจยืนยัน, ยังไม่แก้): XP หายเมื่อส่งคำตอบผิดหลังผ่านบท
+
+- อาการที่คาด: ผ่านบทแล้ว (`completedAt` ถูกตั้ง, XP +100) จากนั้นกด Run tests ด้วยคำตอบผิด `run()` ใน `src/components/QuestApp.tsx` (บรรทัด 386 ที่ `d51e7ca`, 390 ที่ branch import) ตั้ง `completedAt: passed ? (progress.completedAt ?? now) : undefined` ทำให้ `completedAt` ถูกล้าง และ `xpTotal()` ใน `src/lib/storage.ts` นับ XP ของบทนั้นเป็น 0 สถานะกลับเป็น `in-progress`
+- หลักฐาน: อ่านจากโค้ดเท่านั้น ยังไม่ได้ทำซ้ำใน browser; พฤติกรรมนี้มีก่อนการแก้ runner ไม่ได้เกิดจาก `d51e7ca`
+- รอบถัดไป: ยืนยันใน browser ด้วยข้อมูลทดสอบแยก แล้วให้ผู้ใช้ตัดสินว่าการผ่านบทควรคงอยู่หรือไม่เมื่อรันไม่ผ่านภายหลัง ก่อนแก้พร้อม regression test
+
+### Defect fix: Import validation (2026-10-05)
+
+- พื้นที่ทำงาน: สำเนา Linux `/home/cnux/work/sea-fullstack-quest`, branch `fix/import-validation` แตกจาก `480ad3f`; ยังไม่ push/merge และไม่ได้แตะ repo บน `/mnt/c`
+- ต้นเหตุที่ยืนยันก่อนแก้ (node บน `480ad3f`): `isAppData()` ตรวจวันที่แค่ `typeof === "string"` ไฟล์ที่มี `updatedAt: "bad"` จึงผ่าน แล้ว `calculateStreak()` โยน `RangeError: Invalid time value` จาก `Intl.DateTimeFormat.format(new Date("bad"))` ทำให้ `QuestHome` render ไม่ได้; enum ใช้ `String(...)` ทำให้ `status: ["passed"]` และ `roadmapMarks: { x: ["done"] }` ผ่าน; journal `date`/`updatedAt` ที่ไม่ใช่วันที่ก็ผ่าน; Settings แจ้ง “นำเข้าสำเร็จ” ก่อน autosave และไม่สนใจผลการบันทึก
+- วันที่: timestamp ทุกช่อง (`progress.updatedAt`, `completedAt`, `lastResult.at`, `stepProgress.updatedAt`, `projectProgress.updatedAt`, `journal.updatedAt`) ต้องตรงกับ `Date#toISOString()` แบบ round-trip (`YYYY-MM-DDTHH:mm:ss.sssZ`) และ `journal.date` ต้องเป็น `YYYY-MM-DD` ที่มีจริง ตรงกับที่แอปเขียน (`toISOString()` และ `now.slice(0,10)`); ปฏิเสธ `"bad"`, 30 ก.พ., ชั่วโมง 24, ไม่มี milliseconds, timezone offset
+- Enum: `mode`, `status`, `roadmapMarks` ตรวจด้วย `typeof === "string"` และรายการค่าที่อนุญาตโดยตรง
+- `calculateStreak(data, now?)`: นิยามเดิมไม่เปลี่ยน (นับจาก `progress` + `journal` ตามวัน Bangkok); timestamp ที่ไม่ผ่าน `isIsoTimestamp` ถูกข้าม ไม่ throw และไม่สร้างวันจาก rollover
+- Import: `importAppData(text, save)` parse → validate → `save` ก่อน; Settings เรียก `setData` และแจ้งสำเร็จเฉพาะเมื่อบันทึกสำเร็จ ข้อความล้มเหลวระบุว่า “ข้อมูลเดิมไม่ถูกเปลี่ยน”; Export ใช้ `serializeAppData()` ตัวเดียวกับที่ test round-trip
+- ความปลอดภัยข้อมูลตอนโหลด (จำเป็นเพราะ schema เข้มขึ้น): `loadData()` คัดลอกข้อมูลที่ไม่ผ่าน schema/JSON ไป `seas-fullstack-quest:v1:rejected:<ISO time>` (เติม `:2`, `:3` ถ้าชน) ก่อนใช้ข้อมูลว่าง และคืน `backedUpRaw`; `useQuestData` เรียก `canOverwriteStoredData(backedUpRaw)` ก่อนทุก autosave ซึ่งยอมเขียนทับเฉพาะ storage ว่าง, ข้อมูลที่ถูกต้อง หรือค่าที่ backup แล้ว ถ้า backup ล้มเหลวหรือแท็บอื่นเขียนข้อมูลเสียระหว่างใช้งาน autosave จะไม่เขียนทับและแสดงสถานะ error จน import สำเร็จหรือข้อมูลกลับมาถูกต้อง
+- ไฟล์: `src/lib/storage.ts`, `src/components/QuestApp.tsx` (`useQuestData` export เพื่อ test, Settings import/export), `tests/storage-import.test.ts` (50), `tests/quest-data-hook.test.tsx` (4, jsdom + fake timers)
+- Checks ล่าสุด (snapshot `storage.ts` `8f0db8e0…`, `QuestApp.tsx` `a7af45fe…`, `storage-import.test.ts` `af56d3b7…`, `quest-data-hook.test.tsx` `ebfb6744…`): Vitest 124/124, lint (0 warning), `tsc --noEmit`, `npm run build` ผ่าน; mutation check 12 แบบ (วันที่, enum, streak guard, save error, backup, key ชน, gating ใน hook) ทำให้ tests ล้มทุกแบบแล้วคืนไฟล์
+- ผลตรวจ Codex (`codex exec -s read-only --ephemeral`, `gpt-6.1-sol`, ไม่ใช้ OMC team/bypass; hash ตรงทุกรอบ):
+  - รอบ 1 (06:42–06:44): HIGH backup ล้มเหลวแล้ว autosave ทับข้อมูลเดิม; backup key เดียวถูกทับ; streak ยังนับ rollover; timestamp ไม่มี ms ผ่าน; ปี `+010000` ถูกปฏิเสธ → แก้ 4, ข้อสุดท้ายรับเป็นข้อจำกัด
+  - รอบ 2 (06:47–06:49): HIGH หลัง `canSave=false` import สำเร็จแล้ว autosave ไม่กลับมา; backup ชนใน ms เดียว; test ไม่ครอบ → แก้ทั้งหมด
+  - รอบ 3 (06:51–06:53): HIGH autosave ทับข้อมูลเสียที่แท็บอื่นเขียนระหว่าง session; ไม่มี hook test → แก้ด้วย guard ก่อนทุก save และ hook test
+  - รอบ 4 (06:56–06:59, snapshot สุดท้าย): ไม่พบปัญหา CONFIRMED ใหม่; SUSPECTED เฉพาะ race ข้ามแท็บ (ดูข้อจำกัด)
+- ข้อจำกัด: localStorage ไม่มี compare-and-swap จึงยังมีช่องแคบที่แท็บอื่นเขียนระหว่าง “ตรวจ” กับ “บันทึก” หรือสองแท็บสร้าง backup key เดียวกันพร้อมกัน (SUSPECTED, ยังไม่พิสูจน์ใน browser); ข้อมูลปี ≥ 10000 ถูกปฏิเสธ; backup ใน `:rejected:*` ยังไม่มี UI กู้คืน (ต้องใช้ DevTools); export เก่าที่แก้มือให้ timestamp ไม่ตรงรูปแบบจะ import ไม่ได้
+- ไม่ได้ทำในรอบนี้: นิยาม streak, XP (นับซ้ำเมื่อ `lessonId` ซ้ำ/อ่าน key จาก prototype, XP หายหลังรันผิด), เนื้อหาบทเรียน
+- Browser verification: **ยังไม่ได้ตรวจในเบราว์เซอร์ (รอตรวจ)**; ไม่ได้ใช้ Chrome profile หลักทดสอบ Import และไม่ได้ล้างข้อมูลใด ควรใช้ profile/origin แยกเมื่อตรวจ
 
 ## Roadmap iteration ล่าสุด
 
@@ -131,12 +224,16 @@ Tests/build เป็นหลักฐานทางเทคนิคเท�
 | Skills/Journal/Projects/Settings | ใช่ | ยังไม่มี final manual pass | lint/tests/build ผ่าน | `290d49f`–`8475f65` | ใช่ |
 | Nested import safety | ใช่ | ไม่จำเป็นต่อ visual; flow ยังรอ manual | lint, tests 15/15, build ผ่าน | `a8d12b0` | ใช่ |
 | Acceptance documents | ใช่ | ไม่เกี่ยวข้อง | ไม่รันซ้ำเพราะแก้ docs เท่านั้น | เอกสารชุดนี้คือ commit ของรอบ R4 | ตรวจสถานะจาก `origin/main` |
+| Runner comparator (2026-10-05) | ใช่ | ผลตรวจ Chrome ส่งต่อจากผู้ใช้: 3 auto lessons ตามคาด (ไม่ใช่ final acceptance) | lint, tsc, tests 70/70, build ผ่าน; production comparator 12/12 | branch `fix/runner-comparator` ในสำเนา Linux | ไม่ |
+| Import validation (2026-10-05) | ใช่ | **รอตรวจในเบราว์เซอร์** | lint, tsc, tests 124/124, build ผ่าน | branch `fix/import-validation` ในสำเนา Linux | ไม่ |
 
 การดู browser ในอดีตเป็นเพียง intermediate inspection และไม่ใช่ final acceptance หลังทุก commit ผู้ใช้สั่งไม่ให้เรียก Chrome/ถ่าย screenshot เพิ่ม จึงต้องใช้ checklist ให้ผู้ใช้ตรวจเอง
 
 ## การเปลี่ยนแปลงที่ยังไม่ commit
 
-หลัง commit Home `7e4d7c8` ยังมีงานค้างจากชุดขยายเนื้อหาที่ไม่ได้รวมใน commit Home:
+ส่วนนี้เป็นประวัติของ repo ต้นฉบับบน `/mnt/c` หลัง commit Home `7e4d7c8` ไม่ใช่สถานะของสำเนา Linux; ณ 2026-10-05 ไฟล์ที่ modified ใน repo ต้นฉบับเปลี่ยนเฉพาะ line ending และสำเนา Linux ไม่ได้รวมไฟล์เหล่านั้น
+
+รายการเดิมหลัง commit Home มีงานค้างจากชุดขยายเนื้อหาที่ไม่ได้รวมใน commit Home:
 
 ```text
  M src/app/globals.css
@@ -157,7 +254,33 @@ Tests/build เป็นหลักฐานทางเทคนิคเท�
 
 ## ผลตรวจล่าสุด
 
-หลังเขียน Home/heatmap ที่ `7e4d7c8` โดยตรวจบน working tree ปัจจุบัน:
+รอบ Import validation (2026-10-05) บน snapshot สุดท้ายในสำเนา Linux (`storage.ts` `8f0db8e0…`, `QuestApp.tsx` `a7af45fe…`, `tests/storage-import.test.ts` `af56d3b7…`, `tests/quest-data-hook.test.tsx` `ebfb6744…` — ชุดเดียวกับที่ Codex รอบ 4 ตรวจ):
+
+- `npx vitest run`: ผ่าน 124/124 (6 ไฟล์)
+- `npm run lint`: ผ่าน ไม่มี warning
+- `npx tsc --noEmit`: ผ่าน
+- `npm run build`: ผ่าน (clean `.next`)
+- Codex read-only review รอบ 4: ไม่พบปัญหา CONFIRMED ใหม่
+- **ยังไม่ได้ตรวจในเบราว์เซอร์**; preview `localhost:3100` ของรอบ runner ถูกปิดก่อน build รอบนี้
+- หลังจากนั้นแก้เฉพาะเอกสาร จึงไม่รัน checks ซ้ำ
+
+### ประวัติ: รอบ runner comparator
+
+รอบ runner comparator (2026-10-05) บน snapshot สุดท้ายในสำเนา Linux (`compare.ts` `83de524e…`, `runner.ts` `654c1ae6…`, `tests/runner-compare.test.ts` `f473515c…`):
+
+- `npx vitest run`: ผ่าน 70/70 (4 ไฟล์; `runner-compare.test.ts` 42)
+- `npm run lint`: ผ่าน
+- `npx tsc --noEmit`: ผ่าน
+- `npm run build`: ผ่าน (clean `.next`) บน Next.js 16.3.6
+- Production check: ดึง comparator ที่ minify (`eM`) จาก chunk แล้วรันแยก module scope ผ่าน 12/12 และยืนยันว่า Worker ใช้ `instanceof Promise` ไม่อ่าน `.then`
+- Codex read-only review รอบสุดท้าย: ไม่พบปัญหาใหม่
+- Session ที่แก้โค้ดไม่ได้เรียก Chrome หรือถ่าย screenshot
+- Browser: ผลตรวจ Chrome ที่ผู้ใช้ส่งต่อมา (ไม่ใช่ final acceptance) — ดู “ผลตรวจเบราว์เซอร์ (2026-10-05, ส่งต่อจากผู้ใช้)” ในหัวข้อ runner
+- หลังจากนั้นแก้เฉพาะเอกสาร จึงไม่รัน checks ซ้ำ
+
+### ประวัติ: ผลตรวจรอบ Home/heatmap (`7e4d7c8`)
+
+หลังเขียน Home/heatmap ที่ `7e4d7c8` โดยตรวจบน working tree ในเวลานั้น:
 
 - `npm run lint`: ผ่าน
 - `npm test`: ผ่าน 18/18 (รวม activity tests ใหม่ 2 ข้อและ content tests ใน working tree)
@@ -178,7 +301,11 @@ Activity test ใหม่ยืนยัน zero state และการรว
 - `QuestApp.tsx` ยังใหญ่; ไม่ refactor ในรอบตรวจรับโดยไม่มี defect จริง
 - raster assets ใน `public/art/` รวมประมาณ 5.7 MB ยังไม่ได้ทำ responsive variants/optimization audit
 - code samples ยังไม่มี token-level syntax highlighting และ Lesson ไม่มี draggable splitter; ทั้งคู่เป็น optional
-- runner ลด network APIs และ terminate เมื่อ timeout แต่ Web Worker ไม่ใช่ security container ระดับ server sandbox
+- runner ลด network APIs และ terminate เมื่อ timeout แต่ Web Worker ไม่ใช่ security container ระดับ server sandbox; โค้ดผู้เรียนกับ comparator อยู่ realm เดียวกัน จึงปลอมผลผ่านได้ด้วย Proxy/แทนที่ built-in
+- Defect รอตรวจยืนยัน: XP หายเมื่อส่งคำตอบผิดหลังผ่านบท (`run()` ใน `QuestApp.tsx` ล้าง `completedAt`) — รายละเอียดในหัวข้อ runner
+- งานค้างจาก runner (ยังไม่ทำ): ตรวจ browser ส่วนที่ยังไม่ครอบคลุม (XP เริ่มต้น, พิมพ์ด้วยมือ, auto-save/reload); timeout 1.5 วินาทีเดียวรวมทุก test case และรวมเวลา start Worker; `runIsolatedSnippet` ทิ้ง output async และไม่รายงาน unhandled rejection; `EventSource`/`indexedDB`/`caches` ยังไม่ถูกปิด; ถ้าต้องกันการปลอมผลต้องแยก realm ระหว่างโค้ดผู้เรียนกับตัวตรวจ
+- งานค้างจากการตรวจ storage: วันที่ใน import และ enum แบบ array แก้แล้วบน `fix/import-validation` (รอตรวจในเบราว์เซอร์); ที่ยังไม่แก้คือ XP นับซ้ำเมื่อ `lessonId` ซ้ำและอ่าน key จาก prototype, นิยาม streak ไม่รวม step/project และเก็บเฉพาะ `updatedAt` ล่าสุด (ต้องให้ผู้ใช้ตัดสินใจก่อนเปลี่ยน schema)
+- Import/storage: race ข้ามแท็บระหว่างตรวจกับบันทึกยังเป็นไปได้ (localStorage ไม่มี CAS); backup `:rejected:*` ยังไม่มี UI กู้คืน
 - ข้อมูลอยู่ localStorage เท่านั้น ไม่ sync ข้ามอุปกรณ์
 - ไม่มี private hosting/access control; ผู้ใช้ยังไม่ต้องการ deploy
 - acceptance ที่ยังเปิดทั้งหมดอยู่ใน `docs/ACCEPTANCE-CHECKLIST.md`

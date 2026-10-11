@@ -9,8 +9,8 @@ function runWorker(source: string, tests: TestSpec[], functionName = "answer"): 
   const worker = {
     postMessage(message: typeof response) { response = message; },
   } as { onmessage?: (event: { data: unknown }) => void; postMessage: (message: typeof response) => void };
-  runInNewContext(runnerWorkerSource, { self: worker, structuredClone });
-  worker.onmessage?.({ data: { source, functionName, tests } });
+  const payload = JSON.stringify({ source, functionName, tests });
+  runInNewContext(`const structuredClone = value => JSON.parse(JSON.stringify(value));\n${runnerWorkerSource}\nself.onmessage({ data: JSON.parse(payload) });`, { self: worker, payload });
   if (!response?.results) throw new Error(response?.fatal ?? "Worker returned no results");
   return response.results;
 }

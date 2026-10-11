@@ -1,10 +1,11 @@
-type Landmark = "camp" | "java" | "oop" | "frontend" | "backend" | "data" | "integration" | "quality";
+type Landmark = "camp" | "java" | "oop" | "frontend" | "typescript" | "backend" | "data" | "integration" | "quality";
 
 const landmarkLabels: Record<Landmark, string> = {
   camp: "Developer Camp",
   java: "Java Grove",
   oop: "Object Workshop",
   frontend: "Front-end City",
+  typescript: "Type Observatory",
   backend: "Back-end Engine Room",
   data: "Data Vault",
   integration: "Integration Bridge",

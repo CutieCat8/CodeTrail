@@ -74,7 +74,7 @@ Runner ทำงานใน Web Worker แยก UI, ปิด `fetch`, `XMLHtt
 
 ## Java
 
-ใช้ **JDK 25 LTS** บท Java ให้ผู้เรียนรันในเครื่อง:
+บทเรียนที่รวมจาก main ใช้ **JDK 21** เป็นฐานตรวจสอบ บท Java ให้ผู้เรียนรันในเครื่อง:
 
 ```bash
 javac Main.java

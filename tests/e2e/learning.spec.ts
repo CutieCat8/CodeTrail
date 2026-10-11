@@ -49,7 +49,7 @@ test("mobile navigation opens and the roadmap fits the viewport", async ({ page 
 test("micro-step completion contributes to heatmap, streak, and weekly goal", async ({ page }) => {
   await page.goto("/#step/dev-program-concept");
   await page.getByRole("textbox", { name: "Code editor index.js" }).fill("Source code คือข้อความที่เขียนให้โปรแกรมทำงาน");
-  await page.getByRole("button", { name: "Submit answer" }).click();
+  await page.getByRole("button", { name: "บันทึกการทำด้วยตนเอง" }).click();
   await page.getByRole("button", { name: "กางเมนูด้านข้าง" }).click();
   await page.locator(".sidebar nav").getByRole("button", { name: "ฐานปฏิบัติการ" }).click();
   await expect(page.locator(".activity-cell.level-0")).toHaveCount(139);

@@ -36,14 +36,14 @@ describe("Friends Activity Planner milestones", () => {
   });
 
   it("counts self submissions only when evidence is complete and leaves legacy criteria independent", () => {
-    const project = { repositoryUrl: "", demoUrl: "", checklist: [true, true, true, true], updatedAt: "", milestones: { [milestone.id]: { ...ready(), submittedAt: "2026-10-06T12:00:00Z" } } };
+    const project = { repositoryUrl: "", demoUrl: "", checklist: [true, true, true, true], updatedAt: "", milestones: { [milestone.id]: { ...ready(), submittedAt: "2026-10-06T12:00:00.000Z" } } };
     expect(projectMilestoneSummary(project)).toMatchObject({ submitted: 1, total: 9, next: friendsActivityMilestones[1] });
     expect(projectMilestoneSummary({ ...project, milestones: undefined }).submitted).toBe(0);
     expect(isMilestoneSubmitted(milestone, { ...ready(), submittedAt: "not-a-date" })).toBe(false);
   });
 
   it("invalidates a submission when its evidence changes without mutating the old record", () => {
-    const progress = { ...ready(), submittedAt: "2026-10-06T12:00:00Z" };
+    const progress = { ...ready(), submittedAt: "2026-10-06T12:00:00.000Z" };
     const changed = updateMilestone(progress, { notes: "แก้แล้ว ต้องตรวจใหม่" }, "2026-10-07T12:00:00Z");
     expect(changed.submittedAt).toBeUndefined();
     expect(progress.submittedAt).toBeDefined();
@@ -51,7 +51,7 @@ describe("Friends Activity Planner milestones", () => {
   });
 
   it("round trips new milestones while keeping old project links and checklist unchanged", () => {
-    const data = { ...emptyData(), projectProgress: { planner: { repositoryUrl: "https://github.com/example/planner", demoUrl: "", checklist: [true, false], updatedAt: "2026-10-06T12:00:00Z", milestones: { [milestone.id]: { ...ready(), submittedAt: "2026-10-06T12:00:00Z" } } } } };
+    const data = { ...emptyData(), projectProgress: { planner: { repositoryUrl: "https://github.com/example/planner", demoUrl: "", checklist: [true, false], updatedAt: "2026-10-06T12:00:00.000Z", milestones: { [milestone.id]: { ...ready(), submittedAt: "2026-10-06T12:00:00.000Z" } } } } };
     expect(normalizeAppData(JSON.parse(JSON.stringify(data)))?.projectProgress).toEqual(data.projectProgress);
     const broken = { ...data, projectProgress: { planner: { ...data.projectProgress.planner, milestones: { bad: { ...ready(), checks: { scope: "yes" } } } } } };
     expect(isAppData(broken)).toBe(false);

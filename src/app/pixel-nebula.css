@@ -738,3 +738,34 @@ textarea::placeholder {
     animation: none !important;
   }
 }
+
+/* Curriculum v3 lesson blocks: prerequisites, checks, analogy mapping, expected output, auto tests */
+.rich-block.prereq ul { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.rich-block.prereq li { margin: 0; }
+.link-button { border: 1px solid var(--color-border-strong); border-radius: var(--radius-md); padding: 6px 12px; background: var(--color-surface-soft); color: var(--color-info); font: inherit; font-size: 15px; cursor: pointer; }
+.link-button:hover { background: var(--color-surface-raised); }
+.link-button:focus-visible { outline: none; box-shadow: var(--shadow-focus); }
+.rich-block.acceptance { border-left: 3px solid var(--color-success); }
+.rich-block.reflection { border-left: 3px solid var(--color-checkpoint); }
+.rich-block.checks details { margin: 0 0 10px; padding: 10px 14px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface-soft); }
+.rich-block.checks summary { display: block; margin: 0; font-size: 16px; line-height: 1.7; cursor: pointer; color: var(--color-text-primary); }
+.rich-block.checks details p { margin: 10px 0 0; }
+.hint-level { margin: 0 0 8px; }
+.hint-level > summary { font-size: 15px !important; color: var(--color-info) !important; cursor: pointer; }
+.analogy-map { width: 100%; margin: 6px 0 12px; border-collapse: collapse; font-size: 15px; }
+.analogy-map th, .analogy-map td { padding: 8px 10px; border: 1px solid var(--color-border); text-align: left; vertical-align: top; color: var(--color-text-secondary); }
+.analogy-map th { color: var(--color-text-primary); background: var(--color-surface-soft); }
+.analogy-limits { padding: 10px 12px; border-radius: var(--radius-md); background: var(--color-surface-soft); }
+.micro-output { margin-top: 10px; }
+.micro-output > span { display: block; margin: 0 0 6px; color: var(--color-success); font: 700 10px var(--font-mono); letter-spacing: .08em; }
+.micro-output pre { border-left-color: var(--color-success); }
+.micro-test-results { margin: 12px 0; padding: 12px 14px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface-soft); }
+.micro-test-results.all-passed { border-color: var(--color-success); }
+.micro-test-results.has-failed { border-color: var(--color-danger); }
+.micro-test-results ul { margin: 8px 0 0; padding: 0; list-style: none; }
+.micro-test-results li { margin: 0 0 6px; }
+.micro-test-results li.pass span { color: var(--color-success); }
+.micro-test-results li.fail span { color: var(--color-danger); }
+.micro-test-results small { display: block; color: var(--color-text-secondary); overflow-wrap: anywhere; }
+@media (max-width: 760px) { .analogy-map { font-size: 14px; } }
+.submit-note { align-self: center; color: var(--color-text-secondary); font-size: 14px; }

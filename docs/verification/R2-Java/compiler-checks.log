@@ -1,0 +1,108 @@
+ok   java-jdk · example
+manual java-jdk · ติดตั้ง JDK 21: Linux/WSL Bash แบบ archive (shell setup, not a Java example)
+ok   java-jdk · starter compiles
+ok   java-jdk · solution output
+ok   java-jdk · buggy fails to compile with “class Start is public, should be declared in a file named Start.java”
+ok   java-main · example
+ok   java-main · starter compiles
+ok   java-main · solution output
+ok   java-main · buggy fails to compile with “';' expected”
+ok   java-declarations · example
+ok   java-declarations · starter compiles
+ok   java-declarations · solution output
+ok   java-declarations · buggy fails to compile with “variable count might not have been initialized”
+ok   java-output · example
+ok   java-output · 2) specifier ที่ใช้บ่อย
+ok   java-output · starter compiles
+ok   java-output · solution output
+ok   java-output · buggy fails at runtime with “IllegalFormatConversionException: d != java.lang.Double”
+ok   java-expressions · example
+ok   java-expressions · 2) การหารจำนวนเต็มและ %
+ok   java-expressions · starter compiles
+ok   java-expressions · solution output
+ok   java-expressions · buggy runs and prints the wrong output
+ok   java-variables · example
+ok   java-variables · starter compiles
+ok   java-variables · solution output
+ok   java-variables · buggy fails to compile with “cannot assign a value to final variable MAX_LOANS”
+ok   java-primitives · example
+ok   java-primitives · 3) overflow ที่ต้นทาง
+ok   java-primitives · starter compiles
+ok   java-primitives · solution output
+ok   java-primitives · buggy runs and prints the wrong output
+ok   java-string · example
+ok   java-string · 3) เทียบข้อความ
+ok   java-string · starter compiles
+ok   java-string · solution output
+ok   java-string · buggy runs and prints the wrong output
+ok   java-casting · example
+ok   java-casting · starter compiles
+ok   java-casting · solution output
+ok   java-casting · buggy runs and prints the wrong output
+ok   java-scanner · example
+ok   java-scanner · starter compiles
+ok   java-scanner · solution output
+ok   java-scanner · buggy runs and prints the wrong output
+ok   java-branch · example
+ok   java-branch · starter compiles
+ok   java-branch · solution output
+ok   java-branch · buggy runs and prints the wrong output
+ok   java-for-basics · example
+ok   java-for-basics · starter compiles
+ok   java-for-basics · solution output
+ok   java-for-basics · buggy runs and prints the wrong output
+ok   java-loop-sum · example
+ok   java-loop-sum · starter compiles
+ok   java-loop-sum · solution output
+ok   java-loop-sum · buggy runs and prints the wrong output
+ok   java-loops · example
+ok   java-loops · 3) loop ซ้อน
+ok   java-loops · starter compiles
+ok   java-loops · solution output
+ok   java-loops · buggy fails at runtime with “ArrayIndexOutOfBoundsException: Index 3 out of bounds for length 3”
+ok   java-switch · example
+ok   java-switch · starter compiles
+ok   java-switch · solution output
+ok   java-switch · buggy fails to compile with “the switch expression does not cover all possible input values”
+ok   java-method-basics · example
+ok   java-method-basics · starter compiles
+ok   java-method-basics · solution output
+ok   java-method-basics · buggy fails to compile with “missing return statement”
+ok   java-methods · example
+ok   java-methods · starter compiles
+ok   java-methods · solution output
+ok   java-methods · buggy fails to compile with “missing return statement”
+ok   java-array-basics · example
+ok   java-array-basics · starter compiles
+ok   java-array-basics · solution output
+ok   java-array-basics · buggy fails at runtime with “ArrayIndexOutOfBoundsException”
+ok   java-array-minimum · example
+ok   java-array-minimum · starter compiles
+ok   java-array-minimum · solution output
+ok   java-array-minimum · buggy runs and prints the wrong output
+ok   java-array-copy · example
+ok   java-array-copy · starter compiles
+ok   java-array-copy · solution output
+ok   java-array-copy · buggy runs and prints the wrong output
+ok   java-arrays · example
+ok   java-arrays · starter compiles
+ok   java-arrays · solution output
+ok   java-arrays · buggy runs and prints the wrong output
+ok   java-arraylist · example
+ok   java-arraylist · 2) wrapper และ autoboxing
+ok   java-arraylist · starter compiles
+ok   java-arraylist · solution output
+ok   java-arraylist · buggy fails at runtime with “ConcurrentModificationException”
+ok   java-exceptions-basic · example
+ok   java-exceptions-basic · starter compiles
+ok   java-exceptions-basic · solution output
+ok   java-exceptions-basic · buggy runs and prints the wrong output
+ok   java-multi-file · example
+ok   java-multi-file · starter compiles
+ok   java-multi-file · solution output
+ok   java-multi-file · buggy fails to compile with “cannot find symbol”
+ok   java-project-library-0 · example
+ok   java-project-library-0 · starter compiles
+ok   java-project-library-0 · solution matches expected-output.txt
+ok   java-project-library-0 · buggy fails at runtime with “IndexOutOfBoundsException: Index 3 out of bounds for length 3”
+25 Java topics checked, 0 failing checks

@@ -45,7 +45,7 @@ test("old project data stays intact and new milestone evidence survives export/i
   await page.goto("/#projects");
   await page.evaluate(() => localStorage.setItem("seas-fullstack-quest:v1", JSON.stringify({
     version: 1, mode: "mixed", weeklyGoal: 5, progress: {}, journal: [], stepProgress: {},
-    projectProgress: { "friends-activity-planner": { repositoryUrl: "https://github.com/example/old", demoUrl: "https://example.com/demo", checklist: [true, false, false, false], updatedAt: "2026-10-01T12:00:00Z" } },
+    projectProgress: { "friends-activity-planner": { repositoryUrl: "https://github.com/example/old", demoUrl: "https://example.com/demo", checklist: [true, false, false, false], updatedAt: "2026-10-01T12:00:00.000Z" } },
   })));
   await page.reload();
   await expect(page.getByRole("textbox", { name: "Repository URL" })).toHaveValue("https://github.com/example/old");

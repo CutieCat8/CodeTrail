@@ -38,7 +38,9 @@ const mixedStages = [
   ["developer-foundations", "java-foundations"],
   ["web-platform-foundations", "java-oop"],
   ["javascript-foundations"],
+  ["typescript"],
   ["node-foundations"],
+  ["backend"],
 ] as const;
 
 function hasDraft(data: AppData, stepId: string) {
@@ -90,8 +92,8 @@ export function stepRecommendation(data: AppData) {
   const courseOrder = data.mode === "java"
     ? ["java-foundations", "java-oop"]
     : data.mode === "fullstack"
-      ? ["developer-foundations", "web-platform-foundations", "javascript-foundations", "node-foundations"]
-      : ["developer-foundations", "java-foundations", "web-platform-foundations", "javascript-foundations", "java-oop", "node-foundations"];
+      ? ["developer-foundations", "web-platform-foundations", "javascript-foundations", "typescript", "node-foundations", "backend"]
+      : ["developer-foundations", "java-foundations", "web-platform-foundations", "javascript-foundations", "java-oop", "typescript", "node-foundations", "backend"];
   const pool = courseOrder.flatMap((courseId) => learningSteps.filter((step) => step.courseId === courseId));
   const mixed = data.mode === "mixed" ? nextMixedSteps(data) : undefined;
   const step = mixed?.step

@@ -20,7 +20,7 @@ test("lesson draft survives refresh and a wrong answer fails", async ({ page }) 
   await expect(page.locator(".lesson-practice-pane .test-results .fail")).toHaveCount(3);
 });
 
-test("correct answer earns XP once", async ({ page }) => {
+test("earned XP survives a failed retry and is awarded only once", async ({ page }) => {
   await page.goto("/#lesson/web-ts-narrowing");
   const editor = page.getByRole("textbox", { name: "พื้นที่เขียนโค้ด" });
   await editor.fill('function formatActivity(activity) { if (activity.kind === "online") return activity.title + " — Online"; return activity.title + " — ห้อง " + activity.room; }');
@@ -28,6 +28,19 @@ test("correct answer earns XP once", async ({ page }) => {
   await expect(page.locator(".lesson-practice-pane").getByRole("heading", { name: "ผ่านเงื่อนไขรอบนี้" })).toBeVisible();
   await expect(page.locator(".sidebar-progress strong")).not.toHaveText("0 XP");
   const firstXp = await page.locator(".sidebar-progress strong").textContent();
+  await expect(page.locator(".save-pill")).toContainText("บันทึกแล้ว");
+  const firstCompletion = await page.evaluate(() => JSON.parse(localStorage.getItem("seas-fullstack-quest:v1") ?? "{}").progress?.["web-ts-narrowing"]?.completedAt);
+  await editor.fill('function formatActivity() { return "wrong"; }');
+  await page.getByRole("button", { name: "Run tests" }).click();
+  await expect(page.locator(".lesson-practice-pane").getByRole("heading", { name: "ยังมี test ที่ไม่ผ่าน" })).toBeVisible();
+  await expect(page.locator(".sidebar-progress strong")).toHaveText(firstXp ?? "");
+  await expect.poll(() => page.evaluate(() => {
+    const progress = JSON.parse(localStorage.getItem("seas-fullstack-quest:v1") ?? "{}").progress?.["web-ts-narrowing"];
+    return { completedAt: progress?.completedAt, passed: progress?.lastResult?.passed, status: progress?.status, attempts: progress?.attempts };
+  })).toEqual({ completedAt: firstCompletion, passed: false, status: "in-progress", attempts: 2 });
+  await page.reload();
+  await expect(page.locator(".sidebar-progress strong")).toHaveText(firstXp ?? "");
+  await editor.fill('function formatActivity(activity) { if (activity.kind === "online") return activity.title + " — Online"; return activity.title + " — ห้อง " + activity.room; }');
   await page.getByRole("button", { name: "Run tests" }).click();
   await expect(page.locator(".sidebar-progress strong")).toHaveText(firstXp ?? "");
   await expect(page.locator(".save-pill")).toContainText("บันทึกแล้ว");

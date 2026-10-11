@@ -136,3 +136,5 @@ Repository และ deployment ต้องตั้งเป็น private/pro
 หน้า `#diagnostic` มีคำถาม 8 ข้อครอบคลุมพื้นฐานนักพัฒนา เว็บ JavaScript และ Java เพื่อแนะนำบททบทวน ผลบันทึกในเครื่องและรวมใน JSON Export/Import ทำใหม่ได้ ผลปรนัยไม่ใช่การยืนยัน mastery และไม่เพิ่ม XP, activity หรือสถานะผ่านบทเรียน
 
 เส้นทางแนะนำ Full-stack: Developer Foundations → Web Platform → JavaScript → TypeScript → Node → Backend โดยโหมดผสมเรียน Java Foundations/OOP ควบคู่กับช่วงพื้นฐานก่อนต่อเส้นทางเว็บ บทเรียนที่ยังไม่ผ่านจะถูกแนะนำก่อนคอร์สถัดไป
+
+XP ของ Lab ได้จากการผ่านครั้งแรกและคงอยู่เมื่อฝึกซ้ำแล้วตอบผิด ส่วนสถานะและผลตรวจแสดงความพยายามล่าสุด การผ่านซ้ำไม่เพิ่ม XP

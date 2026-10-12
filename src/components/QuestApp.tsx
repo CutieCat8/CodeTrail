@@ -15,6 +15,7 @@ import { StepSections } from "./StepSections";
 import { WorldLandmark } from "./ExpeditionArt";
 import { QuestHome } from "./QuestHome";
 import BackupRecovery from "./BackupRecovery";
+import { BookmarkButton } from "./BookmarkButton";
 import { LessonSearch } from "./LessonSearch";
 import { LearningDiagnostic } from "./LearningDiagnostic";
 import { ProjectMilestones } from "./ProjectMilestones";
@@ -182,7 +183,7 @@ export function QuestApp() {
         <main id="main">
           {view === "dashboard" && <Dashboard data={data} setData={setData} openLesson={openLesson} openStep={openStep} openProjects={() => goView("projects")} />}
           {view === "diagnostic" && <LearningDiagnostic key={data.diagnosticResult?.completedAt ?? "new"} result={data.diagnosticResult} onSave={result => setData(current => ({ ...current, diagnosticResult: result }))} openStep={openStep} />}
-          {view === "curriculum" && <CurriculumView data={data} openStep={openStep} />}
+          {view === "curriculum" && <CurriculumView data={data} setData={setData} openStep={openStep} />}
           {view === "roadmap" && <FullStackRoadmap data={data} setData={setData} openStep={openStep} openLesson={openLesson} />}
           {view === "map" && <LearningMap data={data} openLesson={openLesson} />}
           {view === "challenges" && <ChallengeLibrary data={data} openLesson={openLesson} />}
@@ -207,7 +208,7 @@ function Dashboard({ data, setData, openLesson, openStep, openProjects }: { data
   return <QuestHome data={data} setData={setData} openLesson={openLesson} openStep={openStep} openProjects={openProjects} />;
 }
 
-function CurriculumView({ data, openStep }: { data: AppData; openStep: (id: string) => void }) {
+function CurriculumView({ data, setData, openStep }: { data: AppData; setData: React.Dispatch<React.SetStateAction<AppData>>; openStep: (id: string) => void }) {
   const [track, setTrack] = useState<"all" | "web" | "java" | "foundation">("all");
   const suggested = stepRecommendation(data);
   const [selectedCourseId, setSelectedCourseId] = useState(data.lastStepId ? stepById(data.lastStepId)?.courseId ?? suggested.step.courseId : suggested.step.courseId);
@@ -227,7 +228,7 @@ function CurriculumView({ data, openStep }: { data: AppData; openStep: (id: stri
 
     <div className="segmented curriculum-filter" aria-label="กรองเส้นทาง">{([['all','ทั้งหมด'],['foundation','พื้นฐานนักพัฒนา'],['java','Java & OOP'],['web','Web & Back-end']] as const).map(([id,label])=><button key={id} aria-pressed={track===id} onClick={()=>setTrack(id)}>{label}</button>)}</div>
 
-    <details className="lesson-search-disclosure"><summary>ค้นหาและกรองบทเรียน</summary><LessonSearch data={data} openStep={openStep} track={track} /></details>
+    <details className="lesson-search-disclosure"><summary>ค้นหาและกรองบทเรียน</summary><LessonSearch data={data} setData={setData} openStep={openStep} track={track} /></details>
 
     {selectedCourse && <section className={`featured-course ${selectedCourse.track}`}>
       <div className="featured-course-art"><WorldLandmark world={artFor(selectedCourse.id)} decorative /></div>
@@ -254,12 +255,12 @@ function MicroStepWorkspace({stepId,data,setData,openStep,onExit}:{stepId:string
   const runCode=async()=>{setRunning(true);setRunResult(null);if(isWebFoundation){setRunResult({output:["บทนี้ใช้การอธิบายและทดลองใน browser: บันทึก HTML/CSS เป็นไฟล์แล้วเปิดใน browser หรือใช้ DevTools ตรวจตามโจทย์ จากนั้น Submit answer เพื่อเก็บหลักฐาน"],durationMs:0});setRunning(false);return;}if(!canRunInBrowser){setRunResult({output:[],error:isJava?"บท Java ต้องใช้ JDK 21: บันทึกเป็น Main.java แล้วรัน java Main.java (หรือ javac Main.java และ java Main)":fileName==="index.ts"?"บท TypeScript ตรวจ type ในเครื่อง: ใช้ ts-lab จากบท ts-why บันทึกเป็น src/index.ts แล้วรัน npx tsc -p . — เว็บไซต์นี้รันได้เฉพาะ JavaScript":fileName==="index.mjs"?"บท Node ใช้ API ของ Node (fs, process, http) ที่ไม่มีใน browser: บันทึกเป็น index.mjs แล้วรัน node index.mjs ในเครื่อง (Node 22+ แนะนำ 24 LTS)":fileName==="query.sql"?"บท SQL ต้องรันกับฐานข้อมูลในเครื่อง เช่น psql — เว็บไซต์ไม่ได้ต่อฐานข้อมูล":"บทคำสั่งระบบต้องทดลองใน Terminal จริงของเครื่อง เพื่อไม่ให้เว็บไซต์แตะไฟล์ในเครื่อง",durationMs:0});setRunning(false);return;}const result=await runIsolatedSnippet(code);setRunResult(result);setRunning(false);};
   const runChecks=async()=>{if(!step.check&&!step.outputCheck)return;setRunning(true);setTestResults(null);const tested=code;const results=step.check?await runIsolatedTests(tested,step.check.functionName,step.check.tests):await checkSnippetOutput(tested,step.outputCheck!.expected);setTestResults(results);setRunning(false);if(results.every(result=>result.passed))update({answer:tested,completed:true});};
   return <div className="micro-workspace micro-v2">
-    <header className="micro-header-v2"><button onClick={onExit}><ChevronLeft/>คอร์ส</button><div className="micro-title"><span className="eyebrow">{course?.title} · {step.unit}</span><h1 id="step-title" tabIndex={-1}>{step.title}</h1><p>{step.objective}</p></div><div className="micro-position"><span>STEP</span><strong>{step.position}</strong><small>/ {courseSteps.length}</small></div></header>
-    <div className="micro-progress" aria-label={`ผ่านตำแหน่ง ${step.position} จาก ${courseSteps.length}`}><i style={{width:`${step.position/courseSteps.length*100}%`}}/></div>
+    <header className="micro-header-v2"><button onClick={onExit}><ChevronLeft/>คอร์ส</button><div className="micro-title"><span className="eyebrow">{course?.title} · {step.unit}</span><h1 id="step-title" tabIndex={-1}>{step.title}</h1><p>{step.objective}</p><BookmarkButton stepId={step.id} title={step.title} data={data} setData={setData} /></div><div className="micro-position"><span>STEP</span><strong>{step.position}</strong><small>/ {courseSteps.length}</small></div></header>
+    <div className="micro-progress" role="group" aria-label={`ตำแหน่งบทเรียน ${step.position} จาก ${courseSteps.length}`}><i style={{width:`${step.position/courseSteps.length*100}%`}}/></div>
     <div className="micro-stagebar"><span className={`kind ${step.kind}`}>{kindCopy[step.kind][0]}</span><span><Clock3/>{step.minutes} นาที</span><p>{kindCopy[step.kind][1]}</p><div className="rail-nav"><button disabled={!previous} onClick={()=>previous&&openStep(previous.id)}><ChevronLeft/>ก่อนหน้า</button><button disabled={!next} onClick={()=>next&&openStep(next.id)}>ถัดไป<ChevronRight/></button></div></div>
     <main className="micro-split-workbench">
       <article className="micro-lesson-pane">
-        <section className="micro-learn"><div className="phase-label"><span>01</span><div><small>ทำความเข้าใจ</small><strong>สร้างภาพในหัวก่อนแตะโค้ด</strong></div></div><StepSections step={step} openStep={openStep}/>{step.vocabulary.length>0&&<dl className="vocabulary">{step.vocabulary.map(([term,meaning])=><div key={term}><dt>{term}</dt><dd>{meaning}</dd></div>)}</dl>}{step.code&&!step.sections?.some(x=>x.kind==="code")&&<div className="micro-code"><span>ตัวอย่างที่ใช้สังเกต</span><pre><code>{step.code}</code></pre></div>}{step.starter&&<div className="micro-code starter"><span>Starter code</span><pre><code>{step.starter}</code></pre></div>}</section>
+        <section className="micro-learn"><div className="phase-label"><span>01</span><div><small>ทำความเข้าใจ</small><strong>สร้างภาพในหัวก่อนแตะโค้ด</strong></div></div><StepSections step={step} openStep={openStep}/>{step.vocabulary.length>0&&<dl className="vocabulary">{step.vocabulary.map(([term,meaning])=><div key={term}><dt>{term}</dt><dd>{meaning}</dd></div>)}</dl>}{step.code&&!step.sections?.some(x=>x.kind==="code")&&<div className="micro-code"><span>ตัวอย่างที่ใช้สังเกต</span><pre tabIndex={0}><code>{step.code}</code></pre></div>}{step.starter&&<div className="micro-code starter"><span>Starter code</span><pre tabIndex={0}><code>{step.starter}</code></pre></div>}</section>
         <section className="micro-lab-brief"><div className="phase-label"><span>02</span><div><small>LAB INSTRUCTIONS</small><strong>อ่านโจทย์ แล้วเขียนโค้ดทางขวา</strong></div></div><div className="lab-brief-card"><Lightbulb aria-hidden="true"/><div><span>ภารกิจของซี</span><h2>{effectivePrompt}</h2><p>{isWebFoundation?"เขียนคำอธิบายหรือ HTML/CSS ตามโจทย์ ทดลองใน browser แล้วส่งคำตอบเพื่อเก็บหลักฐาน":step.assessment?"เขียนคำตอบและหลักฐานการตรวจในช่องทางขวา เมื่อส่งแล้วจึงเปิดเกณฑ์และตัวอย่างคำตอบได้":"แก้หรือเติมคำตอบทางขวา กิจกรรมที่รันในเครื่องให้จด command/output แล้วเทียบกับ expected ตามบท"}</p></div></div></section>
         <AICompanion context={step.title} prompts={["อธิบายด้วยการเปรียบเทียบให้หน่อย", "ถามฉันทีละคำถามโดยยังไม่เฉลย", "ช่วยใบ้ว่าควรเริ่มคิดจากตรงไหน"]}/>
         <nav className="micro-footer-nav" aria-label="นำทางระหว่าง micro-step"><button disabled={!previous} onClick={()=>previous&&openStep(previous.id)}><ChevronLeft/><span><small>ก่อนหน้า</small><strong>{previous?.title??"จุดเริ่มต้นคอร์ส"}</strong></span></button><button disabled={!next} onClick={()=>next&&openStep(next.id)}><span><small>ถัดไป</small><strong>{next?.title??"จบคอร์สนี้"}</strong></span><ChevronRight/></button></nav>

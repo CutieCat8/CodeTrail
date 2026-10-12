@@ -4,13 +4,14 @@ import type { CodeLanguage, CurriculumCourse, LearningStep, StepProgress } from 
 export type LearningState = "not-started" | "in-progress" | "completed";
 export type LessonSearchFilters = {
   query: string;
+  bookmarkedOnly: boolean;
   track: "all" | CurriculumCourse["track"];
   courseId: string;
   language: "all" | CodeLanguage;
   state: "all" | LearningState;
 };
 export const initialLessonSearchFilters: LessonSearchFilters = {
-  query: "", track: "all", courseId: "all", language: "all", state: "all",
+  query: "", bookmarkedOnly: false, track: "all", courseId: "all", language: "all", state: "all",
 };
 export const learningStateLabels: Record<LearningState, string> = {
   "not-started": "ยังไม่เริ่ม", "in-progress": "กำลังเรียน", completed: "เรียนแล้ว",
@@ -32,9 +33,12 @@ const searchText = new Map(learningSteps.map(step => [step.id, [
 export function searchLearningSteps(
   filters: LessonSearchFilters,
   progress: Record<string, StepProgress>,
+  bookmarkedStepIds: readonly string[] = [],
 ): LearningStep[] {
+  const bookmarks = new Set(bookmarkedStepIds);
   const tokens = filters.query.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
   return learningSteps.filter(step => {
+    if (filters.bookmarkedOnly && !bookmarks.has(step.id)) return false;
     if (filters.track !== "all" && courseById.get(step.courseId)?.track !== filters.track) return false;
     if (filters.courseId !== "all" && step.courseId !== filters.courseId) return false;
     if (filters.language !== "all" && step.language !== filters.language) return false;

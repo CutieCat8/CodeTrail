@@ -16,6 +16,7 @@ export const emptyData = (): AppData => ({
   journal: [],
   stepProgress: {},
   activityEvents: [],
+  bookmarkedStepIds: [],
 });
 
 const isRecord = (value: unknown): value is Record<string, unknown> => Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -92,6 +93,9 @@ export function isAppData(value: unknown): value is AppData {
   }
   if (candidate.diagnosticResult !== undefined && !isDiagnosticResult(candidate.diagnosticResult)) return false;
   if (candidate.lastLessonId !== undefined && typeof candidate.lastLessonId !== "string") return false;
+  if (candidate.bookmarkedStepIds !== undefined && (!Array.isArray(candidate.bookmarkedStepIds)
+    || !candidate.bookmarkedStepIds.every(id => typeof id === "string" && id.trim().length > 0)
+    || new Set(candidate.bookmarkedStepIds).size !== candidate.bookmarkedStepIds.length)) return false;
   if (candidate.lastStepId !== undefined && typeof candidate.lastStepId !== "string") return false;
   return candidate.journal.every((entry) => isRecord(entry)
     && [entry.id, entry.title, entry.learned, entry.bug, entry.fix, entry.unclear, entry.link].every((field) => typeof field === "string")
@@ -141,7 +145,7 @@ export function canOverwriteStoredData(backedUpRaw: string | null = null): boole
 
 export function normalizeAppData(value: unknown): AppData | null {
   if (!isAppData(value)) return null;
-  return withLegacyActivityEvents({ ...value, stepProgress: value.stepProgress ?? {}, projectProgress: value.projectProgress ?? {} });
+  return withLegacyActivityEvents({ ...value, bookmarkedStepIds: value.bookmarkedStepIds ?? [], stepProgress: value.stepProgress ?? {}, projectProgress: value.projectProgress ?? {} });
 }
 
 export function saveData(data: AppData) {

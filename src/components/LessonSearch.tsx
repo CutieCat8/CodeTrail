@@ -6,12 +6,14 @@ import {
   searchLanguages, searchLearningSteps, stepLearningState,
   type LessonSearchFilters,
 } from "@/lib/lesson-search";
+import { BookmarkButton } from "./BookmarkButton";
 import type { AppData } from "@/types/domain";
 
 const pageSize = 30;
 
 type LessonSearchProps = {
   data: AppData;
+  setData: React.Dispatch<React.SetStateAction<AppData>>;
   openStep: (id: string) => void;
   track?: LessonSearchFilters["track"];
 };
@@ -20,11 +22,11 @@ export function LessonSearch(props: LessonSearchProps) {
   return <LessonSearchContent key={props.track ?? "all"} {...props} />;
 }
 
-function LessonSearchContent({ data, openStep, track = "all" }: LessonSearchProps) {
+function LessonSearchContent({ data, setData, openStep, track = "all" }: LessonSearchProps) {
   const id = useId();
   const [filters, setFilters] = useState(initialLessonSearchFilters);
   const [limit, setLimit] = useState(pageSize);
-  const results = useMemo(() => searchLearningSteps({ ...filters, track }, data.stepProgress), [filters, track, data.stepProgress]);
+  const results = useMemo(() => searchLearningSteps({ ...filters, track }, data.stepProgress, data.bookmarkedStepIds), [filters, track, data.stepProgress, data.bookmarkedStepIds]);
   function update<K extends keyof LessonSearchFilters>(key: K, value: LessonSearchFilters[K]) {
     setFilters(current => ({ ...current, [key]: value }));
     setLimit(pageSize);
@@ -55,6 +57,7 @@ function LessonSearchContent({ data, openStep, track = "all" }: LessonSearchProp
           {Object.entries(learningStateLabels).map(([state, label]) => <option key={state} value={state}>{label}</option>)}
         </select>
       </label>
+      <label className="bookmark-filter"><input type="checkbox" checked={filters.bookmarkedOnly} onChange={event => update("bookmarkedOnly", event.target.checked)} />บันทึกไว้</label>
       <button className="secondary" type="button" onClick={() => { setFilters(initialLessonSearchFilters); setLimit(pageSize); }}>ล้างตัวกรอง</button>
     </div>
     <p role="status" aria-live="polite">พบ {results.length} บทเรียน · แสดง {Math.min(limit, results.length)} บทเรียน</p>
@@ -64,6 +67,7 @@ function LessonSearchContent({ data, openStep, track = "all" }: LessonSearchProp
           <h3>{step.title}</h3><p>{step.objective}</p>
           <small>{step.language ?? "ไม่ระบุภาษา"} · {step.minutes} นาที · {learningStateLabels[stepLearningState(data.stepProgress[step.id])]}</small>
         </div>
+        <BookmarkButton stepId={step.id} title={step.title} data={data} setData={setData} />
         <button className="secondary" type="button" onClick={() => openStep(step.id)} aria-label={`เปิดบทเรียน ${step.title}`}>เปิดบทเรียน</button>
       </li>)}
     </ul>}

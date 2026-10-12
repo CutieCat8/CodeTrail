@@ -210,3 +210,8 @@ button{min-width:24px;min-height:24px}
 .lesson-search li { margin: 10px 0; }
 .lesson-search li button { display: grid; width: 100%; gap: 8px; text-align: left; white-space: normal; padding: 14px; color: var(--color-text-primary); background: #101a2d; border: 1px solid var(--color-border); border-radius: 8px; }
 .lesson-search li small { color: var(--color-text-secondary); }
+
+.bookmark-button { min-height: 44px; white-space: normal; }
+.bookmark-button[aria-pressed="true"] { border-color: var(--color-text-secondary); }
+.lesson-search .bookmark-filter { display: flex; align-items: center; gap: 10px; min-height: 44px; }
+.lesson-search .bookmark-filter input { width: 20px; min-height: 20px; }

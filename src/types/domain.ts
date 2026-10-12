@@ -110,6 +110,7 @@ export type AppData = {
   lastLessonId?: string;
   stepProgress: Record<string, import("./curriculum").StepProgress>;
   lastStepId?: string;
+  bookmarkedStepIds?: string[];
   roadmapMarks?: Record<string, RoadmapMark>;
   projectProgress?: Record<string, ProjectProgress>;
   activityEvents?: ActivityEvent[];

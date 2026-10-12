@@ -12,6 +12,7 @@ import { projectMilestoneSummary } from "@/lib/projects";
 import type { AppData, StudyMode } from "@/types/domain";
 import { ActivityHeatmap } from "./ActivityHeatmap";
 import { ExpeditionBase } from "./ExpeditionArt";
+import { DailyMission } from "./DailyMission";
 import { RouteCompletion } from "./RouteCompletion";
 import { PixelCat } from "./PixelCat";
 
@@ -74,6 +75,7 @@ export function QuestHome({ data, setData, openLesson, openStep, openProjects }:
 
     <div className="home-layout">
       <div className="home-main-column">
+        <DailyMission data={data} setData={setData} openStep={openStep} />
         {recommended.routeComplete ? <RouteCompletion data={data} openStep={openStep} openProjects={openProjects} /> : <section className="continue-quest">
           <div className="continue-art"><ExpeditionBase /></div>
           <div className="continue-overlay" />

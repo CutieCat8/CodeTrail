@@ -91,6 +91,12 @@ export function isAppData(value: unknown): value is AppData {
       && typeof event.id === "string" && typeof event.occurredAt === "string" && typeof event.sourceId === "string"
       && ["step-completed", "lab-attempt", "journal-saved", "project-evidence", "legacy-snapshot"].includes(String(event.type)))) return false;
   }
+  if (candidate.dailyMissions !== undefined) {
+    if (!isRecord(candidate.dailyMissions)) return false;
+    if (!Object.entries(candidate.dailyMissions).every(([mode, mission]) =>
+      ["fullstack", "java", "mixed"].includes(mode) && isRecord(mission)
+      && isIsoDate(mission.date) && typeof mission.stepId === "string" && mission.stepId.trim().length > 0)) return false;
+  }
   if (candidate.diagnosticResult !== undefined && !isDiagnosticResult(candidate.diagnosticResult)) return false;
   if (candidate.lastLessonId !== undefined && typeof candidate.lastLessonId !== "string") return false;
   if (candidate.bookmarkedStepIds !== undefined && (!Array.isArray(candidate.bookmarkedStepIds)

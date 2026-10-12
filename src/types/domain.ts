@@ -111,6 +111,7 @@ export type AppData = {
   stepProgress: Record<string, import("./curriculum").StepProgress>;
   lastStepId?: string;
   bookmarkedStepIds?: string[];
+  dailyMissions?: Partial<Record<StudyMode, { date: string; stepId: string }>>;
   roadmapMarks?: Record<string, RoadmapMark>;
   projectProgress?: Record<string, ProjectProgress>;
   activityEvents?: ActivityEvent[];

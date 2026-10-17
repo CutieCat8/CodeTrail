@@ -6,9 +6,14 @@ import { curriculumCourses, learningSteps, stepById } from "@/content/curriculum
 import { lessonById, lessons } from "@/content/lessons";
 import { stepRecommendation } from "@/lib/recommendation";
 import { calculateStreak, xpTotal } from "@/lib/storage";
+import { weeklyActivityCount } from "@/lib/activity";
+import { friendsActivityProjectId } from "@/content/projects";
+import { projectMilestoneSummary } from "@/lib/projects";
 import type { AppData, StudyMode } from "@/types/domain";
 import { ActivityHeatmap } from "./ActivityHeatmap";
 import { ExpeditionBase } from "./ExpeditionArt";
+import { DailyMission } from "./DailyMission";
+import { RouteCompletion } from "./RouteCompletion";
 import { PixelCat } from "./PixelCat";
 
 type Props = {
@@ -16,13 +21,14 @@ type Props = {
   setData: Dispatch<SetStateAction<AppData>>;
   openLesson: (id: string) => void;
   openStep: (id: string) => void;
+  openProjects: () => void;
 };
 
-const modeOptions: [StudyMode, string][] = [["fullstack", "Full-stack"], ["java", "Java & OOP"], ["mixed", "Mixed"]];
-const fullstackCourseIds = new Set(["developer-foundations", "javascript-foundations", "node-foundations"]);
+const modeOptions: [StudyMode, string][] = [["fullstack", "Full-stack"], ["java", "Java & OOP"], ["mixed", "ผสมสองเส้นทาง"]];
+const fullstackCourseIds = new Set(["developer-foundations", "web-platform-foundations", "javascript-foundations", "typescript", "node-foundations", "backend"]);
 const javaCourseIds = new Set(["java-foundations", "java-oop"]);
 
-export function QuestHome({ data, setData, openLesson, openStep }: Props) {
+export function QuestHome({ data, setData, openLesson, openStep, openProjects }: Props) {
   const recommended = stepRecommendation(data);
   const passedLessons = Object.values(data.progress).filter((progress) => progress.status === "passed").length;
   const completedSteps = Object.values(data.stepProgress).filter((progress) => progress.completed).length;
@@ -57,8 +63,8 @@ export function QuestHome({ data, setData, openLesson, openStep }: Props) {
   const totalLearningItems = lessons.length + learningSteps.length;
   const completedItems = passedLessons + completedSteps;
   const progressPercent = totalLearningItems ? Math.round((completedItems / totalLearningItems) * 100) : 0;
-  const project = data.projectProgress?.["friends-activity-planner"];
-  const projectChecks = project?.checklist.filter(Boolean).length ?? 0;
+  const project = data.projectProgress?.[friendsActivityProjectId];
+  const projectSummary = projectMilestoneSummary(project);
   const today = new Intl.DateTimeFormat("th-TH", { weekday: "long", day: "numeric", month: "long", timeZone: "Asia/Bangkok" }).format(new Date());
 
   return <div className="page home-page">
@@ -69,7 +75,8 @@ export function QuestHome({ data, setData, openLesson, openStep }: Props) {
 
     <div className="home-layout">
       <div className="home-main-column">
-        <section className="continue-quest">
+        <DailyMission data={data} setData={setData} openStep={openStep} />
+        {recommended.routeComplete ? <RouteCompletion data={data} openStep={openStep} openProjects={openProjects} /> : <section className="continue-quest">
           <div className="continue-art"><ExpeditionBase /></div>
           <div className="continue-overlay" />
           <div className="continue-copy">
@@ -80,8 +87,9 @@ export function QuestHome({ data, setData, openLesson, openStep }: Props) {
             <div className="continue-meta"><span><Clock3 /> {continueMinutes} นาที</span><span><Layers3 /> {isMixedMission ? `Next: ${recommended.companionCourse?.title}` : resumableStep ? "Micro-step" : resumableLesson ? "Lab" : recommended.step.kind}</span></div>
             <div className="continue-actions"><button className="primary" onClick={openContinue}>{isMixedMode ? "เริ่มเลย" : "เรียนต่อ"} <ChevronRight /></button>{!isMixedMode && <button className="home-quiet-action" onClick={() => openStep(recommended.step.id)}>ดูภารกิจแนะนำ</button>}</div>
           </div>
-        </section>
+        </section>}
 
+        <section className="diagnostic-invitation"><h2>หาจุดเริ่มเรียน</h2><p>ลองตอบ 8 ข้อเพื่อเลือกหัวข้อทบทวน ไม่เปลี่ยนความคืบหน้าหรือ XP</p><a className="home-quiet-action" href="#diagnostic">{data.diagnosticResult ? "ดูผลประเมินก่อนเรียน" : "ทำแบบประเมินก่อนเรียน"}</a></section>
         <ActivityHeatmap data={data} />
       </div>
 
@@ -99,13 +107,14 @@ export function QuestHome({ data, setData, openLesson, openStep }: Props) {
 
         <section className="home-project-card">
           <div className="home-project-head"><FolderGit2 /><span><small>PROJECT IN PROGRESS</small><strong>Friends Activity Planner</strong></span></div>
-          <p>{project ? "มีงานโปรเจกต์ที่บันทึกไว้แล้ว กลับไปทำต่อจาก milestone ล่าสุดได้" : "เชื่อมบทเว็บแต่ละบทเป็นระบบวางแผนกิจกรรมสำหรับเพื่อน 9 คน"}</p>
-          <div className="home-project-progress"><span><i style={{ width: `${Math.round(projectChecks / 4 * 100)}%` }}/></span><small>{projectChecks}/4 milestones</small></div>
+          <p>{projectSummary.next ? `ขั้นแนะนำ: ${projectSummary.next.title}` : "ส่งหลักฐานครบทุกขั้นแล้ว กลับไปตรวจและปรับผลงานต่อได้"}</p>
+          <div className="home-project-progress"><span><i style={{ width: `${Math.round(projectSummary.submitted / projectSummary.total * 100)}%` }}/></span><small>{projectSummary.submitted}/{projectSummary.total} milestones · ตรวจเอง</small></div>
           <div className="home-project-links"><span className={project?.repositoryUrl ? "ready" : ""}><Code2 /> {project?.repositoryUrl ? "Repository linked" : "Repository not linked yet"}</span></div>
+          <button className="home-project-open" onClick={openProjects}>ไปทำโปรเจกต์<ChevronRight aria-hidden="true" /></button>
         </section>
 
         <section className="weekly-mini-card">
-          <div><span className="eyebrow">Weekly target</span><strong>{Math.min(completedItems, data.weeklyGoal)}/{data.weeklyGoal} steps done</strong></div>
+          <div><span className="eyebrow">Weekly target</span><strong>{Math.min(weeklyActivityCount(data), data.weeklyGoal)}/{data.weeklyGoal} กิจกรรมสัปดาห์นี้</strong></div>
           <input aria-label="เป้าหมายต่อสัปดาห์" type="range" min="1" max="14" value={data.weeklyGoal} onChange={(event) => setData((current) => ({ ...current, weeklyGoal: Number(event.target.value) }))}/>
         </section>
       </aside>

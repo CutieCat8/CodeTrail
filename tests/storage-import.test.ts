@@ -103,21 +103,21 @@ describe("enum validation", () => {
 describe("calculateStreak", () => {
   const now = new Date("2026-10-05T05:00:00.000Z"); // 12:00 in Bangkok
 
-  it("keeps the existing streak definition for valid data", () => {
-    const data = sampleData();
+  it("includes legacy step activity in the shared streak", () => {
+    const data = { ...sampleData(), activityEvents: undefined };
     data.progress["web-react-filter"].updatedAt = "2026-10-05T01:00:00.000Z";
     data.journal[0].updatedAt = "2026-10-04T01:00:00.000Z";
-    expect(calculateStreak(data, now)).toBe(2);
+    expect(calculateStreak(data, now)).toBe(3);
   });
 
   it("uses Bangkok calendar days at the UTC boundary", () => {
-    const data = { ...emptyData(), journal: [{ ...sampleData().journal[0], updatedAt: "2026-10-04T16:59:59.000Z" }] };
+    const data = { ...emptyData(), activityEvents: undefined, journal: [{ ...sampleData().journal[0], updatedAt: "2026-10-04T16:59:59.000Z" }] };
     expect(calculateStreak(data, new Date("2026-10-04T17:00:00.000Z"))).toBe(1);
     expect(calculateStreak(data, new Date("2026-10-05T17:00:00.000Z"))).toBe(0);
   });
 
   it("skips invalid timestamps instead of throwing or inventing a day", () => {
-    const data = sampleData();
+    const data = { ...sampleData(), activityEvents: undefined };
     data.progress["web-react-filter"].updatedAt = "bad";
     data.journal[0].updatedAt = "2026-10-05T01:00:00.000Z";
     expect(() => calculateStreak(data, now)).not.toThrow();
@@ -131,7 +131,7 @@ describe("calculateStreak", () => {
     ["hour 24", "2026-10-04T24:00:00.000Z", "2026-10-05T05:00:00.000Z"],
     ["a timestamp without milliseconds", "2026-10-05T01:00:00Z", "2026-10-05T05:00:00.000Z"],
   ])("does not roll %s over into a real day", (_label, updatedAt, today) => {
-    const data = { ...emptyData(), journal: [{ ...sampleData().journal[0], updatedAt }] };
+    const data = { ...emptyData(), activityEvents: undefined, journal: [{ ...sampleData().journal[0], updatedAt }] };
     expect(calculateStreak(data, new Date(today))).toBe(0);
   });
 });

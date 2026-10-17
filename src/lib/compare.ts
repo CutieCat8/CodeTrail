@@ -75,7 +75,7 @@ export function compareTestValue(actual: unknown, expected: unknown): TestValueC
   };
 
   const equal = (left: Plain, right: Plain): boolean => {
-    if (left === null || right === null || typeof left !== "object" || typeof right !== "object") return left === right;
+    if (left === null || right === null || typeof left !== "object" || typeof right !== "object") return Object.is(left, right);
     if (Array.isArray(left) || Array.isArray(right)) {
       return Array.isArray(left) && Array.isArray(right) && left.length === right.length && left.every((item, index) => equal(item, right[index]));
     }

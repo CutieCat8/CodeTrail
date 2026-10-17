@@ -1,5 +1,8 @@
 import type { AppData, LessonProgress, LessonStatus, RoadmapMark, StudyMode } from "@/types/domain";
 
+import { isDiagnosticResult } from "./diagnostics";
+import { activityTimestamps, withLegacyActivityEvents } from "./activity";
+
 export const STORAGE_KEY = "seas-fullstack-quest:v1";
 // Stored data that fails validation is copied to `${REJECTED_STORAGE_KEY}:<ISO time>` before the
 // app falls back to empty data, so a stricter schema never silently discards what was saved.
@@ -12,6 +15,8 @@ export const emptyData = (): AppData => ({
   progress: {},
   journal: [],
   stepProgress: {},
+  activityEvents: [],
+  bookmarkedStepIds: [],
 });
 
 const isRecord = (value: unknown): value is Record<string, unknown> => Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -69,9 +74,34 @@ export function isAppData(value: unknown): value is AppData {
       const item = progress as { repositoryUrl?: unknown; demoUrl?: unknown; checklist?: unknown; updatedAt?: unknown };
       if (typeof item.repositoryUrl !== "string" || typeof item.demoUrl !== "string" || !isIsoTimestamp(item.updatedAt)) return false;
       if (!isBooleanArray(item.checklist)) return false;
+      if (progress.milestones !== undefined) {
+        if (!isRecord(progress.milestones)) return false;
+        for (const milestone of Object.values(progress.milestones)) {
+          if (!isRecord(milestone) || !isRecord(milestone.checks)) return false;
+          if (!Object.values(milestone.checks).every(value => typeof value === "boolean")) return false;
+          if (typeof milestone.evidenceUrl !== "string" || typeof milestone.notes !== "string" || typeof milestone.updatedAt !== "string") return false;
+          if (milestone.submittedAt !== undefined && (typeof milestone.submittedAt !== "string" || !Number.isFinite(Date.parse(milestone.submittedAt)))) return false;
+        }
+      }
     }
   }
+  if (candidate.activityEvents !== undefined) {
+    if (!Array.isArray(candidate.activityEvents)) return false;
+    if (!candidate.activityEvents.every((event) => isRecord(event)
+      && typeof event.id === "string" && typeof event.occurredAt === "string" && typeof event.sourceId === "string"
+      && ["step-completed", "lab-attempt", "journal-saved", "project-evidence", "legacy-snapshot"].includes(String(event.type)))) return false;
+  }
+  if (candidate.dailyMissions !== undefined) {
+    if (!isRecord(candidate.dailyMissions)) return false;
+    if (!Object.entries(candidate.dailyMissions).every(([mode, mission]) =>
+      ["fullstack", "java", "mixed"].includes(mode) && isRecord(mission)
+      && isIsoDate(mission.date) && typeof mission.stepId === "string" && mission.stepId.trim().length > 0)) return false;
+  }
+  if (candidate.diagnosticResult !== undefined && !isDiagnosticResult(candidate.diagnosticResult)) return false;
   if (candidate.lastLessonId !== undefined && typeof candidate.lastLessonId !== "string") return false;
+  if (candidate.bookmarkedStepIds !== undefined && (!Array.isArray(candidate.bookmarkedStepIds)
+    || !candidate.bookmarkedStepIds.every(id => typeof id === "string" && id.trim().length > 0)
+    || new Set(candidate.bookmarkedStepIds).size !== candidate.bookmarkedStepIds.length)) return false;
   if (candidate.lastStepId !== undefined && typeof candidate.lastStepId !== "string") return false;
   return candidate.journal.every((entry) => isRecord(entry)
     && [entry.id, entry.title, entry.learned, entry.bug, entry.fix, entry.unclear, entry.link].every((field) => typeof field === "string")
@@ -121,7 +151,7 @@ export function canOverwriteStoredData(backedUpRaw: string | null = null): boole
 
 export function normalizeAppData(value: unknown): AppData | null {
   if (!isAppData(value)) return null;
-  return { ...value, stepProgress: value.stepProgress ?? {}, projectProgress: value.projectProgress ?? {} };
+  return withLegacyActivityEvents({ ...value, bookmarkedStepIds: value.bookmarkedStepIds ?? [], stepProgress: value.stepProgress ?? {}, projectProgress: value.projectProgress ?? {} });
 }
 
 export function saveData(data: AppData) {
@@ -177,8 +207,7 @@ export function calculateStreak(data: AppData, now = new Date()) {
   const addDay = (timestamp: string) => {
     if (isIsoTimestamp(timestamp)) activeDays.add(bangkokDay(Date.parse(timestamp)));
   };
-  Object.values(data.progress).forEach((p) => addDay(p.updatedAt));
-  data.journal.forEach((j) => addDay(j.updatedAt));
+  activityTimestamps(data).forEach(addDay);
   if (!activeDays.size) return 0;
   const today = now.getTime();
   let cursor = activeDays.has(bangkokDay(today)) ? today : today - 86_400_000;

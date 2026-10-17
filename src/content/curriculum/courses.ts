@@ -1,6 +1,7 @@
 import type { CurriculumCourse } from "@/types/curriculum";
 
 export const curriculumCourses: CurriculumCourse[] = [
+  { id: "web-platform-foundations", title: "Web Platform Foundations", description: "Browser, HTML, forms, CSS, responsive layout, accessibility และ DOM ก่อน framework", track: "web", status: "partial", targetSteps: 80 },
   { id: "developer-foundations", title: "Developer Foundations", description: "เข้าใจคอมพิวเตอร์ ไฟล์ terminal process error และ Git ก่อนพึ่ง framework", track: "foundation", status: "live", targetSteps: 48 },
   { id: "java-foundations", title: "Java Foundations", description: "JDK 21 ตั้งแต่ compile/run, ชนิดข้อมูล, String, Scanner, if/switch, loops, methods, arrays, ArrayList, exception เบื้องต้น และโปรแกรมหลายไฟล์ พร้อม Library CLI M0", track: "java", status: "live", targetSteps: 90 },
   { id: "java-oop", title: "Java OOP", description: "ออกแบบจากความรับผิดชอบ: class, constructor, identity, encapsulation, composition, interfaces, polymorphism, inheritance, collections, exceptions, refactoring และ JUnit พร้อม Library CLI M1–M3 และ RPG Battle CLI", track: "java", status: "live", targetSteps: 105 },

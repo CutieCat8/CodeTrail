@@ -81,7 +81,7 @@ describe("stepRecommendation", () => {
     expect(result.reason).toMatch(/กลับมาทำต่อ/);
   });
 
-  it("finishes both foundation routes before entering the JavaScript and OOP stage", () => {
+  it("finishes both foundation routes before entering Web Platform and OOP", () => {
     const data = emptyData();
     data.mode = "mixed";
     completeCourse(data, "developer-foundations");
@@ -90,7 +90,7 @@ describe("stepRecommendation", () => {
 
     completeCourse(data, "java-foundations");
 
-    expect(stepRecommendation(data).step.courseId).toBe("javascript-foundations");
+    expect(stepRecommendation(data).step.courseId).toBe("web-platform-foundations");
   });
 
   it("does not skip the longer Java route when Developer Foundations is complete", () => {
@@ -121,17 +121,45 @@ describe("stepRecommendation", () => {
     expect(stepRecommendation(data).step.id).toBe("dev-files-concept");
   });
 
-  it("finishes both second-stage routes before entering Node Foundations", () => {
+  it("finishes Web Platform and OOP before JavaScript, TypeScript, Node and Backend", () => {
     const data = emptyData();
     data.mode = "mixed";
     completeCourse(data, "developer-foundations");
     completeCourse(data, "java-foundations");
-    completeCourse(data, "javascript-foundations");
+    completeCourse(data, "web-platform-foundations");
 
     expect(stepRecommendation(data).step.courseId).toBe("java-oop");
 
     completeCourse(data, "java-oop");
 
+    expect(stepRecommendation(data).step.courseId).toBe("javascript-foundations");
+
+    completeCourse(data, "javascript-foundations");
+
+    expect(stepRecommendation(data).step.courseId).toBe("typescript");
+    completeCourse(data, "typescript");
     expect(stepRecommendation(data).step.courseId).toBe("node-foundations");
+    completeCourse(data, "node-foundations");
+    expect(stepRecommendation(data).step.courseId).toBe("backend");
+  });
+
+  it("advances the full-stack route through every opened course without mutating progress", () => {
+    const data = emptyData();
+    data.mode = "fullstack";
+    for (const courseId of ["developer-foundations", "web-platform-foundations", "javascript-foundations", "typescript", "node-foundations", "backend"]) {
+      const before = structuredClone(data);
+      expect(stepRecommendation(data).step.courseId).toBe(courseId);
+      expect(data).toEqual(before);
+      completeCourse(data, courseId);
+    }
+  });
+
+  it.each(["fullstack", "mixed"] as const)("keeps an unfinished TypeScript step before Node in %s mode", mode => {
+    const data = emptyData();
+    data.mode = mode;
+    for (const courseId of ["developer-foundations", "java-foundations", "web-platform-foundations", "java-oop", "javascript-foundations", "typescript"]) completeCourse(data, courseId);
+    const pending = learningSteps.filter(step => step.courseId === "typescript").at(-1)!;
+    data.stepProgress[pending.id] = { ...completed(pending.id), completed: false, answer: "saved draft" };
+    expect(stepRecommendation(data).step.id).toBe(pending.id);
   });
 });

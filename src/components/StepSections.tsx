@@ -8,7 +8,7 @@ const topicTitle = (id: string) => topicSources.find((topic) => topic.id === id)
 
 function CodeSample({ title, code, output }: { title: string; code?: string; output?: string }) {
   if (!code) return null;
-  return <div className="micro-code"><span>{title}</span><pre><code>{code}</code></pre>{output !== undefined && <div className="micro-output"><span>ผลลัพธ์ที่ควรเห็น</span><pre><code>{output}</code></pre></div>}</div>;
+  return <div className="micro-code"><span>{title}</span><pre tabIndex={0}><code>{code}</code></pre>{output !== undefined && <div className="micro-output"><span>ผลลัพธ์ที่ควรเห็น</span><pre tabIndex={0}><code>{output}</code></pre></div>}</div>;
 }
 
 export function StepSections({ step, openStep }: { step: LearningStep; openStep?: (id: string) => void }) {

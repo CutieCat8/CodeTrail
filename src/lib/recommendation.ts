@@ -1,3 +1,4 @@
+import { learningRouteSummary, routeCourseIds } from "./learning-route";
 import { lessons } from "@/content/lessons";
 import type { AppData, Lesson } from "@/types/domain";
 import { curriculumCourses, learningSteps } from "@/content/curriculum";
@@ -36,8 +37,11 @@ export function accessReason(data: AppData, lesson: Lesson) {
 
 const mixedStages = [
   ["developer-foundations", "java-foundations"],
-  ["javascript-foundations", "java-oop"],
+  ["web-platform-foundations", "java-oop"],
+  ["javascript-foundations"],
+  ["typescript"],
   ["node-foundations"],
+  ["backend"],
 ] as const;
 
 function hasDraft(data: AppData, stepId: string) {
@@ -86,11 +90,8 @@ function nextMixedSteps(data: AppData) {
 }
 
 export function stepRecommendation(data: AppData) {
-  const courseOrder = data.mode === "java"
-    ? ["java-foundations", "java-oop"]
-    : data.mode === "fullstack"
-      ? ["developer-foundations", "javascript-foundations", "node-foundations"]
-      : ["developer-foundations", "java-foundations", "javascript-foundations", "java-oop", "node-foundations"];
+  const courseOrder = routeCourseIds(data.mode);
+  const routeComplete = learningRouteSummary(data).complete;
   const pool = courseOrder.flatMap((courseId) => learningSteps.filter((step) => step.courseId === courseId));
   const mixed = data.mode === "mixed" ? nextMixedSteps(data) : undefined;
   const step = mixed?.step
@@ -112,5 +113,5 @@ export function stepRecommendation(data: AppData) {
     : started
       ? "กลับมาต่อจากคำตอบที่บันทึกไว้"
       : `เรียนตามลำดับพื้นฐานของ ${course?.title ?? "เส้นทางนี้"} โดยไม่ข้าม mental model`;
-  return { step, course, companionStep, companionCourse, reason };
+  return { step, course, companionStep, companionCourse, reason: routeComplete ? "บันทึกครบทุกขั้นที่เปิดแล้ว เลือกทบทวนหรือทำโปรเจกต์ต่อได้" : reason, routeComplete };
 }

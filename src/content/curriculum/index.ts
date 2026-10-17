@@ -1,5 +1,6 @@
 import { expandTopics } from "./generate";
 import { developerFoundationTopics } from "./developer-foundations";
+import { webPlatformFoundationTopics } from "./web-platform-foundations";
 import { javaFoundationTopics } from "./java-foundations";
 import { javaOopTopics } from "./java-oop";
 import { javascriptFoundationTopics } from "./javascript-foundations";
@@ -21,6 +22,7 @@ const withLessons = (topics: TopicSource[], lessons: Record<string, RichLesson>)
 export { curriculumCourses } from "./courses";
 
 export const topicSources = [
+  ...webPlatformFoundationTopics,
   ...withLessons(developerFoundationTopics, developerFoundationLessons),
   ...withLessons(javaFoundationTopics, javaFoundationLessons),
   ...withLessons(javaOopTopics, javaOopLessons),

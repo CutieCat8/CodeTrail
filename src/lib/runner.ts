@@ -104,6 +104,7 @@ export function buildTestWorkerSource() {
     self.WebSocket = undefined;
     self.importScripts = () => { throw new Error("imports are disabled"); };
     const compareTestValue = (${compareTestValue.toString()});
+    const display = (value) => JSON.stringify(value) ?? String(value);
     self.onmessage = ({ data }) => {
       const results = [];
       try {
@@ -114,12 +115,14 @@ export function buildTestWorkerSource() {
             const clonedArgs = structuredClone(test.args);
             const actual = fn(...clonedArgs);
             if (actual instanceof Promise) throw new Error("โจทย์นี้ยังไม่รองรับ async function");
+            // The comparator rejects other Promise prototypes, function-valued thenables and
+            // accessors without reading learner properties or invoking a then getter.
             const comparison = compareTestValue(actual, test.expected);
             const result = { name: test.name, passed: comparison.passed, expected: JSON.stringify(test.expected), actual: comparison.actual };
             if (comparison.error) result.error = comparison.error;
             results.push(result);
           } catch (error) {
-            results.push({ name: test.name, passed: false, expected: JSON.stringify(test.expected), actual: "—", error: error instanceof Error ? error.message : String(error) });
+            results.push({ name: test.name, passed: false, expected: display(test.expected), actual: "—", error: error instanceof Error ? error.message : String(error) });
           }
         }
         self.postMessage({ results });
@@ -129,6 +132,8 @@ export function buildTestWorkerSource() {
     };
   `;
 }
+
+export const runnerWorkerSource = buildTestWorkerSource();
 
 export async function runIsolatedTests(source: string, functionName: string, tests: TestSpec[]): Promise<TestResult[]> {
   const url = URL.createObjectURL(new Blob([buildTestWorkerSource()], { type: "text/javascript" }));

@@ -83,6 +83,22 @@ export type ProjectProgress = {
   demoUrl: string;
   checklist: boolean[];
   updatedAt: string;
+  milestones?: Record<string, ProjectMilestoneProgress>;
+};
+
+export type ProjectMilestoneProgress = {
+  checks: Record<string, boolean>;
+  evidenceUrl: string;
+  notes: string;
+  updatedAt: string;
+  submittedAt?: string;
+};
+
+export type ActivityEvent = {
+  id: string;
+  occurredAt: string;
+  type: "step-completed" | "lab-attempt" | "journal-saved" | "project-evidence" | "legacy-snapshot";
+  sourceId: string;
 };
 
 export type AppData = {
@@ -94,6 +110,10 @@ export type AppData = {
   lastLessonId?: string;
   stepProgress: Record<string, import("./curriculum").StepProgress>;
   lastStepId?: string;
+  bookmarkedStepIds?: string[];
+  dailyMissions?: Partial<Record<StudyMode, { date: string; stepId: string }>>;
   roadmapMarks?: Record<string, RoadmapMark>;
   projectProgress?: Record<string, ProjectProgress>;
+  activityEvents?: ActivityEvent[];
+  diagnosticResult?: import("@/lib/diagnostics").DiagnosticResult;
 };

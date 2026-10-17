@@ -14,7 +14,7 @@
 }
 
 .home-greeting > .pixel-cat {
-  width: 118px;
+  width: 96px;
   filter: drop-shadow(0 12px 24px rgb(59 92 205 / 0.28));
 }
 
@@ -410,7 +410,7 @@
 }
 
 .profile-avatar .pixel-cat {
-  width: 112px;
+  width: 60px;
 }
 
 .profile-identity span {

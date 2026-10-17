@@ -14,6 +14,7 @@
 - โจทย์เช็กลิสต์และ Java ที่ตรวจในเครื่องมากกว่า 3 ข้อ
 - Dashboard, Learning Map, Challenge Library, Skill Evidence, Journal, Projects และ Settings
 - Auto-save, คืนคำตอบหลัง refresh, attempts, latest result, checklist, Export/Import JSON
+- บันทึกกิจกรรมเมื่อจบ micro-step, ทดลอง Lab, บันทึก Journal หรือยืนยันหลักฐานโปรเจกต์; streak, heatmap และเป้าหมายรายสัปดาห์อ่านจากเหตุการณ์ชุดเดียวกัน
 
 ## รันในเครื่อง
 
@@ -37,6 +38,11 @@ Tests:
 
 ```bash
 npm test
+npm run typecheck
+npm run lint
+npm run build
+npx playwright install chromium
+npm run test:e2e  # ต้อง build และติดตั้ง Playwright Chromium ก่อน
 ```
 
 ## โครงสร้าง
@@ -68,7 +74,7 @@ Runner ทำงานใน Web Worker แยก UI, ปิด `fetch`, `XMLHtt
 
 ## Java
 
-ใช้ **JDK 21 LTS** บท Java ให้ผู้เรียนรันในเครื่อง:
+บทเรียนที่รวมจาก main ใช้ **JDK 21** เป็นฐานตรวจสอบ บท Java ให้ผู้เรียนรันในเครื่อง:
 
 ```bash
 javac Main.java
@@ -81,10 +87,22 @@ java Main
 
 ใช้ key `seas-fullstack-quest:v1` ใน `localStorage` และ validate schema ก่อน Import ข้อมูลอยู่เฉพาะ browser/profile ปัจจุบัน:
 
+ข้อมูลเก่าที่ไม่มี activity events จะถูกแปลงจากเวลาแก้ไขล่าสุดของแต่ละรายการเมื่อโหลดหรือ Import จึงรักษาหลักฐานที่ยังมีอยู่ได้ แต่ไม่สามารถย้อนสร้างประวัติวันที่ถูกเขียนทับไปก่อนหน้านั้น
+
 - ไม่ซิงก์ข้ามอุปกรณ์
 - ไม่มีบัญชีผู้ใช้หรือฐานข้อมูล
 - ล้าง browser data แล้วข้อมูลหาย
 - ใช้ Export JSON สำรอง และ Import เพื่อย้ายเครื่อง
+
+## Friends Activity Planner: โปรเจกต์ฝึกทีละขั้น
+
+หน้า `#projects` มี 9 milestones: repo → domain model → UI → API → PostgreSQL → เข้าร่วม/โหวต → integration → tests/reliability → portfolio แต่ละขั้นมีงาน เกณฑ์ตรวจ ผลงานที่ต้องแนบ คำถามสะท้อนความเข้าใจ และปุ่มเปิดบทเรียนที่มีอยู่จริง พร้อมดาวน์โหลดโจทย์ทั้งชุดเป็น Markdown
+
+บันทึก draft/checklist/ลิงก์หลักฐานแยกตาม milestone ได้ เมื่อเกณฑ์ครบ มีลิงก์ HTTP(S) และคำอธิบายผลตรวจ จึงกดส่งหลักฐานได้ สถานะนี้คือ **ผู้เรียนตรวจเอง** ไม่ใช่ผลตรวจ repository หรือการรับรองจากระบบ การแก้ข้อมูลหลังส่งจะคืนขั้นนั้นเป็น draft เพื่อให้ตรวจและส่งใหม่
+
+หน้า Home แสดงจำนวน milestone ที่ส่งหลักฐานและแนะนำขั้นแรกที่ยังไม่ส่ง ข้อมูลอยู่ใน `projectProgress["friends-activity-planner"].milestones` ของ schema v1 เดิม โดยเก็บ checklist และ repository/demo links เดิมไว้แยกกัน; Export/Import รวมข้อมูล milestone ด้วย
+
+นี่คือเส้นทางฝึกสร้าง Friends Activity Planner ไม่ใช่บริการจัดกิจกรรมที่ deploy แล้ว ผู้เรียนสร้างและทดลองชิ้นงานใน repository ของตนเอง Java เป็นทางเลือกฝึก CLI/domain และยังรันในเครื่อง
 
 ## Next.js ที่ใช้ในบทเรียน
 
@@ -112,3 +130,25 @@ vercel
 ## ความเป็นส่วนตัวของ source
 
 Repository และ deployment ต้องตั้งเป็น private/protected แยกกัน การทำ GitHub repository เป็น private ไม่ทำให้ deployment private โดยอัตโนมัติ
+
+### แบบประเมินก่อนเรียน
+
+หน้า `#diagnostic` มีคำถาม 8 ข้อครอบคลุมพื้นฐานนักพัฒนา เว็บ JavaScript และ Java เพื่อแนะนำบททบทวน ผลบันทึกในเครื่องและรวมใน JSON Export/Import ทำใหม่ได้ ผลปรนัยไม่ใช่การยืนยัน mastery และไม่เพิ่ม XP, activity หรือสถานะผ่านบทเรียน
+
+เส้นทางแนะนำ Full-stack: Developer Foundations → Web Platform → JavaScript → TypeScript → Node → Backend โดยโหมดผสมเรียน Java Foundations/OOP ควบคู่กับช่วงพื้นฐานก่อนต่อเส้นทางเว็บ บทเรียนที่ยังไม่ผ่านจะถูกแนะนำก่อนคอร์สถัดไป
+
+XP ของ Lab ได้จากการผ่านครั้งแรกและคงอยู่เมื่อฝึกซ้ำแล้วตอบผิด ส่วนสถานะและผลตรวจแสดงความพยายามล่าสุด การผ่านซ้ำไม่เพิ่ม XP
+
+### กู้คืนข้อมูลในเครื่อง
+
+หน้า Settings เปิดรายการสำรองที่แอปเก็บไว้ได้ ดาวน์โหลดต้นฉบับได้แม้ JSON เสีย กู้คืนได้เฉพาะข้อมูลที่ผ่าน schema v1 โดยดูสรุปและยืนยันก่อนแทนที่ แอปเก็บข้อมูลปัจจุบันเป็นสำรองก่อนกู้คืน และไม่ลบรายการเก่า ข้อมูลทั้งหมดอยู่ใน browser/profile เดิม
+
+CI ตรวจ lint, type-check, tests, build และ browser tests เมื่อ push เข้า `main` หรือ `floridae` และเมื่อเปิด/อัปเดต Pull Request ยังไม่มีขั้น deploy อัตโนมัติใน workflow นี้
+
+เมื่อบันทึกจบทุก micro-step ที่เปิดแล้วในโหมดปัจจุบัน Home จะแสดงสรุปเส้นทาง พร้อมจำนวน Lab/Journal/Planner milestones และปุ่มทบทวน checkpoint, ฝึก Lab, ต่อยอดโปรเจกต์ ไม่รีเซ็ต XP และไม่อ้าง mastery หรือว่าหลักสูตรที่ยัง planned เสร็จแล้ว
+
+หน้า Courses เปิด “ค้นหาและกรองบทเรียน” เพื่อค้น micro-step ที่เปิดแล้วด้วยชื่อ หัวข้อ เป้าหมาย คำศัพท์ หรือชื่อคอร์ส และกรองคอร์ส ภาษา สถานะการเรียนร่วมกันได้ ผลค้นหาไม่เปลี่ยนความคืบหน้า
+
+Bookmark micro-step ได้จากผลค้นหาและหน้าบทเรียน แล้วกรอง “บันทึกไว้” ใน Courses เพื่อกลับมาเรียนภายหลัง รายการเก็บใน browser และอยู่ใน Export/Import JSON; ไฟล์ v1 เก่าที่ไม่มีรายการยังนำเข้าได้ Bookmark ไม่เพิ่ม XP หรือเปลี่ยนความคืบหน้า
+
+Home มี “ภารกิจวันนี้” เลือก micro-step จากเส้นทางแนะนำและคงรายการเดิมตามวันที่ Asia/Bangkok แยกแต่ละโหมด รายการอยู่ใน JSON Export/Import และไฟล์ v1 เก่ายังใช้ได้ สถานะแสดงจาก progress จริง (บทที่ทำแล้วใช้ทบทวน) การ์ดไม่เพิ่ม XP หรือ activity เอง

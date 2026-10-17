@@ -119,7 +119,7 @@ export type CurriculumCourse = {
   title: string;
   description: string;
   track: "foundation" | "web" | "java";
-  status: "live" | "writing" | "planned";
+  status: "live" | "partial" | "complete" | "writing" | "planned";
   targetSteps: number;
 };
 

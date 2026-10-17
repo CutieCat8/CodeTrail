@@ -133,4 +133,208 @@ console.log(book.shelf);
 // ใช้ interface หรือ object spread สร้างสำเนาก็ได้ ถ้าพฤติกรรมตรงสัญญา
 \`\`\``,
   },
+  "ts-arrays-tuples": {
+    prompt: [
+      "โรงอาหารรับรายการสั่งอาหารเป็น tuple ชื่อเมนูกับจำนวนจาน นิยาม Order = [name: string, quantity: number] และเขียน orderSummary รับ readonly Order[] คืน tuple [จำนวนจานรวม, จำนวนรายการที่มีอย่างน้อย 1 จาน] โดยไม่แก้รายการหรือตัว tuple ข้างใน กำหนดให้จำนวนจานเป็นจำนวนเต็มตั้งแต่ 0 ขึ้นไปอยู่แล้ว",
+      "ทดสอบ [[ข้าว, 2], [น้ำ, 0], [ข้าว, 3]] ได้ [5, 2] (เมนูชื่อซ้ำยังนับเป็นคนละรายการ), รายการว่างได้ [0, 0] และ [[น้ำ, 0]] ได้ [0, 0] destructure ผลเพื่อพิมพ์ และแสดงหลักฐานว่าข้อมูลต้นฉบับเหมือนเดิม ทดลองสลับชนิดช่องของ Order เพื่อดู error แล้วนำออกก่อนตรวจฉบับสุดท้าย อธิบายว่า readonly Order[] ป้องกันการแก้ tuple ข้างในหรือไม่",
+      submit,
+    ].join("\n"),
+    rubric: [
+      "กำหนด Order และ parameter/return tuple ตามสัญญา ตรวจ strict ผ่าน และ destructure ผลลัพธ์ก่อนพิมพ์",
+      "กรณีปกติ ชื่อซ้ำ ว่าง และจำนวน 0 ได้ผล 5 2, 0 0, 0 0 พร้อมหลักฐานว่าต้นฉบับไม่เปลี่ยน",
+      "tsc ปฏิเสธ tuple ที่สลับชนิด และอธิบายว่า readonly ของ array ชั้นนอกไม่ป้องกันการแก้ tuple ข้างใน จึงต้องรักษาสัญญานั้นด้วยโค้ด",
+    ],
+    modelAnswer: `\`\`\`ts
+type Order = [name: string, quantity: number];
+
+function orderSummary(orders: readonly Order[]): [plates: number, active: number] {
+  let plates = 0;
+  let active = 0;
+  for (const [, quantity] of orders) {
+    plates += quantity;
+    if (quantity > 0) {
+      active += 1;
+    }
+  }
+  return [plates, active];
+}
+
+const orders: Order[] = [["ข้าว", 2], ["น้ำ", 0], ["ข้าว", 3]];
+const before = JSON.stringify(orders);
+const [plates, active] = orderSummary(orders);
+console.log(plates, active);
+const [emptyPlates, emptyActive] = orderSummary([]);
+console.log(emptyPlates, emptyActive);
+const [zeroPlates, zeroActive] = orderSummary([["น้ำ", 0]]);
+console.log(zeroPlates, zeroActive);
+console.log(JSON.stringify(orders) === before);
+// ทดลองแล้ว comment กลับก่อนรัน:
+// const wrong: Order = [2, "ข้าว"];
+
+// ผลรัน: 5 2 / 0 0 / 0 0 / true
+// [, quantity] ข้ามช่องชื่อและอ่านช่องจำนวนด้วย destructuring
+// readonly Order[] ห้ามแก้ array ชั้นนอก แต่ Order ข้างในยังแก้ได้
+// function นี้อ่านอย่างเดียวจึงรักษาทั้งสองชั้น ไม่รวมชื่อซ้ำเป็นรายการเดียว
+// ใช้ reduce แทน loop ก็ได้ ถ้าไม่แก้ input และได้ tuple ตามสัญญา
+\`\`\``,
+  },
+  "ts-unions-literals": {
+    prompt: [
+      "ประตูตู้เก็บอุปกรณ์มีสถานะ DoorState = closed | open | locked และคำสั่ง DoorAction = open | close | lock (ทุกค่าเป็น string literal) เขียน nextDoor(state, action): DoorState ตามกติกา: closed เปิดหรือใส่ล็อกได้, open ปิดได้, locked ไม่รับคำสั่งใด คำสั่งอื่นในสถานะนั้นให้คงสถานะเดิม",
+      "ทดสอบครบทั้ง 9 คู่สถานะ/คำสั่ง และลองส่งสถานะ broken กับคำสั่ง unlock แยกทีละครั้งเพื่อบันทึก error แล้วนำออกก่อนตรวจฉบับสุดท้าย อธิบายว่า union ช่วยตรวจชุดคำศัพท์อย่างไร และทำไมยังต้องมีโค้ดบังคับกติกาการเปลี่ยนสถานะ",
+      submit,
+    ].join("\n"),
+    rubric: [
+      "ใช้ union ของ string literal ทั้งสองชุด กำหนด parameter/return ตรวจ strict ผ่าน โดยไม่มี any หรือ assertion",
+      "ทดสอบทั้ง 9 คู่: closed ได้ open/closed/locked, open ได้ open/closed/open, locked ได้ locked ทั้งสามคำสั่ง ตามลำดับ open/close/lock",
+      "มีหลักฐาน tsc ปฏิเสธ broken และ unlock พร้อมอธิบายว่าชนิดไม่ได้บังคับกติกาเปลี่ยนสถานะให้อัตโนมัติ",
+    ],
+    modelAnswer: `\`\`\`ts
+type DoorState = "closed" | "open" | "locked";
+type DoorAction = "open" | "close" | "lock";
+
+function nextDoor(state: DoorState, action: DoorAction): DoorState {
+  if (state === "closed" && action === "open") {
+    return "open";
+  }
+  if (state === "closed" && action === "lock") {
+    return "locked";
+  }
+  if (state === "open" && action === "close") {
+    return "closed";
+  }
+  return state;
+}
+
+const states: DoorState[] = ["closed", "open", "locked"];
+const actions: DoorAction[] = ["open", "close", "lock"];
+for (const state of states) {
+  for (const action of actions) {
+    console.log(state, action, nextDoor(state, action));
+  }
+}
+// ทดลองทีละบรรทัดแล้ว comment กลับก่อนรัน:
+// nextDoor("broken", "open");
+// nextDoor("closed", "unlock");
+
+// ผลรันเป็น 9 บรรทัด ตามลำดับ states และ actions ด้านบน
+// union ปฏิเสธคำที่อยู่นอกชุด; เงื่อนไขใน function บังคับกติกาการเปลี่ยน
+// เช่น lock ขณะ open คง open และ locked คงเดิมทุกคำสั่ง
+// ใช้ switch แทน if ก็ได้ ถ้าทั้ง 9 คู่ได้ผลเหมือนกัน
+\`\`\``,
+  },
+  "ts-narrowing": {
+    prompt: [
+      "จอคิวงานพิมพ์รับ PrintJob เป็น union สามแบบ: queued มี position: number, done มี pages: number และ failed มี reason: string โดยใช้ kind เป็นตัวแยก เขียน jobMessage คืน คิว N, พิมพ์ N หน้า หรือ ผิดพลาด: เหตุผล ตามแต่ละแบบ ห้ามใช้ any หรือ assertion และต้องมี exhaustive check ด้วย never",
+      "เขียน isDone เป็น type predicate แล้วใช้คัดงานที่เสร็จเพื่อรวมจำนวนหน้า ทดสอบ queued ตำแหน่ง 0, done 3 หน้า, done 0 หน้า และ failed เหตุผลกระดาษหมด ได้ข้อความครบและรวม 3 หน้า; รายการว่างรวม 0 จากนั้นทดลองเพิ่มชนิด cancelled มี kind: cancelled ใน union แต่ยังไม่เพิ่มกิ่งจัดการ บันทึก error ที่ exhaustive check แล้วนำชนิดทดลองออกก่อนตรวจฉบับสุดท้าย",
+      submit,
+    ].join("\n"),
+    rubric: [
+      "union ใช้ field เฉพาะแบบหลัง narrow และ jobMessage มี never ตรวจครบทุกกรณี; ฉบับสุดท้าย strict ผ่านโดยไม่มี any/assertion",
+      "ได้ คิว 0, พิมพ์ 3 หน้า, พิมพ์ 0 หน้า, ผิดพลาด: กระดาษหมด และใช้ isDone คัดเพื่อรวมได้ 3 กับ 0 เมื่อรายการว่าง",
+      "มีผล tsc ปฏิเสธ cancelled ที่กิ่ง never พร้อมอธิบายว่าการเพิ่ม union ต้องเพิ่มการจัดการด้วย",
+    ],
+    modelAnswer: `\`\`\`ts
+type Queued = { kind: "queued"; position: number };
+type Done = { kind: "done"; pages: number };
+type Failed = { kind: "failed"; reason: string };
+type PrintJob = Queued | Done | Failed;
+
+function jobMessage(job: PrintJob): string {
+  switch (job.kind) {
+    case "queued":
+      return "คิว " + job.position;
+    case "done":
+      return "พิมพ์ " + job.pages + " หน้า";
+    case "failed":
+      return "ผิดพลาด: " + job.reason;
+    default: {
+      const unreachable: never = job;
+      return unreachable;
+    }
+  }
+}
+
+function isDone(job: PrintJob): job is Done {
+  return job.kind === "done";
+}
+
+function printedPages(jobs: PrintJob[]): number {
+  let pages = 0;
+  for (const job of jobs.filter(isDone)) {
+    pages += job.pages;
+  }
+  return pages;
+}
+
+const jobs: PrintJob[] = [
+  { kind: "queued", position: 0 },
+  { kind: "done", pages: 3 },
+  { kind: "done", pages: 0 },
+  { kind: "failed", reason: "กระดาษหมด" },
+];
+for (const job of jobs) {
+  console.log(jobMessage(job));
+}
+console.log(printedPages(jobs));
+console.log(printedPages([]));
+// ทดลองแก้ PrintJob เป็น Queued | Done | Failed | { kind: "cancelled" }
+// tsc จะปฏิเสธการ assign cancelled ให้ never แล้วแก้ union กลับก่อนรัน
+
+// ผลรัน: คิว 0 / พิมพ์ 3 หน้า / พิมพ์ 0 หน้า / ผิดพลาด: กระดาษหมด / 3 / 0
+// kind ทำให้แต่ละกิ่งอ่าน field ที่มีจริง; isDone ทำให้ filter ได้ Done[]
+// never บังคับตรวจซ้ำเมื่อเพิ่มแบบใหม่ ใช้ if ที่จัดการครบแทน switch ก็ได้
+\`\`\``,
+  },
+  "ts-null-safety": {
+    prompt: [
+      "ตู้ข้อมูลมี Kiosk ที่มี id: string และ settings เป็น optional object ซึ่งมี title?: string | null กับ volume?: number | null เขียน kioskSummary(kiosks: Kiosk[], id: string): string ค้นหาตู้ด้วย id ถ้าไม่พบคืน ไม่พบตู้ ถ้าพบคืน title ตามด้วย | และ volume โดย title ที่ขาดหรือ null ใช้ จุดบริการ และ volume ที่ขาดหรือ null ใช้ 50 ต้องคง title ข้อความว่างและ volume 0 ไว้ ห้ามใช้ any, as หรือ non-null assertion",
+      "ทดสอบตู้ชื่อ ทางเข้า เสียง 20, ตู้ที่มี title ว่างและเสียง 0, ตู้ไม่มี settings, ตู้มี settings ว่าง, ตู้มีค่าทั้งสองเป็น null และ id ที่ไม่พบ อธิบายว่า ?. กับ ?? รับผิดชอบคนละส่วนอย่างไร และทดลองอ่าน title จากผล find โดยไม่จัดการ undefined เพื่อบันทึก error แล้วนำออกก่อนตรวจฉบับสุดท้าย",
+      submit,
+    ].join("\n"),
+    rubric: [
+      "ชนิด Kiosk และ kioskSummary ตรงสัญญา strict ผ่าน และไม่มี any/as/non-null assertion",
+      "ผลครบหกกรณี: ทางเข้า|20, |0, จุดบริการ|50 สามครั้ง และ ไม่พบตู้ โดยรักษาข้อความว่างกับ 0",
+      "มีผล tsc ปฏิเสธการอ่านจากผล find ที่อาจไม่มี และอธิบาย ?. ป้องกันการอ่านค่าที่ไม่มี ส่วน ?? ใส่ค่าแทนเฉพาะ null/undefined",
+    ],
+    modelAnswer: `\`\`\`ts
+type Kiosk = {
+  id: string;
+  settings?: {
+    title?: string | null;
+    volume?: number | null;
+  };
+};
+
+function kioskSummary(kiosks: Kiosk[], id: string): string {
+  const kiosk = kiosks.find((item) => item.id === id);
+  if (kiosk === undefined) {
+    return "ไม่พบตู้";
+  }
+  const title = kiosk.settings?.title ?? "จุดบริการ";
+  const volume = kiosk.settings?.volume ?? 50;
+  return title + "|" + volume;
+}
+
+const kiosks: Kiosk[] = [
+  { id: "a", settings: { title: "ทางเข้า", volume: 20 } },
+  { id: "b", settings: { title: "", volume: 0 } },
+  { id: "c" },
+  { id: "d", settings: {} },
+  { id: "e", settings: { title: null, volume: null } },
+];
+for (const id of ["a", "b", "c", "d", "e", "missing"]) {
+  console.log(kioskSummary(kiosks, id));
+}
+// ทดลองแล้ว comment กลับก่อนรัน:
+// const missing = kiosks.find((item) => item.id === "missing");
+// console.log(missing.settings?.title);
+
+// ผลรัน: ทางเข้า|20 / |0 / จุดบริการ|50 / จุดบริการ|50 / จุดบริการ|50 / ไม่พบตู้
+// ตรวจผล find ก่อนจึงแยกไม่พบตู้จากตู้ที่ยังไม่มี settings ได้
+// ?. ยอมให้ settings ไม่มี; ?? ใช้ค่าแทนเฉพาะ null/undefined จึงคง "" กับ 0
+// ใช้การตรวจ null/undefined โดยตรงแทน ?. และ ?? ได้ ถ้าครบทุกกรณี
+\`\`\``,
+  },
+
 };

@@ -223,7 +223,7 @@ const toJs = (source: string) => ts.transpileModule(source, { compilerOptions: {
 describe("TypeScript lessons", () => {
   const tsTopics = topicSources.filter((topic) => topic.language === "typescript");
 
-  it.each(["ts-why", "ts-basic-types", "ts-functions", "ts-object-types"])("%s has a strict-checkable assessment with gated feedback", id => {
+  it.each(["ts-why", "ts-basic-types", "ts-functions", "ts-object-types", "ts-arrays-tuples", "ts-unions-literals", "ts-narrowing", "ts-null-safety"])("%s has a strict-checkable assessment with gated feedback", id => {
     const topic = tsTopics.find(item => item.id === id)!;
     expect(topic.checkpoint).toBeDefined();
     const checkpoint = topic.checkpoint!;
@@ -243,12 +243,35 @@ describe("TypeScript lessons", () => {
     ["ts-basic-types", "พร้อม\n\nเลข: 0\nเลข: 7\nไม่รองรับ\nไม่รองรับ"],
     ["ts-functions", "สมุด x 1\nสมุด x 3\nสมุด x 0\nปากกา x 1"],
     ["ts-object-types", "1 สวน B3 true\n1 สวน undefined true\n1 สวน true true\nA2"],
+    ["ts-arrays-tuples", "5 2\n0 0\n0 0\ntrue"],
+    ["ts-unions-literals", "closed open open\nclosed close closed\nclosed lock locked\nopen open open\nopen close closed\nopen lock open\nlocked open locked\nlocked close locked\nlocked lock locked"],
+    ["ts-narrowing", "คิว 0\nพิมพ์ 3 หน้า\nพิมพ์ 0 หน้า\nผิดพลาด: กระดาษหมด\n3\n0"],
+    ["ts-null-safety", "ทางเข้า|20\n|0\nจุดบริการ|50\nจุดบริการ|50\nจุดบริการ|50\nไม่พบตู้"],
   ])("%s checkpoint model answer matches normal and edge cases", async (id, expected) => {
     const answer = tsTopics.find(topic => topic.id === id)!.checkpoint!.modelAnswer;
     const code = [...answer.matchAll(/```(?:ts|typescript)\n([\s\S]*?)```/g)][0][1];
     const result = await runSnippet(toJs(code));
     expect(result.error).toBeUndefined();
     expect(result.output.join("\n")).toBe(expected);
+  });
+
+  it.each([
+    ["ts-arrays-tuples", 'const wrong: Order = [2, "ข้าว"];', /number.*string|string.*number/],
+    ["ts-unions-literals", 'nextDoor("broken", "open");', /DoorState/],
+    ["ts-unions-literals", 'nextDoor("closed", "unlock");', /DoorAction/],
+    ["ts-null-safety", 'const missing = kiosks.find(item => item.id === "missing");\nconsole.log(missing.settings?.title);', /possibly.*undefined/],
+  ] as const)("%s rejects the intentional type error: %s", (id, invalid, message) => {
+    const answer = tsTopics.find(topic => topic.id === id)!.checkpoint!.modelAnswer;
+    const code = [...answer.matchAll(/```(?:ts|typescript)\n([\s\S]*?)```/g)][0][1];
+    expect(typeErrors(`${code}\n${invalid}`).join("\n")).toMatch(message);
+  });
+
+  it("narrowing assessment catches an unhandled union member at never", () => {
+    const answer = tsTopics.find(topic => topic.id === "ts-narrowing")!.checkpoint!.modelAnswer;
+    const code = [...answer.matchAll(/```(?:ts|typescript)\n([\s\S]*?)```/g)][0][1];
+    const extended = code.replace("type PrintJob = Queued | Done | Failed;", 'type PrintJob = Queued | Done | Failed | { kind: "cancelled" };');
+    expect(extended).not.toBe(code);
+    expect(typeErrors(extended).join("\n")).toMatch(/not assignable to type 'never'/);
   });
 
   it("ships the TypeScript course", () => {

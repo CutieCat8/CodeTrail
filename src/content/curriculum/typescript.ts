@@ -1,11 +1,12 @@
 import type { TopicSource } from "@/types/curriculum";
+import { typescriptCheckpoints } from "./typescript-checkpoints";
 
 const courseId = "typescript";
 const v = (a: string, b: string): [string, string] => [a, b];
 const local = "ทดลองในเครื่อง: ใช้โฟลเดอร์ ts-lab ที่ตั้งไว้ในบท ts-why บันทึกโค้ดเป็น src/index.ts แล้วรัน npx tsc -p . เพื่อตรวจ type แบบ strict (Node 22.18+ รัน node src/index.ts ได้ แต่ Node ไม่ตรวจ type)";
 
 // Order is the learning order. Topic IDs are stored in learner progress: never rename them.
-export const typescriptTopics: TopicSource[] = [
+const topics: TopicSource[] = [
 {
   id: "ts-why",
   courseId,
@@ -315,3 +316,8 @@ export const typescriptTopics: TopicSource[] = [
   vocabulary: [v("migration", "การย้ายโค้ดจาก JavaScript มาเป็น TypeScript ทีละส่วน"), v("intersection type", "A & B คือมีทุก field ของทั้ง A และ B"), v("domain model", "type ที่อธิบายข้อมูลหลักของระบบ เช่น Activity"), v("Object.entries", "แปลง object เป็น array ของ [key, value]")],
 },
 ];
+
+export const typescriptTopics: TopicSource[] = topics.map((topic) => ({
+  ...topic,
+  checkpoint: typescriptCheckpoints[topic.id],
+}));

@@ -223,6 +223,34 @@ const toJs = (source: string) => ts.transpileModule(source, { compilerOptions: {
 describe("TypeScript lessons", () => {
   const tsTopics = topicSources.filter((topic) => topic.language === "typescript");
 
+  it.each(["ts-why", "ts-basic-types", "ts-functions", "ts-object-types"])("%s has a strict-checkable assessment with gated feedback", id => {
+    const topic = tsTopics.find(item => item.id === id)!;
+    expect(topic.checkpoint).toBeDefined();
+    const checkpoint = topic.checkpoint!;
+    const step = learningSteps.find(item => item.id === `${id}-checkpoint`)!;
+    expect(step.assessment).toBe(true);
+    expect(step.starter).toBe("");
+    expect(step.prompt).toBe(checkpoint.prompt);
+    expect(step.check).toBeUndefined();
+    expect(step.outputCheck).toBeUndefined();
+    const snippets = [...checkpoint.modelAnswer.matchAll(/```(?:ts|typescript)\n([\s\S]*?)```/g)];
+    expect(snippets.length).toBeGreaterThan(0);
+    for (const [, code] of snippets) expect(typeErrors(code), id).toEqual([]);
+  });
+
+  it.each([
+    ["ts-why", "36\n0"],
+    ["ts-basic-types", "พร้อม\n\nเลข: 0\nเลข: 7\nไม่รองรับ\nไม่รองรับ"],
+    ["ts-functions", "สมุด x 1\nสมุด x 3\nสมุด x 0\nปากกา x 1"],
+    ["ts-object-types", "1 สวน B3 true\n1 สวน undefined true\n1 สวน true true\nA2"],
+  ])("%s checkpoint model answer matches normal and edge cases", async (id, expected) => {
+    const answer = tsTopics.find(topic => topic.id === id)!.checkpoint!.modelAnswer;
+    const code = [...answer.matchAll(/```(?:ts|typescript)\n([\s\S]*?)```/g)][0][1];
+    const result = await runSnippet(toJs(code));
+    expect(result.error).toBeUndefined();
+    expect(result.output.join("\n")).toBe(expected);
+  });
+
   it("ships the TypeScript course", () => {
     expect(tsTopics.length).toBeGreaterThanOrEqual(12);
   });
